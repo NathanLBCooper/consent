@@ -3,14 +3,11 @@ import { DIContext } from '../dependencies';
 import { Button, CircularProgress, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import { Permission } from "../api/permission";
 
-
 export default function Permissions(): JSX.Element {
     const { permissionEndpoint } = useContext(DIContext);
 
     const [permissions, setPermissions] = useState<Permission[]>([]);
     const [loaded, setLoaded] = useState<boolean>(false);
-
-    const [underEdit, setUnderEdit] = useState<number>(-1);
 
     useEffect(() => {
         (async () => {
@@ -19,25 +16,13 @@ export default function Permissions(): JSX.Element {
                 setPermissions(result);
             }
             finally {
-
                 setLoaded(true);
             }
         })();
     }, []);
 
-    function onEditButtonClicked(id: number) {
-        setUnderEdit(id);
-    }
-
-    function onCancelButtonClicked(id: number) {
-        setUnderEdit(-1);
-    }
-
     function onSaveButtonClicked(e: any) {
-        console.warn("hello")
-        console.error(e);
-        // const permission = permissions.filter(p => p.id === id);
-        // console.log(permission)
+        console.warn("onSaveButtonClicked")
     }
 
     if (!loaded) {
@@ -47,10 +32,12 @@ export default function Permissions(): JSX.Element {
     return (
         <>
             <h1>Permissions</h1>
-            <p>Some specific idea that can be agreed to.
-                When writing an application and you ask the question &quot;Can I do X&quot; with this user, &quot;X&quot; is a permission.</p>
-            <p>Being able to do &quot;X&quot; always means the same thing regardless of in what Contract that Permission was obtained.
-                If the meaning changes, create a new permission.
+            <p>Some specific idea that can be agreed to
+                This is motivated by your usecase.
+                When you ask yourself &quot;can I do X with this user&quot;, or &quot;can I do X and/or Y with this user&quot;,
+                X and Y are the permissions.
+                It may be possible to collect permssion to do X or Y in multiple different ways, but the meaning of X and Y never changes.
+                If the meaning does look like it should change, that means a new permission is needed.
             </p>
             <Divider />
             <TableContainer component={Paper}>
@@ -64,7 +51,7 @@ export default function Permissions(): JSX.Element {
                     </TableHead>
                     <TableBody>
                         {permissions.map((permission) => (
-                            <PermissionsRow key={permission.id} permission={permission} thisRowEditing={permission.id == underEdit} someRowEditing={underEdit > 0} />
+                            <PermissionsRow key={permission.id} permission={permission} />
                         ))}
                         <TableRow>
                             <TableCell><strong>Add</strong></TableCell>
@@ -75,37 +62,18 @@ export default function Permissions(): JSX.Element {
         </>
     );
 
-    function PermissionsRow({ permission, onUpdate }: { permission: Permission, onUpdate: () => void }) {
+    function PermissionsRow({ permission }: { permission: Permission }) {
         return (
             <TableRow
                 key={permission.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" style={{ opacity: permission.active ? 1 : 0.4 }}>
                     {permission.key}
                 </TableCell>
-                <TableCell align="left">{permission.description}</TableCell>
+                <TableCell align="left" style={{ opacity: permission.active ? 1 : 0.4 }}>{permission.description}</TableCell>
                 <TableCell align="left">
-                    <Button onClick={() => onEditButtonClicked(permission.id)} disabled={someRowEditing}>Edit</Button> <Button disabled={someRowEditing}>Disable</Button>
-                </TableCell>
-            </TableRow>
-        );
-    }
-
-    function EditablePermissionsRow({ permission }: { permission: Permission }) {
-        const [value, setValue] = React.useState(permission)
-
-        return (
-            <TableRow
-                key={value.id}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-                <TableCell component="th" scope="row">
-                    {value.key}
-                </TableCell>
-                <TableCell align="left" contentEditable={true} onChange={e => setValue(e.target.value)}>{value.description}</TableCell>
-                <TableCell align="left">
-                    <Button onClick={onSaveButtonClicked}>Save</Button> <Button onClick={() => onCancelButtonClicked(permission.id)}>Cancel</Button>
+                    <Button> {permission.active ? "Disable" : "Enable"} </Button>
                 </TableCell>
             </TableRow>
         );

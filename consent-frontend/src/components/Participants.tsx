@@ -53,7 +53,7 @@ export default function Participants(): JSX.Element {
                                 </TableCell>
                                 <TableCell align="left">{p.language}</TableCell>
                                 <TableCell align="left">{p.participantGroups.map(g => g.key).join(", ").toString()}</TableCell>
-                                <TableCell align="left">(projects, share_data)</TableCell>
+                                <TableCell align="left">collect_data, collect_location_data</TableCell>
                                 <TableCell align="left"><Button key={p.id}
                                     component={NavLink} to={`${p.id}`}>View</Button></TableCell>
                             </TableRow>

@@ -29,8 +29,8 @@ export default function App(): JSX.Element {
           >
             <Routes>
               <Route path="/permissions" element={<Permissions />} />
-              <Route path="/contracts" element={<Contracts />} />
-              <Route path="/contracts/:id" element={<Contract />} />
+              <Route path="/contracts/:lang" element={<Contracts />} />
+              <Route path="/contracts/:lang/:id" element={<Contract />} />
               <Route path="/participants" element={<Participants />} />
               <Route path="/participants/:id" element={<Participant />} />
               <Route path="/api" element={<ApiDocs />} />
