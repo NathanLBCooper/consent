@@ -1,0 +1,78 @@
+definitions:
+  controllers.ComponentHealth:
+    properties:
+      detail:
+        type: string
+      isHealthy:
+        type: boolean
+      name:
+        type: string
+    type: object
+  controllers.HealthResponse:
+    properties:
+      components:
+        items:
+          $ref: '#/definitions/controllers.ComponentHealth'
+        type: array
+    type: object
+  controllers.OrganizationCreateRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  user.AccountModel:
+    properties:
+      created:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      removed:
+        type: boolean
+      updated:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Consent API
+  version: "1.0"
+paths:
+  /v1/account/{id}:
+    get:
+      parameters:
+      - description: Account Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.AccountModel'
+      summary: Get an account
+  /v1/health:
+    get:
+      description: Get component by component health status
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.HealthResponse'
+      summary: Get Health
+  /v1/organization/{id}:
+    get:
+      parameters:
+      - description: Organization Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.OrganizationCreateRequest'
+      summary: Get an Organization
+swagger: "2.0"

@@ -1,22 +1,13 @@
-package internal
+package user
 
-import (
-	"time"
-)
-
-type Model struct {
-	ID      string
-	Created time.Time
-	Updated time.Time
-	Removed bool
-}
+import "nathan.dev/consent/internal/domain"
 
 type Account struct {
 	Name string
 }
 
 type AccountModel struct {
-	Model
+	domain.Model
 	Account
 }
 
@@ -30,6 +21,6 @@ type OrganizationMember struct {
 }
 
 type OrganizationModel struct {
-	Model
+	domain.Model
 	Organization
 }

@@ -1,10 +1,24 @@
 version: '3.4'
 
 services:
-  consent-frontend:
-    volumes:
-      - ./consent-frontend/src:/workdir/src
-      - ./consent-frontend/public:/workdir/public
-      - ./consent-frontend/package.json:/workdir/package.json
-      - ./consent-frontend/yarn.lock:/workdir/yarn.lock
-      - ./consent-frontend/tsconfig.json:/workdir/tsconfig.json
+#   consent-frontend:
+#     volumes:
+#       - ./consent-frontend/src:/workdir/src
+#       - ./consent-frontend/public:/workdir/public
+#       - ./consent-frontend/package.json:/workdir/package.json
+#       - ./consent-frontend/yarn.lock:/workdir/yarn.lock
+#       - ./consent-frontend/tsconfig.json:/workdir/tsconfig.json
+
+  api:
+    depends_on:
+          - mongo
+
+  mongo:
+      image: mongo:5.0
+      ports:
+        - 33002:27017
+      volumes:
+        - .data/mongo:/data/db
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: example

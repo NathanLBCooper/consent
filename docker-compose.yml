@@ -1,9 +1,15 @@
 version: '3.4'
 
 services:
-  consent-frontend:
-    image: ${DOCKER_REGISTRY-}consentfrontend
+  # consent-frontend:
+  #   image: ${DOCKER_REGISTRY-}consentfrontend
+  #   build:
+  #     context: ./consent-frontend
+  #   ports:
+  #     - "33000:3000"
+  api:
+    image: ${DOCKER_REGISTRY-}consentapi
     build:
-      context: ./consent-frontend
+      context: ./api
     ports:
-      - "33000:3000"
+      - "33001:3001"
