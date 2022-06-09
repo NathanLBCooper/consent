@@ -1,0 +1,3 @@
+mongoconnectionsettings:
+  uri: mongodb://localhost:33002
+  dbname: consent

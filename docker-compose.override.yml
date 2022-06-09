@@ -10,8 +10,10 @@ services:
 #       - ./consent-frontend/tsconfig.json:/workdir/tsconfig.json
 
   api:
+    environment:
+      - mongoconnectionsettings__uri=mongodb://mongo:27017
     depends_on:
-          - mongo
+      - mongo
 
   mongo:
       image: mongo:5.0
