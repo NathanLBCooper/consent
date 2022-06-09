@@ -21,13 +21,33 @@ func NewUsersController(endpoint *user.Endpoint, session context.SessionStorage,
 // @Success      200  {object}  user.AccountModel
 // @Router       /v1/account/{id} [get]
 func (controller *UserController) GetAccount(ctx *gin.Context) {
-	v, err := controller.endpoint.GetAccount(context.NewContext(ctx), user.AccountGetRequest{Id: ctx.Param("id")})
+	model, err := controller.endpoint.GetAccount(context.NewContext(ctx), user.AccountGetRequest{Id: ctx.Param("id")})
 	if err != nil {
 		ctx.JSON(404, gin.H{"status": "not found"})
 		return
 	}
 
-	ctx.JSON(200, gin.H{"status": v})
+	ctx.JSON(200, gin.H{"status": model})
+}
+
+// @Summary      Create an account
+// @Param        account  body      user.AccountCreateRequest  true  "Create account"
+// @Success      200      {object}  user.AccountModel
+// @Router       /v1/account [post]
+func (controller *UserController) CreateAccount(ctx *gin.Context) {
+	var request user.AccountCreateRequest
+	if err := ctx.BindJSON(&request); err != nil {
+		ctx.JSON(500, gin.H{"status": "todo 1"})
+		return
+	}
+
+	model, err := controller.endpoint.CreateAccount(context.NewContext(ctx), request)
+	if err != nil {
+		ctx.JSON(500, gin.H{"status": "todo 2"})
+		return
+	}
+
+	ctx.JSON(200, gin.H{"status": model})
 }
 
 // @Summary      Get an Organization

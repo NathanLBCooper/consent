@@ -20,6 +20,11 @@ definitions:
       name:
         type: string
     type: object
+  user.AccountCreateRequest:
+    properties:
+      name:
+        type: string
+    type: object
   user.AccountModel:
     properties:
       created:
@@ -35,9 +40,22 @@ definitions:
     type: object
 info:
   contact: {}
-  title: Consent API
-  version: "1.0"
 paths:
+  /v1/account:
+    post:
+      parameters:
+      - description: Create account
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/user.AccountCreateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.AccountModel'
+      summary: Create an account
   /v1/account/{id}:
     get:
       parameters:
