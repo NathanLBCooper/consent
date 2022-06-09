@@ -43,7 +43,7 @@ func (e *Endpoint) CreateOrganization(ctx domain.Context, req OrganizationCreate
 	return e.repo.CreateOrganization(ctx, Organization{
 		Name: req.Name,
 		Members: map[string]*OrganizationMember{
-			member.Id: {Role: "owner"},
+			member.Id: {Role: Owner},
 		},
 	})
 }

@@ -17,8 +17,20 @@ type Organization struct {
 }
 
 type OrganizationMember struct {
-	Role string
+	Role Role
 }
+
+type Role struct {
+	slug string
+}
+
+func (r Role) String() string {
+	return r.slug
+}
+
+var (
+	Owner = Role{"owner"}
+)
 
 type OrganizationModel struct {
 	domain.Model
