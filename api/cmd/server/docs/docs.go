@@ -16,6 +16,30 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/account/organization": {
+            "post": {
+                "summary": "Create an Organization",
+                "parameters": [
+                    {
+                        "description": "Create organization",
+                        "name": "organization",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.OrganizationCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/account.OrganizationModel"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/account/organization/{id}": {
             "get": {
                 "summary": "Get an Organization",
@@ -32,7 +56,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controllers.OrganizationCreateRequest"
+                            "$ref": "#/definitions/account.OrganizationModel"
                         }
                     }
                 }
@@ -100,6 +124,43 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "account.OrganizationMember": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "$ref": "#/definitions/account.Role"
+                }
+            }
+        },
+        "account.OrganizationModel": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/account.OrganizationMember"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "account.Role": {
+            "type": "object"
+        },
         "account.UserCreateRequest": {
             "type": "object",
             "properties": {

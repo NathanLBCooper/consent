@@ -54,8 +54,8 @@ func (s *Service) configureRoutes() {
 			{
 				organization := account.Group("/organization")
 				organization.GET(":id", s.container.accountController.GetOrganization)
+				organization.POST("", s.container.accountController.CreateOrganization)
 			}
-
 		}
 	}
 }

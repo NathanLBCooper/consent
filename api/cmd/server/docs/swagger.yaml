@@ -1,4 +1,28 @@
 definitions:
+  account.OrganizationMember:
+    properties:
+      role:
+        $ref: '#/definitions/account.Role'
+    type: object
+  account.OrganizationModel:
+    properties:
+      created:
+        type: string
+      id:
+        type: string
+      members:
+        additionalProperties:
+          $ref: '#/definitions/account.OrganizationMember'
+        type: object
+      name:
+        type: string
+      removed:
+        type: boolean
+      updated:
+        type: string
+    type: object
+  account.Role:
+    type: object
   account.UserCreateRequest:
     properties:
       name:
@@ -41,6 +65,21 @@ definitions:
 info:
   contact: {}
 paths:
+  /v1/account/organization:
+    post:
+      parameters:
+      - description: Create organization
+        in: body
+        name: organization
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.OrganizationCreateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/account.OrganizationModel'
+      summary: Create an Organization
   /v1/account/organization/{id}:
     get:
       parameters:
@@ -53,7 +92,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controllers.OrganizationCreateRequest'
+            $ref: '#/definitions/account.OrganizationModel'
       summary: Get an Organization
   /v1/account/user:
     post:

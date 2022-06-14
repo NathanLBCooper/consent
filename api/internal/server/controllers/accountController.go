@@ -52,7 +52,7 @@ func (controller *AccountController) CreateAccount(ctx *gin.Context) {
 
 // @Summary      Get an Organization
 // @Param        id   path      int  true  "Organization Id"
-// @Success      200  {object}  OrganizationCreateRequest
+// @Success      200  {object}  account.OrganizationModel
 // @Router       /v1/account/organization/{id} [get]
 func (controller *AccountController) GetOrganization(ctx *gin.Context) {
 	ctx.JSON(500, gin.H{"status": "not implemented"})
@@ -62,7 +62,10 @@ type OrganizationCreateRequest struct {
 	Name string
 }
 
-// todo docs and hook up
+// @Summary      Create an Organization
+// @Param        organization     body      OrganizationCreateRequest  true  "Create organization"
+// @Success      200  {object}  account.OrganizationModel
+// @Router       /v1/account/organization [post]
 func (controller *AccountController) CreateOrganization(ctx *gin.Context) {
 	context := context.NewContext(ctx)
 	id := controller.session.Get(context.CorrelationId(), "user")
