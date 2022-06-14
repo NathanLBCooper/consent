@@ -7,6 +7,11 @@ type Organization struct {
 	Members map[string]*OrganizationMember
 }
 
+type OrganizationModel struct {
+	domain.Model
+	Organization
+}
+
 type OrganizationMember struct {
 	Role Role
 }
@@ -22,8 +27,3 @@ func (r Role) String() string {
 var (
 	Owner = Role{"owner"}
 )
-
-type OrganizationModel struct {
-	domain.Model
-	Organization
-}

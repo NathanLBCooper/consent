@@ -1,4 +1,4 @@
-package legal
+package contract
 
 type Element interface {
 	// todo. Not sure burying the good stuff, permissions, in "Elements" works

@@ -5,10 +5,10 @@ import (
 )
 
 type Participant struct {
-	ExternalId         string
-	OrganizationId     string
-	ActiveAgreementIds []string // read model, agreements with those "overwritten" by a fresher responses to a SectionVersion filtered out
-	AllAgreementsIds   []string
+	ExternalId            string
+	OrganizationId        string
+	AcceptedPermissionIds []string // read model. Calculated from AllAgreements
+	AllAgreements         []*Agreement
 }
 
 type ParticipantModel struct {
