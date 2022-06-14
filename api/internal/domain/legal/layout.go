@@ -1,7 +1,7 @@
 package legal
 
 type Element interface {
-	// todo can this either a provision or a subsection
+	// todo. Not sure burying the good stuff, permissions, in "Elements" works
 }
 
 type List struct {
