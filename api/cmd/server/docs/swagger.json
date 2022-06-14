@@ -4,67 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/v1/account": {
-            "post": {
-                "summary": "Create an account",
-                "parameters": [
-                    {
-                        "description": "Create account",
-                        "name": "account",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.AccountCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.AccountModel"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/account/{id}": {
-            "get": {
-                "summary": "Get an account",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Account Id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/user.AccountModel"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/health": {
-            "get": {
-                "description": "Get component by component health status",
-                "summary": "Get Health",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.HealthResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/organization/{id}": {
+        "/v1/account/organization/{id}": {
             "get": {
                 "summary": "Get an Organization",
                 "parameters": [
@@ -85,9 +25,97 @@
                     }
                 }
             }
+        },
+        "/v1/account/user": {
+            "post": {
+                "summary": "Create a user",
+                "parameters": [
+                    {
+                        "description": "Create user",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/account.UserCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/account.UserModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/account/user/{id}": {
+            "get": {
+                "summary": "Get an user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/account.UserModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/health": {
+            "get": {
+                "description": "Get component by component health status",
+                "summary": "Get Health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.HealthResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "account.UserCreateRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "account.UserModel": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
         "controllers.ComponentHealth": {
             "type": "object",
             "properties": {
@@ -117,34 +145,6 @@
             "type": "object",
             "properties": {
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.AccountCreateRequest": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.AccountModel": {
-            "type": "object",
-            "properties": {
-                "created": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "removed": {
-                    "type": "boolean"
-                },
-                "updated": {
                     "type": "string"
                 }
             }

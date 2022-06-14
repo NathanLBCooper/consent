@@ -1,4 +1,22 @@
 definitions:
+  account.UserCreateRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  account.UserModel:
+    properties:
+      created:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      removed:
+        type: boolean
+      updated:
+        type: string
+    type: object
   controllers.ComponentHealth:
     properties:
       detail:
@@ -20,66 +38,10 @@ definitions:
       name:
         type: string
     type: object
-  user.AccountCreateRequest:
-    properties:
-      name:
-        type: string
-    type: object
-  user.AccountModel:
-    properties:
-      created:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      removed:
-        type: boolean
-      updated:
-        type: string
-    type: object
 info:
   contact: {}
 paths:
-  /v1/account:
-    post:
-      parameters:
-      - description: Create account
-        in: body
-        name: account
-        required: true
-        schema:
-          $ref: '#/definitions/user.AccountCreateRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.AccountModel'
-      summary: Create an account
-  /v1/account/{id}:
-    get:
-      parameters:
-      - description: Account Id
-        in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/user.AccountModel'
-      summary: Get an account
-  /v1/health:
-    get:
-      description: Get component by component health status
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.HealthResponse'
-      summary: Get Health
-  /v1/organization/{id}:
+  /v1/account/organization/{id}:
     get:
       parameters:
       - description: Organization Id
@@ -93,4 +55,42 @@ paths:
           schema:
             $ref: '#/definitions/controllers.OrganizationCreateRequest'
       summary: Get an Organization
+  /v1/account/user:
+    post:
+      parameters:
+      - description: Create user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/account.UserCreateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/account.UserModel'
+      summary: Create a user
+  /v1/account/user/{id}:
+    get:
+      parameters:
+      - description: User Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/account.UserModel'
+      summary: Get an user
+  /v1/health:
+    get:
+      description: Get component by component health status
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.HealthResponse'
+      summary: Get Health
 swagger: "2.0"

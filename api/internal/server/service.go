@@ -7,7 +7,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"nathan.dev/consent/internal/domain/user"
+	"nathan.dev/consent/internal/domain/account"
 	"nathan.dev/consent/internal/server/context"
 	"nathan.dev/consent/internal/server/controllers"
 	"nathan.dev/consent/internal/storage"
@@ -44,22 +44,25 @@ func (s *Service) configureRoutes() {
 	{
 		v1.GET("/health", s.container.healthController.Health)
 
-		account := v1.Group("/account")
 		{
-			account.GET(":id", s.container.userController.GetAccount)
-			account.POST("", s.container.userController.CreateAccount)
-		}
+			account := v1.Group("/account")
+			{
+				user := account.Group("/user")
+				user.GET(":id", s.container.accountController.GetUser)
+				user.POST("", s.container.accountController.CreateAccount)
+			}
+			{
+				organization := account.Group("/organization")
+				organization.GET(":id", s.container.accountController.GetOrganization)
+			}
 
-		Organization := v1.Group("/organization")
-		{
-			Organization.GET(":id", s.container.userController.GetOrganization)
 		}
 	}
 }
 
 type container struct {
-	healthController *controllers.HealthController
-	userController   *controllers.UserController
+	healthController  *controllers.HealthController
+	accountController *controllers.AccountController
 }
 
 func configureDependencies(engine *gin.Engine, config *Config) *container {
@@ -68,12 +71,12 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("mongo init fail", err)
 	}
 
-	userRepo, err := storage.NewUserRepo(mongoConnection.Db)
+	accountRepo, err := storage.NewAccountRepo(mongoConnection.Db)
 	if err != nil {
-		log.Fatalln("userRepo init fail", err)
+		log.Fatalln("accountRepo init fail", err)
 	}
 
-	userEndpoint, err := user.NewEndpoint(userRepo)
+	accountEndpoint, err := account.NewEndpoint(accountRepo)
 	if err != nil {
 		log.Fatalln("userEndpoint init fail", err)
 	}
@@ -83,10 +86,10 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("healthController init fail", err)
 	}
 
-	userController, err := controllers.NewUsersController(userEndpoint, nil, engine)
+	accountController, err := controllers.NewAccountController(accountEndpoint, nil, engine)
 	if err != nil {
 		log.Fatalln("accountController init fail", err)
 	}
 
-	return &container{healthController: healthController, userController: userController}
+	return &container{healthController: healthController, accountController: accountController}
 }

@@ -1,12 +1,12 @@
-package user
+package account
 
 import (
 	"context"
 )
 
 type Repo interface {
-	CreateAccount(context.Context, Account) (*AccountModel, error)
-	GetAccount(context.Context, string) (*AccountModel, error)
+	CreateUser(context.Context, User) (*UserModel, error)
+	GetUser(context.Context, string) (*UserModel, error)
 	CreateOrganization(context.Context, Organization) (*OrganizationModel, error)
 	GetOrganization(context.Context, string) (*OrganizationModel, error)
 }

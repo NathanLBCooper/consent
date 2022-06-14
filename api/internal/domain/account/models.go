@@ -1,14 +1,14 @@
-package user
+package account
 
 import "nathan.dev/consent/internal/domain"
 
-type Account struct {
+type User struct {
 	Name string
 }
 
-type AccountModel struct {
+type UserModel struct {
 	domain.Model
-	Account
+	User
 }
 
 type Organization struct {
