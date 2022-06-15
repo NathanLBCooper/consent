@@ -42,19 +42,19 @@ func (s *Service) configureRoutes() {
 
 	v1 := s.engine.Group("/v1")
 	{
-		v1.GET("/health", s.container.healthController.Health)
+		v1.GET("/health", s.container.healthController.Get)
 
 		{
 			account := v1.Group("/account")
 			{
 				user := account.Group("/user")
-				user.GET(":id", s.container.accountController.GetUser)
-				user.POST("", s.container.accountController.CreateAccount)
+				user.GET(":id", s.container.accountController.UserGet)
+				user.POST("", s.container.accountController.UserCreate)
 			}
 			{
 				organization := account.Group("/organization")
-				organization.GET(":id", s.container.accountController.GetOrganization)
-				organization.POST("", s.container.accountController.CreateOrganization)
+				organization.GET(":id", s.container.accountController.OrganizationGet)
+				organization.POST("", s.container.accountController.OrganizationCreate)
 			}
 		}
 	}
@@ -76,7 +76,7 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("accountRepo init fail", err)
 	}
 
-	accountEndpoint, err := account.NewEndpoint(accountRepo)
+	accountEndpoint, err := account.NewAccountEndpoint(accountRepo)
 	if err != nil {
 		log.Fatalln("userEndpoint init fail", err)
 	}

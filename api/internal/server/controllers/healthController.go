@@ -32,20 +32,20 @@ type ComponentHealth struct {
 // @Description  Get component by component health status
 // @Success      200  {object}  HealthResponse
 // @Router       /v1/health [get]
-func (controller *HealthController) Health(c *gin.Context) {
+func (c *HealthController) Get(ctx *gin.Context) {
 	response := HealthResponse{
 		Components: []ComponentHealth{
 			{Name: "api", IsHealthy: true},
-			controller.checkMongo(),
+			c.checkMongo(),
 		},
 	}
 
-	c.JSON(http.StatusOK, response)
+	ctx.JSON(http.StatusOK, response)
 }
 
-func (controller *HealthController) checkMongo() ComponentHealth {
+func (c *HealthController) checkMongo() ComponentHealth {
 	const name string = "mongo"
-	if err := controller.mongoConnection.Client.Ping(context.Background(), nil); err != nil {
+	if err := c.mongoConnection.Client.Ping(context.Background(), nil); err != nil {
 		return ComponentHealth{Name: name, IsHealthy: false, Detail: err.Error()}
 	}
 
