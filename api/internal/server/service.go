@@ -8,6 +8,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"nathan.dev/consent/internal/domain/account"
+	"nathan.dev/consent/internal/domain/participant"
 	"nathan.dev/consent/internal/server/context"
 	"nathan.dev/consent/internal/server/controllers"
 	"nathan.dev/consent/internal/storage"
@@ -43,7 +44,6 @@ func (s *Service) configureRoutes() {
 	v1 := s.engine.Group("/v1")
 	{
 		v1.GET("/health", s.container.healthController.Get)
-
 		{
 			account := v1.Group("/account")
 			{
@@ -57,12 +57,17 @@ func (s *Service) configureRoutes() {
 				organization.POST("", s.container.accountController.OrganizationCreate)
 			}
 		}
+		{
+			participant := v1.Group("/participant")
+			participant.GET(":id", s.container.participantController.ParticipantGet)
+		}
 	}
 }
 
 type container struct {
-	healthController  *controllers.HealthController
-	accountController *controllers.AccountController
+	healthController      *controllers.HealthController
+	accountController     *controllers.AccountController
+	participantController *controllers.ParticipantController
 }
 
 func configureDependencies(engine *gin.Engine, config *Config) *container {
@@ -81,6 +86,11 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("userEndpoint init fail", err)
 	}
 
+	participantEndpoint, err := participant.NewParticipantEndpoint()
+	if err != nil {
+		log.Fatalln("participantEndpoint init fail", err)
+	}
+
 	healthController, err := controllers.NewHealthController(mongoConnection, engine)
 	if err != nil {
 		log.Fatalln("healthController init fail", err)
@@ -91,5 +101,10 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("accountController init fail", err)
 	}
 
-	return &container{healthController: healthController, accountController: accountController}
+	participantController, err := controllers.NewParticipantController(participantEndpoint, nil, engine)
+	if err != nil {
+		log.Fatalln("accountController init fail", err)
+	}
+
+	return &container{healthController: healthController, accountController: accountController, participantController: participantController}
 }

@@ -62,6 +62,41 @@ definitions:
       name:
         type: string
     type: object
+  participant.Agreement:
+    properties:
+      accepted:
+        type: boolean
+      acceptedTime:
+        type: string
+      contractVersionId:
+        type: string
+      permissionId:
+        type: string
+    type: object
+  participant.ParticipantModel:
+    properties:
+      acceptedPermissionIds:
+        description: read model. Calculated from AllAgreements
+        items:
+          type: string
+        type: array
+      allAgreements:
+        items:
+          $ref: '#/definitions/participant.Agreement'
+        type: array
+      created:
+        type: string
+      externalId:
+        type: string
+      id:
+        type: string
+      organizationId:
+        type: string
+      removed:
+        type: boolean
+      updated:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -132,4 +167,18 @@ paths:
           schema:
             $ref: '#/definitions/controllers.HealthResponse'
       summary: Get Health
+  /v1/participant/{id}:
+    get:
+      parameters:
+      - description: User Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/participant.ParticipantModel'
+      summary: Get an participant
 swagger: "2.0"

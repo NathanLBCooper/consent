@@ -109,6 +109,28 @@
                     }
                 }
             }
+        },
+        "/v1/participant/{id}": {
+            "get": {
+                "summary": "Get an participant",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/participant.ParticipantModel"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -206,6 +228,59 @@
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "participant.Agreement": {
+            "type": "object",
+            "properties": {
+                "accepted": {
+                    "type": "boolean"
+                },
+                "acceptedTime": {
+                    "type": "string"
+                },
+                "contractVersionId": {
+                    "type": "string"
+                },
+                "permissionId": {
+                    "type": "string"
+                }
+            }
+        },
+        "participant.ParticipantModel": {
+            "type": "object",
+            "properties": {
+                "acceptedPermissionIds": {
+                    "description": "read model. Calculated from AllAgreements",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "allAgreements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/participant.Agreement"
+                    }
+                },
+                "created": {
+                    "type": "string"
+                },
+                "externalId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "organizationId": {
+                    "type": "string"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "updated": {
                     "type": "string"
                 }
             }
