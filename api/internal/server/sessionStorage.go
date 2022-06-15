@@ -1,6 +1,6 @@
-package context
+package server
 
-type SessionStorage interface {
+type sessionStorage interface {
 	Get(sessionID string, key string) string
 	Set(sessionID string, key string, value string)
 }

@@ -1,10 +1,7 @@
-package participant
+package domain
 
 import (
 	"errors"
-
-	"nathan.dev/consent/internal/domain"
-	"nathan.dev/consent/internal/domain/application"
 )
 
 type ParticipantEndpoint struct {
@@ -23,7 +20,7 @@ type ParticipantCreateRequest struct {
 	OrganizationId string
 }
 
-func (e *ParticipantEndpoint) ParticipantCreate(ctx domain.Context, req ParticipantGetRequest) (*ParticipantModel, error) {
+func (e *ParticipantEndpoint) ParticipantCreate(ctx Context, req ParticipantGetRequest) (*ParticipantModel, error) {
 	return nil, errors.New("not implemented")
 }
 
@@ -31,7 +28,7 @@ type ParticipantGetRequest struct {
 	Id string
 }
 
-func (e *ParticipantEndpoint) ParticipantGet(ctx domain.Context, req ParticipantGetRequest) (*ParticipantModel, error) {
+func (e *ParticipantEndpoint) ParticipantGet(ctx Context, req ParticipantGetRequest) (*ParticipantModel, error) {
 	return nil, errors.New("not implemented")
 }
 
@@ -39,7 +36,7 @@ type ParticipantGetByExternalIdRequest struct {
 	ExternalId string
 }
 
-func (e *ParticipantEndpoint) ParticipantGetByExternalId(ctx domain.Context, req ParticipantGetRequest) (*ParticipantModel, error) {
+func (e *ParticipantEndpoint) ParticipantGetByExternalId(ctx Context, req ParticipantGetRequest) (*ParticipantModel, error) {
 	return nil, errors.New("not implemented")
 }
 
@@ -49,9 +46,9 @@ type AcceptedPermissionsGetRequest struct {
 
 type AcceptedPermissionsGetResponse struct {
 	ParticipantId       string
-	AcceptedPermissions *application.PermissionModel
+	AcceptedPermissions *PermissionModel
 }
 
-func (e *ParticipantEndpoint) AcceptedPermissionsGet(ctx domain.Context, req AcceptedPermissionsGetRequest) (*AcceptedPermissionsGetResponse, error) {
+func (e *ParticipantEndpoint) AcceptedPermissionsGet(ctx Context, req AcceptedPermissionsGetRequest) (*AcceptedPermissionsGetResponse, error) {
 	return nil, errors.New("not implemented")
 }

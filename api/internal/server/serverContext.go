@@ -1,24 +1,24 @@
-package context
+package server
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-type Context struct {
+type serverContext struct {
 	*gin.Context
 	correlationId string
 }
 
 const headerName string = "session"
 
-func NewContext(ctx *gin.Context) *Context {
-	return &Context{Context: ctx, correlationId: ctx.GetString(headerName)}
+func newServerContext(ctx *gin.Context) *serverContext {
+	return &serverContext{Context: ctx, correlationId: ctx.GetString(headerName)}
 }
 
-func (context *Context) CorrelationId() string { return context.correlationId }
+func (context *serverContext) CorrelationId() string { return context.correlationId }
 
-func EnrichHeader(ctx *gin.Context) {
+func enrichHeader(ctx *gin.Context) {
 	header := ctx.GetHeader(headerName)
 	if header == "" {
 		header = uuid.NewString()

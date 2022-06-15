@@ -7,10 +7,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"nathan.dev/consent/internal/domain/account"
-	"nathan.dev/consent/internal/domain/participant"
-	"nathan.dev/consent/internal/server/context"
-	"nathan.dev/consent/internal/server/controllers"
+	"nathan.dev/consent/internal/domain"
 	"nathan.dev/consent/internal/storage"
 )
 
@@ -27,7 +24,7 @@ type Config struct {
 // @version         1.0
 func StartService(config *Config) (*Service, error) {
 	s := &Service{engine: gin.Default()}
-	s.engine.Use(context.EnrichHeader)
+	s.engine.Use(enrichHeader)
 	s.container = configureDependencies(s.engine, config)
 	s.configureRoutes()
 
@@ -48,13 +45,13 @@ func (s *Service) configureRoutes() {
 			account := v1.Group("/account")
 			{
 				user := account.Group("/user")
-				user.GET(":id", s.container.accountController.UserGet)
-				user.POST("", s.container.accountController.UserCreate)
+				user.GET(":id", s.container.accountController.userGet)
+				user.POST("", s.container.accountController.userCreate)
 			}
 			{
 				organization := account.Group("/organization")
-				organization.GET(":id", s.container.accountController.OrganizationGet)
-				organization.POST("", s.container.accountController.OrganizationCreate)
+				organization.GET(":id", s.container.accountController.organizationGet)
+				organization.POST("", s.container.accountController.organizationCreate)
 			}
 		}
 		{
@@ -65,9 +62,9 @@ func (s *Service) configureRoutes() {
 }
 
 type container struct {
-	healthController      *controllers.HealthController
-	accountController     *controllers.AccountController
-	participantController *controllers.ParticipantController
+	healthController      *healthController
+	accountController     *accountController
+	participantController *participantController
 }
 
 func configureDependencies(engine *gin.Engine, config *Config) *container {
@@ -81,27 +78,27 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("accountRepo init fail", err)
 	}
 
-	accountEndpoint, err := account.NewAccountEndpoint(accountRepo)
+	accountEndpoint, err := domain.NewAccountEndpoint(accountRepo)
 	if err != nil {
 		log.Fatalln("userEndpoint init fail", err)
 	}
 
-	participantEndpoint, err := participant.NewParticipantEndpoint()
+	participantEndpoint, err := domain.NewParticipantEndpoint()
 	if err != nil {
 		log.Fatalln("participantEndpoint init fail", err)
 	}
 
-	healthController, err := controllers.NewHealthController(mongoConnection, engine)
+	healthController, err := newHealthController(mongoConnection, engine)
 	if err != nil {
 		log.Fatalln("healthController init fail", err)
 	}
 
-	accountController, err := controllers.NewAccountController(accountEndpoint, nil, engine)
+	accountController, err := newAccountController(accountEndpoint, nil, engine)
 	if err != nil {
 		log.Fatalln("accountController init fail", err)
 	}
 
-	participantController, err := controllers.NewParticipantController(participantEndpoint, nil, engine)
+	participantController, err := newParticipantController(participantEndpoint, nil, engine)
 	if err != nil {
 		log.Fatalln("accountController init fail", err)
 	}

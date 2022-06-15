@@ -1,6 +1,4 @@
-package application
-
-import "nathan.dev/consent/internal/domain"
+package domain
 
 // Some specific idea that can be agreed to
 type Permission struct {
@@ -8,6 +6,6 @@ type Permission struct {
 }
 
 type PermissionModel struct {
-	domain.Model
+	Model
 	Permission
 }

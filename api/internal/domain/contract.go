@@ -1,6 +1,4 @@
-package contract
-
-import "nathan.dev/consent/internal/domain"
+package domain
 
 // Contains content that gathers (a) Permission(s).
 // A self-contained unit that contains all wording required for informed consent
@@ -10,7 +8,7 @@ type Contract struct {
 }
 
 type ContractModel struct {
-	domain.Model
+	Model
 	Contract
 }
 
@@ -35,3 +33,14 @@ var (
 	Deprecated = ContractVersionStatus{"deprecated"} // Still valid. Hard push Participants to active versions
 	Obsolete   = ContractVersionStatus{"obsolete"}   // Is no longer valid. Hard push Participants to active versions
 )
+
+// An collection of Contracts forms a Document. Which is shown to Participants at the given touchpoints.
+type Document struct {
+	ContractIds   []string
+	TouchpointIds []string
+}
+
+type DocumentModel struct {
+	Model
+	Document
+}

@@ -26,7 +26,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.OrganizationCreateRequest"
+                            "$ref": "#/definitions/server.organizationCreateRequest"
                         }
                     }
                 ],
@@ -34,7 +34,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/account.OrganizationModel"
+                            "$ref": "#/definitions/domain.OrganizationModel"
                         }
                     }
                 }
@@ -56,7 +56,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/account.OrganizationModel"
+                            "$ref": "#/definitions/domain.OrganizationModel"
                         }
                     }
                 }
@@ -72,7 +72,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/account.UserCreateRequest"
+                            "$ref": "#/definitions/domain.UserCreateRequest"
                         }
                     }
                 ],
@@ -80,7 +80,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/account.UserModel"
+                            "$ref": "#/definitions/domain.UserModel"
                         }
                     }
                 }
@@ -102,7 +102,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/account.UserModel"
+                            "$ref": "#/definitions/domain.UserModel"
                         }
                     }
                 }
@@ -116,7 +116,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controllers.HealthResponse"
+                            "$ref": "#/definitions/server.healthResponse"
                         }
                     }
                 }
@@ -138,7 +138,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/participant.ParticipantModel"
+                            "$ref": "#/definitions/domain.ParticipantModel"
                         }
                     }
                 }
@@ -146,105 +146,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "account.OrganizationMember": {
-            "type": "object",
-            "properties": {
-                "role": {
-                    "$ref": "#/definitions/account.Role"
-                }
-            }
-        },
-        "account.OrganizationModel": {
-            "type": "object",
-            "properties": {
-                "created": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "members": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/account.OrganizationMember"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "removed": {
-                    "type": "boolean"
-                },
-                "updated": {
-                    "type": "string"
-                }
-            }
-        },
-        "account.Role": {
-            "type": "object"
-        },
-        "account.UserCreateRequest": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "account.UserModel": {
-            "type": "object",
-            "properties": {
-                "created": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "removed": {
-                    "type": "boolean"
-                },
-                "updated": {
-                    "type": "string"
-                }
-            }
-        },
-        "controllers.ComponentHealth": {
-            "type": "object",
-            "properties": {
-                "detail": {
-                    "type": "string"
-                },
-                "isHealthy": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "controllers.HealthResponse": {
-            "type": "object",
-            "properties": {
-                "components": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/controllers.ComponentHealth"
-                    }
-                }
-            }
-        },
-        "controllers.OrganizationCreateRequest": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "participant.Agreement": {
+        "domain.Agreement": {
             "type": "object",
             "properties": {
                 "accepted": {
@@ -261,7 +163,41 @@ const docTemplate = `{
                 }
             }
         },
-        "participant.ParticipantModel": {
+        "domain.OrganizationMember": {
+            "type": "object",
+            "properties": {
+                "role": {
+                    "$ref": "#/definitions/domain.Role"
+                }
+            }
+        },
+        "domain.OrganizationModel": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "members": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/domain.OrganizationMember"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ParticipantModel": {
             "type": "object",
             "properties": {
                 "acceptedPermissionIds": {
@@ -274,7 +210,7 @@ const docTemplate = `{
                 "allAgreements": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/participant.Agreement"
+                        "$ref": "#/definitions/domain.Agreement"
                     }
                 },
                 "created": {
@@ -293,6 +229,70 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Role": {
+            "type": "object"
+        },
+        "domain.UserCreateRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UserModel": {
+            "type": "object",
+            "properties": {
+                "created": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "removed": {
+                    "type": "boolean"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
+        },
+        "server.componentHealth": {
+            "type": "object",
+            "properties": {
+                "detail": {
+                    "type": "string"
+                },
+                "isHealthy": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "server.healthResponse": {
+            "type": "object",
+            "properties": {
+                "components": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/server.componentHealth"
+                    }
+                }
+            }
+        },
+        "server.organizationCreateRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
                     "type": "string"
                 }
             }

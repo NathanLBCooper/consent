@@ -1,68 +1,5 @@
 definitions:
-  account.OrganizationMember:
-    properties:
-      role:
-        $ref: '#/definitions/account.Role'
-    type: object
-  account.OrganizationModel:
-    properties:
-      created:
-        type: string
-      id:
-        type: string
-      members:
-        additionalProperties:
-          $ref: '#/definitions/account.OrganizationMember'
-        type: object
-      name:
-        type: string
-      removed:
-        type: boolean
-      updated:
-        type: string
-    type: object
-  account.Role:
-    type: object
-  account.UserCreateRequest:
-    properties:
-      name:
-        type: string
-    type: object
-  account.UserModel:
-    properties:
-      created:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      removed:
-        type: boolean
-      updated:
-        type: string
-    type: object
-  controllers.ComponentHealth:
-    properties:
-      detail:
-        type: string
-      isHealthy:
-        type: boolean
-      name:
-        type: string
-    type: object
-  controllers.HealthResponse:
-    properties:
-      components:
-        items:
-          $ref: '#/definitions/controllers.ComponentHealth'
-        type: array
-    type: object
-  controllers.OrganizationCreateRequest:
-    properties:
-      name:
-        type: string
-    type: object
-  participant.Agreement:
+  domain.Agreement:
     properties:
       accepted:
         type: boolean
@@ -73,7 +10,29 @@ definitions:
       permissionId:
         type: string
     type: object
-  participant.ParticipantModel:
+  domain.OrganizationMember:
+    properties:
+      role:
+        $ref: '#/definitions/domain.Role'
+    type: object
+  domain.OrganizationModel:
+    properties:
+      created:
+        type: string
+      id:
+        type: string
+      members:
+        additionalProperties:
+          $ref: '#/definitions/domain.OrganizationMember'
+        type: object
+      name:
+        type: string
+      removed:
+        type: boolean
+      updated:
+        type: string
+    type: object
+  domain.ParticipantModel:
     properties:
       acceptedPermissionIds:
         description: read model. Calculated from AllAgreements
@@ -82,7 +41,7 @@ definitions:
         type: array
       allAgreements:
         items:
-          $ref: '#/definitions/participant.Agreement'
+          $ref: '#/definitions/domain.Agreement'
         type: array
       created:
         type: string
@@ -97,6 +56,47 @@ definitions:
       updated:
         type: string
     type: object
+  domain.Role:
+    type: object
+  domain.UserCreateRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  domain.UserModel:
+    properties:
+      created:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      removed:
+        type: boolean
+      updated:
+        type: string
+    type: object
+  server.componentHealth:
+    properties:
+      detail:
+        type: string
+      isHealthy:
+        type: boolean
+      name:
+        type: string
+    type: object
+  server.healthResponse:
+    properties:
+      components:
+        items:
+          $ref: '#/definitions/server.componentHealth'
+        type: array
+    type: object
+  server.organizationCreateRequest:
+    properties:
+      name:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -108,12 +108,12 @@ paths:
         name: organization
         required: true
         schema:
-          $ref: '#/definitions/controllers.OrganizationCreateRequest'
+          $ref: '#/definitions/server.organizationCreateRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/account.OrganizationModel'
+            $ref: '#/definitions/domain.OrganizationModel'
       summary: Create an Organization
   /v1/account/organization/{id}:
     get:
@@ -127,7 +127,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/account.OrganizationModel'
+            $ref: '#/definitions/domain.OrganizationModel'
       summary: Get an Organization
   /v1/account/user:
     post:
@@ -137,12 +137,12 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/account.UserCreateRequest'
+          $ref: '#/definitions/domain.UserCreateRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/account.UserModel'
+            $ref: '#/definitions/domain.UserModel'
       summary: Create a user
   /v1/account/user/{id}:
     get:
@@ -156,7 +156,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/account.UserModel'
+            $ref: '#/definitions/domain.UserModel'
       summary: Get an user
   /v1/health:
     get:
@@ -165,7 +165,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controllers.HealthResponse'
+            $ref: '#/definitions/server.healthResponse'
       summary: Get Health
   /v1/participant/{id}:
     get:
@@ -179,6 +179,6 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/participant.ParticipantModel'
+            $ref: '#/definitions/domain.ParticipantModel'
       summary: Get an participant
 swagger: "2.0"

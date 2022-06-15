@@ -1,8 +1,6 @@
-package participant
+package domain
 
-import (
-	"nathan.dev/consent/internal/domain"
-)
+import "time"
 
 type Participant struct {
 	ExternalId            string
@@ -12,8 +10,16 @@ type Participant struct {
 }
 
 type ParticipantModel struct {
-	domain.Model
+	Model
 	Participant
+}
+
+type Agreement struct {
+	ContractVersionId string
+	PermissionId      string
+	Accepted          bool
+	AcceptedTime      time.Time
+	// todo more optional context. Document, Touchpoint etc?
 }
 
 // todo joining of Participant in different organisation. Person? Remove OrganizationId and ExternalId from Participant?

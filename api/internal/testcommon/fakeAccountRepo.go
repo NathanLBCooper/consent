@@ -7,19 +7,18 @@ import (
 
 	"github.com/google/uuid"
 	"nathan.dev/consent/internal/domain"
-	"nathan.dev/consent/internal/domain/account"
 )
 
 type FakeAccountRepo struct {
-	users         []*account.UserModel
-	organizations []*account.OrganizationModel
+	users         []*domain.UserModel
+	organizations []*domain.OrganizationModel
 }
 
-var _ account.AccountRepo = &FakeAccountRepo{}
+var _ domain.AccountRepo = &FakeAccountRepo{}
 
-func (r *FakeAccountRepo) UserCreate(ctx context.Context, user account.User) (*account.UserModel, error) {
+func (r *FakeAccountRepo) UserCreate(ctx context.Context, user domain.User) (*domain.UserModel, error) {
 	now := time.Now()
-	model := &account.UserModel{
+	model := &domain.UserModel{
 		Model: domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
 		User:  user,
 	}
@@ -28,7 +27,7 @@ func (r *FakeAccountRepo) UserCreate(ctx context.Context, user account.User) (*a
 	return model, nil
 }
 
-func (r *FakeAccountRepo) UserGet(ctx context.Context, id string) (*account.UserModel, error) {
+func (r *FakeAccountRepo) UserGet(ctx context.Context, id string) (*domain.UserModel, error) {
 	for i := range r.users {
 		if r.users[i].Id == id {
 			return r.users[i], nil
@@ -38,9 +37,9 @@ func (r *FakeAccountRepo) UserGet(ctx context.Context, id string) (*account.User
 	return nil, errors.New("not found")
 }
 
-func (r *FakeAccountRepo) OrganizationCreate(ctx context.Context, org account.Organization) (*account.OrganizationModel, error) {
+func (r *FakeAccountRepo) OrganizationCreate(ctx context.Context, org domain.Organization) (*domain.OrganizationModel, error) {
 	now := time.Now()
-	model := &account.OrganizationModel{
+	model := &domain.OrganizationModel{
 		Model:        domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
 		Organization: org,
 	}
@@ -49,7 +48,7 @@ func (r *FakeAccountRepo) OrganizationCreate(ctx context.Context, org account.Or
 	return model, nil
 }
 
-func (r *FakeAccountRepo) OrganizationGet(ctx context.Context, id string) (*account.OrganizationModel, error) {
+func (r *FakeAccountRepo) OrganizationGet(ctx context.Context, id string) (*domain.OrganizationModel, error) {
 	for i := range r.organizations {
 		if r.organizations[i].Id == id {
 			return r.organizations[i], nil

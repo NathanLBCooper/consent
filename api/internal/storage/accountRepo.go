@@ -8,14 +8,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"nathan.dev/consent/internal/domain"
-	"nathan.dev/consent/internal/domain/account"
 )
 
 type AccountRepo struct {
 	db *mongo.Database
 }
 
-var _ account.AccountRepo = &AccountRepo{}
+var _ domain.AccountRepo = &AccountRepo{}
 
 func NewAccountRepo(db *mongo.Database) (*AccountRepo, error) {
 	return &AccountRepo{db: db}, nil
@@ -24,9 +23,9 @@ func NewAccountRepo(db *mongo.Database) (*AccountRepo, error) {
 const userKey string = "user"
 const organizationKey string = "organization"
 
-func (r *AccountRepo) UserCreate(ctx context.Context, user account.User) (*account.UserModel, error) {
+func (r *AccountRepo) UserCreate(ctx context.Context, user domain.User) (*domain.UserModel, error) {
 	now := time.Now()
-	doc := &account.UserModel{
+	doc := &domain.UserModel{
 		Model: domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
 		User:  user,
 	}
@@ -36,17 +35,17 @@ func (r *AccountRepo) UserCreate(ctx context.Context, user account.User) (*accou
 	return doc, nil
 }
 
-func (r *AccountRepo) UserGet(ctx context.Context, id string) (*account.UserModel, error) {
-	var doc account.UserModel
+func (r *AccountRepo) UserGet(ctx context.Context, id string) (*domain.UserModel, error) {
+	var doc domain.UserModel
 	if err := r.db.Collection(userKey).FindOne(ctx, bson.M{"model.id": id}).Decode(&doc); err != nil {
 		return nil, err
 	}
 	return &doc, nil
 }
 
-func (r *AccountRepo) OrganizationCreate(ctx context.Context, org account.Organization) (*account.OrganizationModel, error) {
+func (r *AccountRepo) OrganizationCreate(ctx context.Context, org domain.Organization) (*domain.OrganizationModel, error) {
 	now := time.Now()
-	doc := &account.OrganizationModel{
+	doc := &domain.OrganizationModel{
 		Model:        domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
 		Organization: org,
 	}
@@ -56,8 +55,8 @@ func (r *AccountRepo) OrganizationCreate(ctx context.Context, org account.Organi
 	return doc, nil
 }
 
-func (r *AccountRepo) OrganizationGet(ctx context.Context, id string) (*account.OrganizationModel, error) {
-	var doc account.OrganizationModel
+func (r *AccountRepo) OrganizationGet(ctx context.Context, id string) (*domain.OrganizationModel, error) {
+	var doc domain.OrganizationModel
 	if err := r.db.Collection(organizationKey).FindOne(ctx, bson.M{"model.id": id}).Decode(&doc); err != nil {
 		return nil, err
 	}

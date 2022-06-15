@@ -1,6 +1,4 @@
-package application
-
-import "nathan.dev/consent/internal/domain"
+package domain
 
 // Some touchpoint eg Registration
 type Touchpoint struct {
@@ -8,6 +6,6 @@ type Touchpoint struct {
 }
 
 type TouchpointModel struct {
-	domain.Model
+	Model
 	Touchpoint
 }
