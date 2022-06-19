@@ -56,20 +56,12 @@ func NewAccountEndpoint(accountRepo AccountRepo) (*AccountEndpoint, error) {
 	return &AccountEndpoint{accountRepo: accountRepo}, nil
 }
 
-type UserCreateRequest struct {
-	Name string
+func (e *AccountEndpoint) UserCreate(ctx Context, user User) (*UserModel, error) {
+	return e.accountRepo.UserCreate(ctx, user)
 }
 
-func (e *AccountEndpoint) UserCreate(ctx Context, req UserCreateRequest) (*UserModel, error) {
-	return e.accountRepo.UserCreate(ctx, User{Name: req.Name})
-}
-
-type UserGetRequest struct {
-	Id string
-}
-
-func (e *AccountEndpoint) UserGet(ctx Context, req UserGetRequest) (*UserModel, error) {
-	return e.accountRepo.UserGet(ctx, req.Id)
+func (e *AccountEndpoint) UserGet(ctx Context, id string) (*UserModel, error) {
+	return e.accountRepo.UserGet(ctx, id)
 }
 
 type OrganizationCreateRequest struct {
@@ -91,10 +83,6 @@ func (e *AccountEndpoint) OrganizationCreate(ctx Context, req OrganizationCreate
 	})
 }
 
-type OrganizationGetRequest struct {
-	Id string
-}
-
-func (e *AccountEndpoint) OrganizationGet(ctx Context, req OrganizationGetRequest) (*OrganizationModel, error) {
-	return e.accountRepo.OrganizationGet(ctx, req.Id)
+func (e *AccountEndpoint) OrganizationGet(ctx Context, id string) (*OrganizationModel, error) {
+	return e.accountRepo.OrganizationGet(ctx, id)
 }

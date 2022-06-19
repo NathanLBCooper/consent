@@ -1,11 +1,11 @@
 definitions:
   domain.Agreement:
     properties:
-      accepted:
-        type: boolean
       acceptedTime:
         type: string
       contractVersionId:
+        type: string
+      participantId:
         type: string
       permissionId:
         type: string
@@ -58,7 +58,7 @@ definitions:
     type: object
   domain.Role:
     type: object
-  domain.UserCreateRequest:
+  domain.User:
     properties:
       name:
         type: string
@@ -137,7 +137,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/domain.UserCreateRequest'
+          $ref: '#/definitions/domain.User'
       responses:
         "200":
           description: OK

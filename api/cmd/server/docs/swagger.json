@@ -60,7 +60,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.UserCreateRequest"
+                            "$ref": "#/definitions/domain.User"
                         }
                     }
                 ],
@@ -137,13 +137,13 @@
         "domain.Agreement": {
             "type": "object",
             "properties": {
-                "accepted": {
-                    "type": "boolean"
-                },
                 "acceptedTime": {
                     "type": "string"
                 },
                 "contractVersionId": {
+                    "type": "string"
+                },
+                "participantId": {
                     "type": "string"
                 },
                 "permissionId": {
@@ -224,7 +224,7 @@
         "domain.Role": {
             "type": "object"
         },
-        "domain.UserCreateRequest": {
+        "domain.User": {
             "type": "object",
             "properties": {
                 "name": {

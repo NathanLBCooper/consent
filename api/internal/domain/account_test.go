@@ -28,12 +28,12 @@ func setupAccountTest(t *testing.T) *accountTest {
 func Test_create_and_get_user(t *testing.T) {
 	state := setupAccountTest(t)
 
-	request := domain.UserCreateRequest{Name: "testuser"}
+	request := domain.User{Name: "testuser"}
 	model, err := state.sut.UserCreate(state.ctx, request)
 	assert.NoError(t, err)
 	assert.Equal(t, request.Name, model.Name)
 
-	result, err := state.sut.UserGet(state.ctx, domain.UserGetRequest{Id: model.Id})
+	result, err := state.sut.UserGet(state.ctx, model.Id)
 	assert.NoError(t, err)
 
 	assert.Equal(t, request.Name, result.Name)
@@ -42,7 +42,7 @@ func Test_create_and_get_user(t *testing.T) {
 func Test_create_and_get_organization(t *testing.T) {
 	state := setupAccountTest(t)
 
-	user, err := state.sut.UserCreate(state.ctx, domain.UserCreateRequest{Name: "user"})
+	user, err := state.sut.UserCreate(state.ctx, domain.User{Name: "user"})
 	assert.NoError(t, err)
 
 	request := domain.OrganizationCreateRequest{Name: "testorganization", OwnerUserId: user.Id}
@@ -50,7 +50,7 @@ func Test_create_and_get_organization(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, request.Name, model.Name)
 
-	result, err := state.sut.OrganizationGet(state.ctx, domain.OrganizationGetRequest{Id: model.Id})
+	result, err := state.sut.OrganizationGet(state.ctx, model.Id)
 	assert.NoError(t, err)
 
 	assert.Equal(t, request.Name, result.Name)

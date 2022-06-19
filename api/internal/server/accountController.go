@@ -20,7 +20,8 @@ func newAccountController(endpoint *domain.AccountEndpoint, session sessionStora
 // @Success      200  {object}  domain.UserModel
 // @Router       /v1/account/user/{id} [get]
 func (c *accountController) userGet(ctx *gin.Context) {
-	model, err := c.endpoint.UserGet(newServerContext(ctx), domain.UserGetRequest{Id: ctx.Param("id")})
+	id := ctx.Param("id")
+	model, err := c.endpoint.UserGet(newServerContext(ctx), id)
 	if err != nil {
 		ctx.JSON(404, gin.H{"status": "not found"})
 		return
@@ -30,11 +31,11 @@ func (c *accountController) userGet(ctx *gin.Context) {
 }
 
 // @Summary      Create a user
-// @Param        user     body      domain.UserCreateRequest  true  "Create user"
+// @Param        user     body      domain.User  true  "Create user"
 // @Success      200      {object}  domain.UserModel
 // @Router       /v1/account/user [post]
 func (c *accountController) userCreate(ctx *gin.Context) {
-	var request domain.UserCreateRequest
+	var request domain.User
 	if err := ctx.BindJSON(&request); err != nil {
 		ctx.JSON(500, gin.H{"status": "todo 1"})
 		return

@@ -72,7 +72,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.UserCreateRequest"
+                            "$ref": "#/definitions/domain.User"
                         }
                     }
                 ],
@@ -149,13 +149,13 @@ const docTemplate = `{
         "domain.Agreement": {
             "type": "object",
             "properties": {
-                "accepted": {
-                    "type": "boolean"
-                },
                 "acceptedTime": {
                     "type": "string"
                 },
                 "contractVersionId": {
+                    "type": "string"
+                },
+                "participantId": {
                     "type": "string"
                 },
                 "permissionId": {
@@ -236,7 +236,7 @@ const docTemplate = `{
         "domain.Role": {
             "type": "object"
         },
-        "domain.UserCreateRequest": {
+        "domain.User": {
             "type": "object",
             "properties": {
                 "name": {
