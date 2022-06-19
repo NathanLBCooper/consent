@@ -8,25 +8,25 @@ import (
 	"nathan.dev/consent/internal/testcommon"
 )
 
-type endpointTest struct {
+type accountTest struct {
 	ctx *testcommon.FakeContext
 	sut *domain.AccountEndpoint
 }
 
-func setupEndpointTest(t *testing.T) *endpointTest {
+func setupAccountTest(t *testing.T) *accountTest {
 	fakeRepo := &testcommon.FakeAccountRepo{}
 
 	endpoint, err := domain.NewAccountEndpoint(fakeRepo)
 	assert.NoError(t, err)
 
-	return &endpointTest{
+	return &accountTest{
 		ctx: testcommon.NewFakeContext("someid"),
 		sut: endpoint,
 	}
 }
 
 func Test_create_and_get_user(t *testing.T) {
-	state := setupEndpointTest(t)
+	state := setupAccountTest(t)
 
 	request := domain.UserCreateRequest{Name: "testuser"}
 	model, err := state.sut.UserCreate(state.ctx, request)
@@ -40,7 +40,7 @@ func Test_create_and_get_user(t *testing.T) {
 }
 
 func Test_create_and_get_organization(t *testing.T) {
-	state := setupEndpointTest(t)
+	state := setupAccountTest(t)
 
 	user, err := state.sut.UserCreate(state.ctx, domain.UserCreateRequest{Name: "user"})
 	assert.NoError(t, err)
@@ -57,7 +57,7 @@ func Test_create_and_get_organization(t *testing.T) {
 }
 
 func Test_create_organization_throws_if_owning_user_doesnt_exist(t *testing.T) {
-	state := setupEndpointTest(t)
+	state := setupAccountTest(t)
 
 	request := domain.OrganizationCreateRequest{Name: "testorganization", OwnerUserId: "thisdoesntexist"}
 	_, err := state.sut.OrganizationCreate(state.ctx, request)
