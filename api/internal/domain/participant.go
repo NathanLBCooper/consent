@@ -5,10 +5,8 @@ import (
 )
 
 type Participant struct {
-	ExternalId            string
-	OrganizationId        string
-	AcceptedPermissionIds []string // read model. Calculated from AllAgreements
-	AllAgreements         []*Agreement
+	ExternalId     string
+	OrganizationId string
 }
 
 type ParticipantModel struct {
