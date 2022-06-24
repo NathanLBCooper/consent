@@ -7,6 +7,7 @@ import (
 type Participant struct {
 	ExternalId     string
 	OrganizationId string
+	Tags           []Tag
 }
 
 type ParticipantModel struct {

@@ -8,6 +8,7 @@ type Contract struct {
 	Name string
 	//Versions []*ContractVersion
 	Body Element // move to version
+	Tags []Tag
 }
 
 type ContractModel struct {
