@@ -18,6 +18,14 @@ type Agreement struct {
 	Accepted      bool
 }
 
+/*
+Things will happen that make an agreement valid. Right now, a newer answer, but more things once versioning happens
+How to deal with it? Maintain a table of all agreements ever (for audit), and a table of valid ones?
+
+Since "auditablity" is at the core of what this need to do. Event store and read model?
+Dual use of this. 1) What is accpeted now, and 2) what has ever happened. Maybe it doesn't make sense for one endpoint?
+*/
+
 type AgreementModel struct {
 	Agreement
 	Model

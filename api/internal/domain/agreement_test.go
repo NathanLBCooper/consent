@@ -160,6 +160,27 @@ func Test_newest_agreement_is_what_counts(t *testing.T) {
 	assert.Equal(t, true, accepted)
 }
 
+func Test_agreements_that_have_been_superseeded_still_exist(t *testing.T) {
+	state := setupAgreementTest(t)
+	participant, permission, contract := uuid.New(), uuid.New(), uuid.New()
+	builder := agreementBuilder{
+		ParticipantId: &participant,
+		PermissionId:  &permission,
+		ContractId:    &contract,
+	}
+
+	builder.Accepted = tc.NewPtr(false)
+	no_t0 := builder.build()
+	noModel_t0 := state.createAgreement(*no_t0)
+	builder.Accepted = tc.NewPtr(true)
+	yes_t1 := builder.build()
+	_ = state.createAgreement(*yes_t1)
+
+	getNo_t0, err := state.sut.AgreementGet(state.ctx, noModel_t0.Id)
+	assert.NoError(t, err)
+	assertAgreementsEqual(t, no_t0, &getNo_t0.Agreement)
+}
+
 func (a *agreementTest) createAgreement(agreement domain.Agreement) *domain.AgreementModel {
 	model, err := a.sut.AgreementCreate(a.ctx, agreement)
 	assert.NoError(a.t, err)
