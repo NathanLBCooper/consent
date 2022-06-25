@@ -11,18 +11,20 @@ type User struct {
 	Name string
 }
 
+type UserId uuid.UUID
 type UserModel struct {
-	Model
+	Model[UserId]
 	User
 }
 
 type Organization struct {
 	Name    string
-	Members map[uuid.UUID]*OrganizationMember
+	Members map[UserId]*OrganizationMember
 }
 
+type OrganizationId uuid.UUID
 type OrganizationModel struct {
-	Model
+	Model[OrganizationId]
 	Organization
 }
 
@@ -48,9 +50,9 @@ type AccountEndpoint struct {
 
 type AccountRepo interface {
 	UserCreate(context.Context, User) (*UserModel, error)
-	UserGet(context.Context, uuid.UUID) (*UserModel, error)
+	UserGet(context.Context, UserId) (*UserModel, error)
 	OrganizationCreate(context.Context, Organization) (*OrganizationModel, error)
-	OrganizationGet(context.Context, uuid.UUID) (*OrganizationModel, error)
+	OrganizationGet(context.Context, OrganizationId) (*OrganizationModel, error)
 }
 
 func NewAccountEndpoint(accountRepo AccountRepo) (*AccountEndpoint, error) {
@@ -61,13 +63,13 @@ func (e *AccountEndpoint) UserCreate(ctx Context, user User) (*UserModel, error)
 	return e.accountRepo.UserCreate(ctx, user)
 }
 
-func (e *AccountEndpoint) UserGet(ctx Context, id uuid.UUID) (*UserModel, error) {
+func (e *AccountEndpoint) UserGet(ctx Context, id UserId) (*UserModel, error) {
 	return e.accountRepo.UserGet(ctx, id)
 }
 
 type OrganizationCreateRequest struct {
 	Name        string
-	OwnerUserId uuid.UUID
+	OwnerUserId UserId
 }
 
 func (e *AccountEndpoint) OrganizationCreate(ctx Context, req OrganizationCreateRequest) (*OrganizationModel, error) {
@@ -78,12 +80,12 @@ func (e *AccountEndpoint) OrganizationCreate(ctx Context, req OrganizationCreate
 
 	return e.accountRepo.OrganizationCreate(ctx, Organization{
 		Name: req.Name,
-		Members: map[uuid.UUID]*OrganizationMember{
+		Members: map[UserId]*OrganizationMember{
 			member.Id: {Role: Owner},
 		},
 	})
 }
 
-func (e *AccountEndpoint) OrganizationGet(ctx Context, id uuid.UUID) (*OrganizationModel, error) {
+func (e *AccountEndpoint) OrganizationGet(ctx Context, id OrganizationId) (*OrganizationModel, error) {
 	return e.accountRepo.OrganizationGet(ctx, id)
 }

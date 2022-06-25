@@ -2,6 +2,8 @@ package domain
 
 import (
 	"errors"
+
+	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
 type Participant struct {
@@ -10,8 +12,9 @@ type Participant struct {
 	Tags           []Tag
 }
 
+type ParticipantId uuid.UUID
 type ParticipantModel struct {
-	Model
+	Model[ParticipantId]
 	Participant
 }
 
@@ -26,25 +29,17 @@ func NewParticipantEndpoint() (*ParticipantEndpoint, error) {
 
 type ParticipantCreateRequest struct {
 	ExternalId     string
-	OrganizationId string
+	OrganizationId OrganizationId
 }
 
-func (e *ParticipantEndpoint) ParticipantCreate(ctx Context, req ParticipantGetRequest) (*ParticipantModel, error) {
+func (e *ParticipantEndpoint) ParticipantCreate(ctx Context, req ParticipantCreateRequest) (*ParticipantModel, error) {
 	return nil, errors.New("not implemented")
 }
 
-type ParticipantGetRequest struct {
-	Id string
-}
-
-func (e *ParticipantEndpoint) ParticipantGet(ctx Context, req ParticipantGetRequest) (*ParticipantModel, error) {
+func (e *ParticipantEndpoint) ParticipantGet(ctx Context, id ParticipantId) (*ParticipantModel, error) {
 	return nil, errors.New("not implemented")
 }
 
-type ParticipantGetByExternalIdRequest struct {
-	ExternalId string
-}
-
-func (e *ParticipantEndpoint) ParticipantGetByExternalId(ctx Context, req ParticipantGetRequest) (*ParticipantModel, error) {
+func (e *ParticipantEndpoint) ParticipantGetByExternalId(ctx Context, externalId string) (*ParticipantModel, error) {
 	return nil, errors.New("not implemented")
 }

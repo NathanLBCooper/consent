@@ -60,7 +60,7 @@ func Test_create_and_get_organization(t *testing.T) {
 func Test_create_organization_throws_if_owning_user_doesnt_exist(t *testing.T) {
 	state := setupAccountTest(t)
 
-	request := domain.OrganizationCreateRequest{Name: "testorganization", OwnerUserId: uuid.New()}
+	request := domain.OrganizationCreateRequest{Name: "testorganization", OwnerUserId: domain.UserId(uuid.New())}
 	_, err := state.sut.OrganizationCreate(state.ctx, request)
 
 	assert.NotNil(t, err)

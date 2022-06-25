@@ -11,9 +11,9 @@ import (
 
 type Agreement struct {
 	//ContractVersionId uuid.UUID
-	ContractId    uuid.UUID
-	PermissionId  uuid.UUID
-	ParticipantId uuid.UUID
+	ContractId    ContractId
+	PermissionId  PermissionId
+	ParticipantId ParticipantId
 	DecisionTime  time.Time
 	Accepted      bool
 }
@@ -26,9 +26,10 @@ Since "auditablity" is at the core of what this need to do. Event store and read
 Dual use of this. 1) What is accpeted now, and 2) what has ever happened. Maybe it doesn't make sense for one endpoint?
 */
 
+type AgreementId uuid.UUID
 type AgreementModel struct {
+	Model[AgreementId]
 	Agreement
-	Model
 }
 
 type AgreementEndpoint struct {
@@ -42,18 +43,18 @@ func (e *AgreementEndpoint) AgreementCreate(ctx Context, agreement Agreement) (*
 	return nil, errors.New("not implemented")
 }
 
-func (e *AgreementEndpoint) AgreementGet(ctx Context, id uuid.UUID) (*AgreementModel, error) {
+func (e *AgreementEndpoint) AgreementGet(ctx Context, id AgreementId) (*AgreementModel, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (e *AgreementEndpoint) AgreementGetAll(ctx Context, participantId uuid.UUID) ([]*AgreementModel, error) {
+func (e *AgreementEndpoint) AgreementGetAll(ctx Context, participantId ParticipantId) ([]*AgreementModel, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (e *AgreementEndpoint) IsAccepted(ctx Context, participantId uuid.UUID, permissionId uuid.UUID) (bool, error) {
+func (e *AgreementEndpoint) IsAccepted(ctx Context, participantId ParticipantId, permissionId PermissionId) (bool, error) {
 	return false, errors.New("not implemented")
 }
 
-func (e *AgreementEndpoint) GetPermissions(ctx Context, participantId uuid.UUID) ([]uuid.UUID, error) {
+func (e *AgreementEndpoint) GetPermissions(ctx Context, participantId ParticipantId) ([]uuid.UUID, error) {
 	return nil, errors.New("not implemented")
 }

@@ -27,7 +27,7 @@ func (c *accountController) userGet(ctx *gin.Context) {
 		return
 	}
 
-	model, err := c.endpoint.UserGet(newServerContext(ctx), id)
+	model, err := c.endpoint.UserGet(newServerContext(ctx), domain.UserId(id))
 	if err != nil {
 		ctx.JSON(404, gin.H{"status": "not found"})
 		return

@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
 	"nathan.dev/consent/internal/domain"
 )
@@ -21,7 +22,13 @@ func newParticipantController(endpoint *domain.ParticipantEndpoint, session sess
 // @Success      200  {object}  domain.ParticipantModel
 // @Router       /v1/participant/{id} [get]
 func (c *participantController) ParticipantGet(ctx *gin.Context) {
-	model, err := c.endpoint.ParticipantGet(newServerContext(ctx), domain.ParticipantGetRequest{Id: ctx.Param("id")})
+	id, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(400, gin.H{"status": "todo bad id"})
+		return
+	}
+
+	model, err := c.endpoint.ParticipantGet(newServerContext(ctx), domain.ParticipantId(id))
 	if err != nil {
 		ctx.JSON(404, gin.H{"status": "not found"})
 		return

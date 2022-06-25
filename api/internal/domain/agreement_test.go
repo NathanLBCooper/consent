@@ -52,14 +52,14 @@ func Test_can_accept_and_then_get_agreements(t *testing.T) {
 func Test_can_get_all_agreements_for_a_participant(t *testing.T) {
 	state := setupAgreementTest(t)
 
-	participantId := uuid.New()
+	participantId := domain.ParticipantId(uuid.New())
 	participantsAgreements := []*domain.Agreement{
 		agreementBuilder{ParticipantId: &participantId}.build(),
 		agreementBuilder{ParticipantId: &participantId, Accepted: tc.NewPtr(true)}.build(),
 		agreementBuilder{ParticipantId: &participantId, Accepted: tc.NewPtr(false)}.build()}
 
 	participantAgreementModels := state.createAgreements(participantsAgreements)
-	otherParticipant := uuid.New()
+	otherParticipant := domain.ParticipantId(uuid.New())
 	otherAgreementModel := state.createAgreement(*agreementBuilder{ParticipantId: &otherParticipant}.build())
 
 	result, err := state.sut.AgreementGetAll(state.ctx, participantId)
@@ -97,17 +97,18 @@ func Test_when_agreement_is_accepted_then_associated_permission_is_accepted(t *t
 
 func Test_when_a_permission_is_accepted_in_any_contract_it_is_accepted(t *testing.T) {
 	state := setupAgreementTest(t)
-	participant, permission := uuid.New(), uuid.New()
+	participant := domain.ParticipantId(uuid.New())
+	permission := domain.PermissionId(uuid.New())
 
 	yes := agreementBuilder{
 		ParticipantId: &participant,
 		PermissionId:  &permission,
-		ContractId:    tc.NewPtr(uuid.New()),
+		ContractId:    tc.NewPtr(domain.ContractId(uuid.New())),
 		Accepted:      tc.NewPtr(true)}.build()
 	newerNo := agreementBuilder{
 		ParticipantId:        &participant,
 		PermissionId:         &permission,
-		ContractId:           tc.NewPtr(uuid.New()),
+		ContractId:           tc.NewPtr(domain.ContractId(uuid.New())),
 		Accepted:             tc.NewPtr(false),
 		RelativeDecisionTime: tc.NewPtr(time.Hour)}.build()
 
@@ -121,7 +122,9 @@ func Test_when_a_permission_is_accepted_in_any_contract_it_is_accepted(t *testin
 
 func Test_newest_agreement_is_what_counts(t *testing.T) {
 	state := setupAgreementTest(t)
-	participant, permission, contract := uuid.New(), uuid.New(), uuid.New()
+	participant := domain.ParticipantId(uuid.New())
+	permission := domain.PermissionId(uuid.New())
+	contract := domain.ContractId(uuid.New())
 
 	builder := agreementBuilder{
 		ParticipantId: &participant,
@@ -162,7 +165,9 @@ func Test_newest_agreement_is_what_counts(t *testing.T) {
 
 func Test_agreements_that_have_been_superseeded_still_exist(t *testing.T) {
 	state := setupAgreementTest(t)
-	participant, permission, contract := uuid.New(), uuid.New(), uuid.New()
+	participant := domain.ParticipantId(uuid.New())
+	permission := domain.PermissionId(uuid.New())
+	contract := domain.ContractId(uuid.New())
 	builder := agreementBuilder{
 		ParticipantId: &participant,
 		PermissionId:  &permission,
@@ -196,9 +201,9 @@ func (a *agreementTest) createAgreements(agreements []*domain.Agreement) []*doma
 }
 
 type agreementBuilder struct {
-	ParticipantId        *uuid.UUID
-	ContractId           *uuid.UUID
-	PermissionId         *uuid.UUID
+	ParticipantId        *domain.ParticipantId
+	ContractId           *domain.ContractId
+	PermissionId         *domain.PermissionId
 	RelativeDecisionTime *time.Duration
 	Accepted             *bool
 }
@@ -209,9 +214,9 @@ func (a agreementBuilder) build() *domain.Agreement {
 		decisionTime = decisionTime.Add(*a.RelativeDecisionTime)
 	}
 	return &domain.Agreement{
-		ParticipantId: tc.Coalesce(a.ParticipantId, uuid.New()),
-		ContractId:    tc.Coalesce(a.ContractId, uuid.New()),
-		PermissionId:  tc.Coalesce(a.PermissionId, uuid.New()),
+		ParticipantId: tc.Coalesce(a.ParticipantId, domain.ParticipantId(uuid.New())),
+		ContractId:    tc.Coalesce(a.ContractId, domain.ContractId(uuid.New())),
+		PermissionId:  tc.Coalesce(a.PermissionId, domain.PermissionId(uuid.New())),
 		DecisionTime:  tc.Coalesce(&decisionTime, now()),
 		Accepted:      tc.Coalesce(a.Accepted, true),
 	}

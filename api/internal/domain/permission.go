@@ -1,6 +1,10 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 // A specific idea that can be agreed to
 // Eg: 'Receive information and offers', 'Use of cookies', 'Share your knäckebröd preferences with Wasa"
@@ -9,8 +13,9 @@ type Permission struct {
 	OrganizationId string
 }
 
+type PermissionId uuid.UUID
 type PermissionModel struct {
-	Model
+	Model[PermissionId]
 	Permission
 }
 
@@ -25,14 +30,14 @@ func (e *PermissionEndpoint) PermissionCreate(ctx Context, permission Permission
 	return nil, errors.New("not implemented")
 }
 
-func (e *PermissionEndpoint) PermissionGet(ctx Context, id string) (*PermissionModel, error) {
+func (e *PermissionEndpoint) PermissionGet(ctx Context, id PermissionId) (*PermissionModel, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (e *PermissionEndpoint) PermissionGetByName(ctx Context, name string, organizationId string) (*PermissionModel, error) {
+func (e *PermissionEndpoint) PermissionGetByName(ctx Context, name string, organizationId OrganizationId) (*PermissionModel, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (e *PermissionEndpoint) PermissionGetAll(ctx Context, organizationId string) (*PermissionModel, error) {
+func (e *PermissionEndpoint) PermissionGetAll(ctx Context, organizationId OrganizationId) (*PermissionModel, error) {
 	return nil, errors.New("not implemented")
 }

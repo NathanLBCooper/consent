@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/google/uuid"
+
 // Ignore versioning for first iteration
 
 // Contains content that gathers (a) Permission(s).
@@ -11,8 +13,9 @@ type Contract struct {
 	Tags []Tag
 }
 
+type ContractId uuid.UUID
 type ContractModel struct {
-	Model
+	Model[ContractId]
 	Contract
 }
 
@@ -44,7 +47,8 @@ type Document struct {
 	TouchpointIds []string
 }
 
+type DocumentId uuid.UUID
 type DocumentModel struct {
-	Model
+	Model[DocumentId]
 	Document
 }

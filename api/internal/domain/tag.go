@@ -1,11 +1,14 @@
 package domain
 
+import "go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
+
 type Tag struct {
 	Key string
 }
 
+type TagId uuid.UUID
 type TagModel struct {
-	Model
+	Model[TagId]
 	Tag
 }
 
