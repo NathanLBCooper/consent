@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -17,7 +18,7 @@ type UserModel struct {
 
 type Organization struct {
 	Name    string
-	Members map[string]*OrganizationMember
+	Members map[uuid.UUID]*OrganizationMember
 }
 
 type OrganizationModel struct {
@@ -47,9 +48,9 @@ type AccountEndpoint struct {
 
 type AccountRepo interface {
 	UserCreate(context.Context, User) (*UserModel, error)
-	UserGet(context.Context, string) (*UserModel, error)
+	UserGet(context.Context, uuid.UUID) (*UserModel, error)
 	OrganizationCreate(context.Context, Organization) (*OrganizationModel, error)
-	OrganizationGet(context.Context, string) (*OrganizationModel, error)
+	OrganizationGet(context.Context, uuid.UUID) (*OrganizationModel, error)
 }
 
 func NewAccountEndpoint(accountRepo AccountRepo) (*AccountEndpoint, error) {
@@ -60,13 +61,13 @@ func (e *AccountEndpoint) UserCreate(ctx Context, user User) (*UserModel, error)
 	return e.accountRepo.UserCreate(ctx, user)
 }
 
-func (e *AccountEndpoint) UserGet(ctx Context, id string) (*UserModel, error) {
+func (e *AccountEndpoint) UserGet(ctx Context, id uuid.UUID) (*UserModel, error) {
 	return e.accountRepo.UserGet(ctx, id)
 }
 
 type OrganizationCreateRequest struct {
 	Name        string
-	OwnerUserId string
+	OwnerUserId uuid.UUID
 }
 
 func (e *AccountEndpoint) OrganizationCreate(ctx Context, req OrganizationCreateRequest) (*OrganizationModel, error) {
@@ -77,12 +78,12 @@ func (e *AccountEndpoint) OrganizationCreate(ctx Context, req OrganizationCreate
 
 	return e.accountRepo.OrganizationCreate(ctx, Organization{
 		Name: req.Name,
-		Members: map[string]*OrganizationMember{
+		Members: map[uuid.UUID]*OrganizationMember{
 			member.Id: {Role: Owner},
 		},
 	})
 }
 
-func (e *AccountEndpoint) OrganizationGet(ctx Context, id string) (*OrganizationModel, error) {
+func (e *AccountEndpoint) OrganizationGet(ctx Context, id uuid.UUID) (*OrganizationModel, error) {
 	return e.accountRepo.OrganizationGet(ctx, id)
 }

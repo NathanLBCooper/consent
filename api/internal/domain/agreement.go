@@ -42,7 +42,7 @@ func (e *AgreementEndpoint) AgreementCreate(ctx Context, agreement Agreement) (*
 	return nil, errors.New("not implemented")
 }
 
-func (e *AgreementEndpoint) AgreementGet(ctx Context, id string) (*AgreementModel, error) {
+func (e *AgreementEndpoint) AgreementGet(ctx Context, id uuid.UUID) (*AgreementModel, error) {
 	return nil, errors.New("not implemented")
 }
 
@@ -54,6 +54,6 @@ func (e *AgreementEndpoint) IsAccepted(ctx Context, participantId uuid.UUID, per
 	return false, errors.New("not implemented")
 }
 
-func (e *AgreementEndpoint) GetPermissions(ctx Context, participantId uuid.UUID) ([]string, error) {
+func (e *AgreementEndpoint) GetPermissions(ctx Context, participantId uuid.UUID) ([]uuid.UUID, error) {
 	return nil, errors.New("not implemented")
 }

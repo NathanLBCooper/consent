@@ -26,7 +26,7 @@ const organizationKey string = "organization"
 func (r *AccountRepo) UserCreate(ctx context.Context, user domain.User) (*domain.UserModel, error) {
 	now := time.Now()
 	doc := &domain.UserModel{
-		Model: domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
+		Model: domain.Model{Id: uuid.New(), Created: now, Updated: now},
 		User:  user,
 	}
 	if _, err := r.db.Collection(userKey).InsertOne(ctx, doc); err != nil {
@@ -35,7 +35,7 @@ func (r *AccountRepo) UserCreate(ctx context.Context, user domain.User) (*domain
 	return doc, nil
 }
 
-func (r *AccountRepo) UserGet(ctx context.Context, id string) (*domain.UserModel, error) {
+func (r *AccountRepo) UserGet(ctx context.Context, id uuid.UUID) (*domain.UserModel, error) {
 	var doc domain.UserModel
 	if err := r.db.Collection(userKey).FindOne(ctx, bson.M{"model.id": id}).Decode(&doc); err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func (r *AccountRepo) UserGet(ctx context.Context, id string) (*domain.UserModel
 func (r *AccountRepo) OrganizationCreate(ctx context.Context, org domain.Organization) (*domain.OrganizationModel, error) {
 	now := time.Now()
 	doc := &domain.OrganizationModel{
-		Model:        domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
+		Model:        domain.Model{Id: uuid.New(), Created: now, Updated: now},
 		Organization: org,
 	}
 	if _, err := r.db.Collection(organizationKey).InsertOne(ctx, doc); err != nil {
@@ -55,7 +55,7 @@ func (r *AccountRepo) OrganizationCreate(ctx context.Context, org domain.Organiz
 	return doc, nil
 }
 
-func (r *AccountRepo) OrganizationGet(ctx context.Context, id string) (*domain.OrganizationModel, error) {
+func (r *AccountRepo) OrganizationGet(ctx context.Context, id uuid.UUID) (*domain.OrganizationModel, error) {
 	var doc domain.OrganizationModel
 	if err := r.db.Collection(organizationKey).FindOne(ctx, bson.M{"model.id": id}).Decode(&doc); err != nil {
 		return nil, err

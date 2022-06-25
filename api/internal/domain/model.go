@@ -1,9 +1,13 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Model struct {
-	Id      string
+	Id      uuid.UUID
 	Created time.Time
 	Updated time.Time
 	Removed bool

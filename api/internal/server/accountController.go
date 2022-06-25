@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"nathan.dev/consent/internal/domain"
 )
 
@@ -20,7 +21,12 @@ func newAccountController(endpoint *domain.AccountEndpoint, session sessionStora
 // @Success      200  {object}  domain.UserModel
 // @Router       /v1/account/user/{id} [get]
 func (c *accountController) userGet(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id, err := uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(400, gin.H{"status": "todo bad id"})
+		return
+	}
+
 	model, err := c.endpoint.UserGet(newServerContext(ctx), id)
 	if err != nil {
 		ctx.JSON(404, gin.H{"status": "not found"})

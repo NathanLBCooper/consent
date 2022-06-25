@@ -19,7 +19,7 @@ var _ domain.AccountRepo = &FakeAccountRepo{}
 func (r *FakeAccountRepo) UserCreate(ctx context.Context, user domain.User) (*domain.UserModel, error) {
 	now := time.Now()
 	model := &domain.UserModel{
-		Model: domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
+		Model: domain.Model{Id: uuid.New(), Created: now, Updated: now},
 		User:  user,
 	}
 
@@ -27,7 +27,7 @@ func (r *FakeAccountRepo) UserCreate(ctx context.Context, user domain.User) (*do
 	return model, nil
 }
 
-func (r *FakeAccountRepo) UserGet(ctx context.Context, id string) (*domain.UserModel, error) {
+func (r *FakeAccountRepo) UserGet(ctx context.Context, id uuid.UUID) (*domain.UserModel, error) {
 	for i := range r.users {
 		if r.users[i].Id == id {
 			return r.users[i], nil
@@ -40,7 +40,7 @@ func (r *FakeAccountRepo) UserGet(ctx context.Context, id string) (*domain.UserM
 func (r *FakeAccountRepo) OrganizationCreate(ctx context.Context, org domain.Organization) (*domain.OrganizationModel, error) {
 	now := time.Now()
 	model := &domain.OrganizationModel{
-		Model:        domain.Model{Id: uuid.NewString(), Created: now, Updated: now},
+		Model:        domain.Model{Id: uuid.New(), Created: now, Updated: now},
 		Organization: org,
 	}
 
@@ -48,7 +48,7 @@ func (r *FakeAccountRepo) OrganizationCreate(ctx context.Context, org domain.Org
 	return model, nil
 }
 
-func (r *FakeAccountRepo) OrganizationGet(ctx context.Context, id string) (*domain.OrganizationModel, error) {
+func (r *FakeAccountRepo) OrganizationGet(ctx context.Context, id uuid.UUID) (*domain.OrganizationModel, error) {
 	for i := range r.organizations {
 		if r.organizations[i].Id == id {
 			return r.organizations[i], nil
