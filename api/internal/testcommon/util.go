@@ -6,6 +6,7 @@ func Coalesce[T any](left *T, right T) T {
 	}
 	return *left
 }
+
 func NewPtr[T any](v T) *T {
 	return &v
 }

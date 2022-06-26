@@ -11,6 +11,7 @@ import (
 )
 
 // Ignore versioning for first iteration
+// todo, no checks that participants, permissions, contracts etc actually exist
 
 type agreementTest struct {
 	t   *testing.T
@@ -19,7 +20,8 @@ type agreementTest struct {
 }
 
 func setupAgreementTest(t *testing.T) *agreementTest {
-	endpoint, err := domain.NewAgreementEndpoint()
+	repo := tc.NewFakeAgreementRepo()
+	endpoint, err := domain.NewAgreementEndpoint(repo)
 	assert.NoError(t, err)
 
 	return &agreementTest{
@@ -30,12 +32,12 @@ func setupAgreementTest(t *testing.T) *agreementTest {
 
 func Test_can_accept_and_then_get_agreements(t *testing.T) {
 	state := setupAgreementTest(t)
-	agreements := []*domain.Agreement{
+	agreements := [3]*domain.Agreement{
 		agreementBuilder{}.build(),
 		agreementBuilder{}.build(),
 		agreementBuilder{Accepted: tc.NewPtr(false)}.build()}
 
-	models := []*domain.AgreementModel{}
+	models := [len(agreements)]*domain.AgreementModel{}
 	for i, ag := range agreements {
 		model, err := state.sut.AgreementCreate(state.ctx, *ag)
 		assert.NoError(t, err)
@@ -62,7 +64,7 @@ func Test_can_get_all_agreements_for_a_participant(t *testing.T) {
 	otherParticipant := domain.ParticipantId(uuid.New())
 	otherAgreementModel := state.createAgreement(*agreementBuilder{ParticipantId: &otherParticipant}.build())
 
-	result, err := state.sut.AgreementGetAll(state.ctx, participantId)
+	result, err := state.sut.AgreementGetByParticipant(state.ctx, participantId)
 
 	assert.NoError(t, err)
 	assert.Equal(t, len(participantAgreementModels), len(result))
