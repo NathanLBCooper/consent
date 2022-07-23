@@ -44,15 +44,20 @@ var (
 	Owner = Role{"owner"}
 )
 
-type AccountEndpoint struct {
-	accountRepo AccountRepo
-}
-
 type AccountRepo interface {
 	UserCreate(context.Context, User) (*UserModel, error)
 	UserGet(context.Context, UserId) (*UserModel, error)
 	OrganizationCreate(context.Context, Organization) (*OrganizationModel, error)
 	OrganizationGet(context.Context, OrganizationId) (*OrganizationModel, error)
+}
+
+type OrganizationCreateRequest struct {
+	Name        string
+	OwnerUserId UserId
+}
+
+type AccountEndpoint struct {
+	accountRepo AccountRepo
 }
 
 func NewAccountEndpoint(accountRepo AccountRepo) (*AccountEndpoint, error) {
@@ -65,11 +70,6 @@ func (e *AccountEndpoint) UserCreate(ctx Context, user User) (*UserModel, error)
 
 func (e *AccountEndpoint) UserGet(ctx Context, id UserId) (*UserModel, error) {
 	return e.accountRepo.UserGet(ctx, id)
-}
-
-type OrganizationCreateRequest struct {
-	Name        string
-	OwnerUserId UserId
 }
 
 func (e *AccountEndpoint) OrganizationCreate(ctx Context, req OrganizationCreateRequest) (*OrganizationModel, error) {

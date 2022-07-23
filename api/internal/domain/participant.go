@@ -20,16 +20,16 @@ type ParticipantModel struct {
 
 // todo joining of Participant in different organisation. Person? Remove OrganizationId and ExternalId from Participant?
 
+type ParticipantCreateRequest struct {
+	ExternalId     string
+	OrganizationId OrganizationId
+}
+
 type ParticipantEndpoint struct {
 }
 
 func NewParticipantEndpoint() (*ParticipantEndpoint, error) {
 	return &ParticipantEndpoint{}, nil
-}
-
-type ParticipantCreateRequest struct {
-	ExternalId     string
-	OrganizationId OrganizationId
 }
 
 func (e *ParticipantEndpoint) ParticipantCreate(ctx Context, req ParticipantCreateRequest) (*ParticipantModel, error) {
