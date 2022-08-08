@@ -83,7 +83,7 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("userEndpoint init fail", err)
 	}
 
-	participantEndpoint, err := domain.NewParticipantEndpoint()
+	participantEndpoint, err := domain.NewParticipantEndpoint(nil) // todo nil
 	if err != nil {
 		log.Fatalln("participantEndpoint init fail", err)
 	}
@@ -93,12 +93,12 @@ func configureDependencies(engine *gin.Engine, config *Config) *container {
 		log.Fatalln("healthController init fail", err)
 	}
 
-	accountController, err := newAccountController(accountEndpoint, nil, engine)
+	accountController, err := newAccountController(accountEndpoint, nil, engine) // todo nil
 	if err != nil {
 		log.Fatalln("accountController init fail", err)
 	}
 
-	participantController, err := newParticipantController(participantEndpoint, nil, engine)
+	participantController, err := newParticipantController(participantEndpoint, nil, engine) // todo nil
 	if err != nil {
 		log.Fatalln("accountController init fail", err)
 	}

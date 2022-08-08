@@ -1,14 +1,16 @@
 package domain
 
 import (
-	"errors"
+	"context"
 
 	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
+// Participants just belong to one organisation for now.
+
 type Participant struct {
-	ExternalId     string
-	OrganizationId string
+	ExternalId     ParticipantExternalId
+	OrganizationId OrganizationId
 	Tags           []Tag
 }
 
@@ -18,28 +20,30 @@ type ParticipantModel struct {
 	Participant
 }
 
-// todo joining of Participant in different organisation. Person? Remove OrganizationId and ExternalId from Participant?
+type ParticipantExternalId string
 
-type ParticipantCreateRequest struct {
-	ExternalId     string
-	OrganizationId OrganizationId
+type ParticipantRepo interface {
+	ParticipantCreate(context.Context, Participant) (*ParticipantModel, error)
+	ParticipantGet(context.Context, ParticipantId) (*ParticipantModel, error)
+	ParticipantGetByExternalId(context.Context, ParticipantExternalId) (*ParticipantModel, error)
 }
 
 type ParticipantEndpoint struct {
+	participantRepo ParticipantRepo
 }
 
-func NewParticipantEndpoint() (*ParticipantEndpoint, error) {
-	return &ParticipantEndpoint{}, nil
+func NewParticipantEndpoint(participantRepo ParticipantRepo) (*ParticipantEndpoint, error) {
+	return &ParticipantEndpoint{participantRepo: participantRepo}, nil
 }
 
-func (e *ParticipantEndpoint) ParticipantCreate(ctx Context, req ParticipantCreateRequest) (*ParticipantModel, error) {
-	return nil, errors.New("not implemented")
+func (e *ParticipantEndpoint) ParticipantCreate(ctx Context, participant Participant) (*ParticipantModel, error) {
+	return e.participantRepo.ParticipantCreate(ctx, participant)
 }
 
 func (e *ParticipantEndpoint) ParticipantGet(ctx Context, id ParticipantId) (*ParticipantModel, error) {
-	return nil, errors.New("not implemented")
+	return e.participantRepo.ParticipantGet(ctx, id)
 }
 
-func (e *ParticipantEndpoint) ParticipantGetByExternalId(ctx Context, externalId string) (*ParticipantModel, error) {
-	return nil, errors.New("not implemented")
+func (e *ParticipantEndpoint) ParticipantGetByExternalId(ctx Context, externalId ParticipantExternalId) (*ParticipantModel, error) {
+	return e.participantRepo.ParticipantGetByExternalId(ctx, externalId)
 }
