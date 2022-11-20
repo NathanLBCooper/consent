@@ -1,26 +1,31 @@
 version: '3.4'
 
 services:
-#   consent-frontend:
-#     volumes:
-#       - ./consent-frontend/src:/workdir/src
-#       - ./consent-frontend/public:/workdir/public
-#       - ./consent-frontend/package.json:/workdir/package.json
-#       - ./consent-frontend/yarn.lock:/workdir/yarn.lock
-#       - ./consent-frontend/tsconfig.json:/workdir/tsconfig.json
-
   api:
     environment:
-      - mongoconnectionsettings__uri=mongodb://mongo:27017
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "33080:80"
     depends_on:
-      - mongo
+      - sql-server
 
-  mongo:
-      image: mongo:5.0
-      ports:
-        - 33002:27017
-      volumes:
-        - .data/mongo:/data/db
-      environment:
-        MONGO_INITDB_ROOT_USERNAME: root
-        MONGO_INITDB_ROOT_PASSWORD: example
+  # consent-frontend:
+  #   volumes:
+  #     - ./consent-frontend/src:/workdir/src
+  #     - ./consent-frontend/public:/workdir/public
+  #     - ./consent-frontend/package.json:/workdir/package.json
+  #     - ./consent-frontend/yarn.lock:/workdir/yarn.lock
+  #     - ./consent-frontend/tsconfig.json:/workdir/tsconfig.json
+  #   ports:
+  #     - "33000:3000"
+
+  sql-server:
+    image: ${DOCKER_REGISTRY-}developmentsqlserver
+    build: ./sql-server-container
+    user: root
+    expose:
+      - 1433
+    ports:
+      - 31433:1433
+    volumes:
+      - .data/sqlserver:/var/opt/mssql/data
