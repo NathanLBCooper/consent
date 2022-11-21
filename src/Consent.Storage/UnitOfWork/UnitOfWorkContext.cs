@@ -14,8 +14,7 @@ namespace Consent.Storage.UnitOfWork
         public UnitOfWorkContext(SqlSettings sqlSettings)
         {
             if (sqlSettings == null) throw new ArgumentNullException(nameof(sqlSettings));
-            if (sqlSettings?.ConnectionString == null)
-                throw new ArgumentException($"{nameof(SqlSettings.ConnectionString)} cannot be null", nameof(sqlSettings));
+            if (string.IsNullOrEmpty(sqlSettings.ConnectionString)) throw new ArgumentException(nameof(sqlSettings.ConnectionString));
 
             _connectionString = sqlSettings.ConnectionString;
         }

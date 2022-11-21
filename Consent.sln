@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consent.Api", "src\Consent.
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{DC14D6DB-B633-4CFA-8AF9-D3E7050011C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consent.Api.Tests", "test\Consent.Api.Tests\Consent.Api.Tests.csproj", "{D8506CB4-D759-4C10-898F-FC5F75C0EA0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consent.Tests", "test\Consent.Tests\Consent.Tests.csproj", "{D8506CB4-D759-4C10-898F-FC5F75C0EA0F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consent.Domain", "src\Consent.Domain\Consent.Domain.csproj", "{1632DBF8-B5AE-4B71-B84E-25575A0666E4}"
 EndProject

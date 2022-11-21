@@ -5,7 +5,7 @@ services:
     image: ${DOCKER_REGISTRY-}consentapi
     build:
       context: .
-      dockerfile: src/Api/Dockerfile
+      dockerfile: src/Consent.Api/Dockerfile
 
 #  consent-frontend:
 #     image: ${DOCKER_REGISTRY-}consentfrontend

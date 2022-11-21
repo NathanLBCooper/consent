@@ -8,9 +8,9 @@ using System.Data.SqlClient;
 
 namespace Consent.Storage.Migrator
 {
-    internal class Program
+    public class Program
     {
-        public static int Main(string[] args)
+        internal static int Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                .AddJsonFile("appsettings.json")
