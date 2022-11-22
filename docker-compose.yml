@@ -6,6 +6,14 @@ services:
     build:
       context: .
       dockerfile: src/Consent.Api/Dockerfile
+    depends_on:
+      - migrator
+
+  migrator:
+     image: ${DOCKER_REGISTRY-}consentmigrator
+     build:
+       context: .
+       dockerfile: src/Consent.Storage.Migrator/Dockerfile
 
 #  consent-frontend:
 #     image: ${DOCKER_REGISTRY-}consentfrontend
