@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Consent.Tests.Infrastructure
+namespace Consent.Tests
 {
     internal class NullLogger<TCategoryName> : ILogger<TCategoryName>
     {

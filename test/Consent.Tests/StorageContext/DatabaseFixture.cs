@@ -4,7 +4,7 @@ using Consent.Storage.UnitOfWork;
 using System;
 using System.Data;
 
-namespace Consent.Tests.Infrastructure
+namespace Consent.Tests.StorageContext
 {
     public class DatabaseFixture : IDisposable
     {

@@ -5,7 +5,7 @@ using System;
 using System.Data.SqlClient;
 using System.Reflection;
 
-namespace Consent.Tests.Infrastructure
+namespace Consent.Tests.StorageContext
 {
     internal class TestDatabaseContext : IDisposable
     {
@@ -36,9 +36,9 @@ namespace Consent.Tests.Infrastructure
             masterConnection.Execute($"create database [{databaseName}]");
         }
 
-        private static void MigrateDatabase(string panelistCommunicationsConnectionString)
+        private static void MigrateDatabase(string connectionString)
         {
-            using var connection = new SqlConnection(panelistCommunicationsConnectionString);
+            using var connection = new SqlConnection(connectionString);
             var databaseProvider = new MssqlDatabaseProvider(connection);
             var migrator = new SimpleMigrator(typeof(Consent.Storage.Migrator.Program).GetTypeInfo().Assembly, databaseProvider);
             migrator.Load();

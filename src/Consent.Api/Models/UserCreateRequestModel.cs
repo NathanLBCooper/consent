@@ -2,14 +2,14 @@
 
 namespace Consent.Api.Models
 {
-    public record OrganizationCreateRequestModel
+    public record UserCreateRequestModel
     {
         public string? Name { get; init; }
     }
 
-    public class OrganizationCreateRequestModelValidator : AbstractValidator<OrganizationCreateRequestModel>
+    public class UserCreateRequestModelValidator : AbstractValidator<UserCreateRequestModel>
     {
-        public OrganizationCreateRequestModelValidator()
+        public UserCreateRequestModelValidator()
         {
             RuleFor(q => q).NotEmpty();
             RuleFor(q => q.Name).NotNull().NotEmpty();

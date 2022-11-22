@@ -41,7 +41,7 @@ namespace Consent.Storage.Migrator
 
         private static void MigrateDatabase(SqlSettings settings)
         {
-            var migrationsAssembly = typeof(Migrations.Migration001_Todo).Assembly;
+            var migrationsAssembly = typeof(Migrations.Migration001_Account).Assembly;
             using (var connection = new SqlConnection(settings.ConnectionString))
             {
                 var databaseProvider = new MssqlDatabaseProvider(connection);
