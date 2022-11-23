@@ -80,8 +80,15 @@ namespace Consent.Tests.Workspaces
             var memberships = await _sut.WorkspaceMembersGet(created.Id, ctx);
 
             memberships.ShouldNotBeNull();
-            memberships[0].UserId.ShouldBe(ctx.UserId);
-            // todo etc
+
+            var membership = memberships[0];
+            membership.UserId.ShouldBe(ctx.UserId);
+            membership.WorkspaceId.ShouldBe(created.Id);
+            membership.Permissions.ShouldBeEquivalentTo(
+                new[] { WorkspacePermission.View, WorkspacePermission.Edit, WorkspacePermission.Admin, WorkspacePermission.Buyer }
+                );
+
+            // todo add more user to workspace
         }
 
         // to check only admin can Can_get_workspace_memberships
