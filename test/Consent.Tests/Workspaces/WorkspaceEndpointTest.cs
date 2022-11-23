@@ -5,6 +5,7 @@ using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Consent.Tests.StorageContext;
 using Shouldly;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -18,11 +19,12 @@ namespace Consent.Tests.Workspaces
 
         public WorkspaceEndpointTest(DatabaseFixture fixture)
         {
-            var workspaceRepository = new WorkspaceRepository(fixture.GetConnection);
-            _sut = new WorkspaceEndpoint(workspaceRepository, fixture.CreateUnitOfWork);
+            var unitOfWorkContext = fixture.CreateUnitOfWorkContext();
 
-            var userRepository = new UserRepository(fixture.GetConnection);
-            _userEndpoint = new UserEndpoint(userRepository, fixture.CreateUnitOfWork);
+            var workspaceRepository = new WorkspaceRepository(unitOfWorkContext);
+            var userRepository = new UserRepository(unitOfWorkContext);
+            _sut = new WorkspaceEndpoint(workspaceRepository, userRepository, unitOfWorkContext);
+            _userEndpoint = new UserEndpoint(userRepository, unitOfWorkContext);
         }
 
         [Fact]
@@ -30,7 +32,7 @@ namespace Consent.Tests.Workspaces
         {
             var ctx = await CreateUserContext();
 
-            var workspace = new Workspace("someworkspacename");
+            var workspace = NewWorkspace();
             var created = await _sut.WorkspaceCreate(workspace, ctx);
 
             created.ShouldNotBeNull();
@@ -44,11 +46,20 @@ namespace Consent.Tests.Workspaces
         }
 
         [Fact]
+        public void Cannot_create_workspace_with_nonexistant_user()
+        {
+            var workspace = NewWorkspace();
+            var action = async () => await _sut.WorkspaceCreate(workspace, new Context { UserId = new UserId(-1) });
+
+            action.ShouldThrowAsync<ArgumentException>();
+        }
+
+        [Fact]
         public async Task Workspace_creater_gets_all_permissions()
         {
             var ctx = await CreateUserContext();
 
-            var created = await _sut.WorkspaceCreate(new Workspace("someworkspacename"), ctx);
+            var created = await _sut.WorkspaceCreate(NewWorkspace(), ctx);
 
             var permissions = await _sut.WorkspacePermissionsGet(created.Id, ctx);
             permissions.ShouldBeEquivalentTo(
@@ -61,7 +72,7 @@ namespace Consent.Tests.Workspaces
         {
             var ctx = await CreateUserContext();
 
-            var created = await _sut.WorkspaceCreate(new Workspace("someworkspacename"), ctx);
+            var created = await _sut.WorkspaceCreate(NewWorkspace(), ctx);
 
             var permissionsForNonexistant = await _sut.WorkspacePermissionsGet(new WorkspaceId(-1), ctx);
             permissionsForNonexistant.ShouldBeEmpty();
@@ -76,7 +87,7 @@ namespace Consent.Tests.Workspaces
         {
             var ctx = await CreateUserContext();
 
-            var created = await _sut.WorkspaceCreate(new Workspace("someworkspacename"), ctx);
+            var created = await _sut.WorkspaceCreate(NewWorkspace(), ctx);
             var memberships = await _sut.WorkspaceMembersGet(created.Id, ctx);
 
             memberships.ShouldNotBeNull();
@@ -94,6 +105,8 @@ namespace Consent.Tests.Workspaces
         // to check only admin can Can_get_workspace_memberships
 
         private async Task<Context> CreateUserContext([CallerMemberName] string callerName = "") =>
-            new Context { UserId = (await _userEndpoint.UserCreate(new User(callerName))).Id };
+            new Context { UserId = (await _userEndpoint.UserCreate(new User($"{callerName}-user"))).Id };
+
+        private Workspace NewWorkspace([CallerMemberName] string callerName = "") => new Workspace($"{callerName}-workspace");
     }
 }

@@ -19,8 +19,8 @@ create table [dbo].[Workspace](
     );
 
 create table [dbo].[UserWorkspaceMembership](
-    [UserId] int not null,
-    [WorkspaceId] int not null,
+    [UserId] int foreign key references [User]([Id]),
+    [WorkspaceId] int foreign key references [Workspace]([Id]),
     [Permission] int not null,
     unique nonclustered ([UserId],[WorkspaceId],[Permission]) 
     );

@@ -1,18 +1,16 @@
-﻿using Consent.Domain.UnitOfWork;
-using Consent.Storage;
+﻿using Consent.Storage;
 using Consent.Storage.TypeHandlers;
 using Consent.Storage.UnitOfWork;
 using System;
-using System.Data;
 
 namespace Consent.Tests.StorageContext
 {
     public class DatabaseFixture : IDisposable
     {
         private readonly TestDatabaseContext _testDatabaseContext;
+        private readonly SqlSettings _sqlSettings;
 
-        public IGetConnection GetConnection { get; }
-        public ICreateUnitOfWork CreateUnitOfWork { get; }
+        public UnitOfWorkContext CreateUnitOfWorkContext() => new UnitOfWorkContext(_sqlSettings);
 
         public DatabaseFixture()
         {
@@ -20,11 +18,7 @@ namespace Consent.Tests.StorageContext
             _testDatabaseContext.InitializeTestDatabase();
             var connectionString = _testDatabaseContext.ConnectionString;
 
-            var sqlSettings = new SqlSettings { ConnectionString = connectionString };
-
-            var unitOfWorkContext = new UnitOfWorkContext(sqlSettings);
-            CreateUnitOfWork = unitOfWorkContext;
-            GetConnection = unitOfWorkContext;
+            _sqlSettings = new SqlSettings { ConnectionString = connectionString };
         }
 
         static DatabaseFixture()

@@ -14,8 +14,9 @@ namespace Consent.Tests.Users
 
         public UserEndpointTest(DatabaseFixture fixture)
         {
-            var userRepository = new UserRepository(fixture.GetConnection);
-            _sut = new UserEndpoint(userRepository, fixture.CreateUnitOfWork);
+            var unitOfWorkContext = fixture.CreateUnitOfWorkContext();
+            var userRepository = new UserRepository(unitOfWorkContext);
+            _sut = new UserEndpoint(userRepository, unitOfWorkContext);
         }
 
         [Fact]

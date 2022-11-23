@@ -48,6 +48,8 @@ namespace Consent.Api.Controllers
 
             var workspace = await _workspaceEndpoint.WorkspaceCreate(new Workspace(request.Name), new Context { UserId = new UserId(userId) });
 
+            // todo handle user doesn't exist
+
             return Ok(workspace.ToModel());
         }
 

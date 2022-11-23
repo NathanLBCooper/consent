@@ -1,4 +1,5 @@
 ﻿using Consent.Domain.UnitOfWork;
+using Consent.Domain.Users;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,17 +17,26 @@ namespace Consent.Domain.Workspaces
     public class WorkspaceEndpoint : IWorkspaceEndpoint
     {
         private readonly IWorkspaceRepository _workspaceRepository;
+        private readonly IUserRepository _userRepository;
         private readonly ICreateUnitOfWork _createUnitOfWork;
 
-        public WorkspaceEndpoint(IWorkspaceRepository workspaceRepository, ICreateUnitOfWork createUnitOfWork)
+        public WorkspaceEndpoint(IWorkspaceRepository workspaceRepository, IUserRepository userRepository,
+            ICreateUnitOfWork createUnitOfWork)
         {
             _workspaceRepository = workspaceRepository;
+            _userRepository = userRepository;
             _createUnitOfWork = createUnitOfWork;
         }
 
         public async Task<WorkspaceEntity> WorkspaceCreate(Workspace workspace, Context ctx)
         {
             using var uow = _createUnitOfWork.Create();
+            var user = await _userRepository.Get(ctx.UserId);
+            if (user == null)
+            {
+                throw new ArgumentException("User does not exist");
+            }
+
             var created = await _workspaceRepository.Create(workspace);
 
             await _workspaceRepository.PermissionsCreate(ctx.UserId, created.Id,
