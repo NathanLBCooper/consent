@@ -21,7 +21,7 @@ namespace Consent.Api.Controllers
             _userEndpoint = userEndpoint;
         }
 
-        [HttpGet("User", Name = "GetUser")]
+        [HttpGet("", Name = "GetUser")]
         public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId)
         {
             var user = await _userEndpoint.UserGet(new Context { UserId = new UserId(userId) });
@@ -31,7 +31,7 @@ namespace Consent.Api.Controllers
             return Ok(user.ToModel());
         }
 
-        [HttpPost("User", Name = "CreateUser")]
+        [HttpPost("", Name = "CreateUser")]
         public async Task<ActionResult<UserModel>> UserCreate(UserCreateRequestModel request)
         {
             var validationResult = _userCreateRequestModelValidator.Validate(request);

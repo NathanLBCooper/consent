@@ -4,7 +4,6 @@ using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +24,7 @@ namespace Consent.Api.Controllers
             _workspaceEndpoint = workspaceEndpoint;
         }
 
-        [HttpGet("Workspace/{id}", Name = "GetWorkspace")]
+        [HttpGet("{id}", Name = "GetWorkspace")]
         public async Task<ActionResult<WorkspaceModel>> WorkspaceGet(int id, [FromHeader] int userId)
         {
             var workspace = await _workspaceEndpoint.WorkspaceGet(new WorkspaceId(id), new Context { UserId = new UserId(userId) });
@@ -35,7 +34,7 @@ namespace Consent.Api.Controllers
             return Ok(workspace.ToModel());
         }
 
-        [HttpPost("Workspace", Name ="CreateWorkspace")]
+        [HttpPost("", Name ="CreateWorkspace")]
         public async Task<ActionResult<WorkspaceModel>> WorkspaceCreate(WorkspaceCreateRequestModel request, [FromHeader] int userId)
         {
             var validationResult = _workspaceCreateRequestModelValidator.Validate(request);
@@ -48,15 +47,13 @@ namespace Consent.Api.Controllers
 
             var workspace = await _workspaceEndpoint.WorkspaceCreate(new Workspace(request.Name), new Context { UserId = new UserId(userId) });
 
-            // todo handle user doesn't exist
-
             return Ok(workspace.ToModel());
         }
 
-        [HttpGet("Workspace/{id}/Permissions", Name = "PermissionsGet")]
-        public async Task<ActionResult<WorkspacePermission[]>> PermissionsGet(int workspaceId, [FromHeader] int userId)
+        [HttpGet("{id}/Permissions", Name = "PermissionsGet")]
+        public async Task<ActionResult<WorkspacePermission[]>> PermissionsGet(int id, [FromHeader] int userId)
         {
-            var permissions = await _workspaceEndpoint.WorkspacePermissionsGet(new WorkspaceId(workspaceId), new Context { UserId = new UserId(userId) });
+            var permissions = await _workspaceEndpoint.WorkspacePermissionsGet(new WorkspaceId(id), new Context { UserId = new UserId(userId) });
 
             if (permissions == null || !permissions.Any()) return NotFound();
 
