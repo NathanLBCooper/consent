@@ -2,6 +2,10 @@
 
 namespace Consent.Domain.Workspaces
 {
+    /**
+     *  A container for ... something todo
+     */
+
     public record Workspace
     {
         public string Name { get; private init; }

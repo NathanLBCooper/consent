@@ -2,6 +2,10 @@
 
 namespace Consent.Domain.Users
 {
+    /**
+     *  A user of the system who manages and sets up things
+     */
+
     public record User
     {
         public string Name { get; private init; }
