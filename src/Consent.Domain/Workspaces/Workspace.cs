@@ -1,5 +1,4 @@
-﻿using Consent.Domain.Users;
-using System;
+﻿using System;
 
 namespace Consent.Domain.Workspaces
 {
@@ -30,26 +29,4 @@ namespace Consent.Domain.Workspaces
     }
 
     public record struct WorkspaceId(int Value);
-
-    public record WorkspaceMembership
-    {
-        public UserId UserId { get; private init; }
-        public WorkspaceId WorkspaceId { get; private init; }
-        public WorkspacePermission[] Permissions { get; private init; }
-
-        public WorkspaceMembership(UserId userId, WorkspaceId workspaceId, WorkspacePermission[] permissions)
-        {
-            UserId = userId;
-            WorkspaceId = workspaceId;
-            Permissions = permissions;
-        }
-    }
-
-    public enum WorkspacePermission
-    {
-        View,
-        Edit,
-        Admin,
-        Buyer
-    }
 }
