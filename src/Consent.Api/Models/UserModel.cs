@@ -12,7 +12,7 @@ namespace Consent.Api.Models
     {
         public static UserModel ToModel(this UserEntity entity)
         {
-            return new UserModel { Id = entity.Id, Name = entity.Name };
+            return new UserModel { Id = entity.Id.Value, Name = entity.Name };
         }
     }
 }

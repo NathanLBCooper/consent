@@ -13,16 +13,18 @@ namespace Consent.Domain.Users
         }
     }
 
-    public record UserEntity : User, IEntity
-    {
-        public int Id { get; private init; }
+    public record struct UserId(int Value);
 
-        public UserEntity(int id, User user) : base(user)
+    public record UserEntity : User
+    {
+        public UserId Id { get; private init; }
+
+        public UserEntity(UserId id, User user) : base(user)
         {
             Id = id;
         }
 
-        public UserEntity(int id, string name) : base(name)
+        public UserEntity(UserId id, string name) : base(name)
         {
             Id = id;
         }

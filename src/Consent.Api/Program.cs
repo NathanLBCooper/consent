@@ -20,6 +20,7 @@ namespace Consent.Api
                 .Build();
 
             ConfigureLogging(configuration);
+            Storage.TypeHandlers.TypeHandlers.Setup();
 
             try
             {

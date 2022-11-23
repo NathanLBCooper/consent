@@ -14,28 +14,30 @@ namespace Consent.Domain.Workspaces
         }
     }
 
-    public record WorkspaceEntity : Workspace, IEntity
+    public record WorkspaceEntity : Workspace
     {
-        public int Id { get; private init; }
+        public WorkspaceId Id { get; private init; }
 
-        public WorkspaceEntity(int id, Workspace workspace) : base(workspace)
+        public WorkspaceEntity(WorkspaceId id, Workspace workspace) : base(workspace)
         {
             Id = id;
         }
 
-        public WorkspaceEntity(int id, string name) : base(name)
+        public WorkspaceEntity(WorkspaceId id, string name) : base(name)
         {
             Id = id;
         }
     }
 
+    public record struct WorkspaceId(int Value);
+
     public record WorkspaceMembership
     {
-        public int UserId { get; private init; }
-        public int WorkspaceId { get; private init; }
+        public UserId UserId { get; private init; }
+        public WorkspaceId WorkspaceId { get; private init; }
         public WorkspacePermission[] Permissions { get; private init; }
 
-        public WorkspaceMembership(int userId, int workspaceId, WorkspacePermission[] permissions)
+        public WorkspaceMembership(UserId userId, WorkspaceId workspaceId, WorkspacePermission[] permissions)
         {
             UserId = userId;
             WorkspaceId = workspaceId;

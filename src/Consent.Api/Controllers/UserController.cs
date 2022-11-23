@@ -24,7 +24,7 @@ namespace Consent.Api.Controllers
         [HttpGet("User", Name = "GetUser")]
         public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId)
         {
-            var user = await _userEndpoint.UserGet(new Context { UserId = userId });
+            var user = await _userEndpoint.UserGet(new Context { UserId = new UserId(userId) });
 
             if (user == null) return NotFound();
 

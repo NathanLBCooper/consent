@@ -1,5 +1,6 @@
 ﻿using Consent.Domain.UnitOfWork;
 using Consent.Storage;
+using Consent.Storage.TypeHandlers;
 using Consent.Storage.UnitOfWork;
 using System;
 using System.Data;
@@ -26,7 +27,10 @@ namespace Consent.Tests.StorageContext
             GetConnection = unitOfWorkContext;
         }
 
-        public (IDbConnection connection, IDbTransaction transaction) GetCurrentConnection() => GetConnection.GetConnection();
+        static DatabaseFixture()
+        {
+            TypeHandlers.Setup();
+        }
 
         public void Dispose()
         {

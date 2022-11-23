@@ -8,9 +8,9 @@ namespace Consent.Domain.Workspaces
     public interface IWorkspaceEndpoint
     {
         Task<WorkspaceEntity> WorkspaceCreate(Workspace workspace, Context ctx);
-        Task<WorkspaceEntity?> WorkspaceGet(int id, Context ctx);
-        Task<WorkspacePermission[]> WorkspacePermissionsGet(int workspaceId, Context ctx);
-        Task<WorkspaceMembership[]?> WorkspaceMembersGet(int workspaceId, Context ctx);
+        Task<WorkspaceEntity?> WorkspaceGet(WorkspaceId id, Context ctx);
+        Task<WorkspacePermission[]> WorkspacePermissionsGet(WorkspaceId workspaceId, Context ctx);
+        Task<WorkspaceMembership[]?> WorkspaceMembersGet(WorkspaceId workspaceId, Context ctx);
     }
 
     public class WorkspaceEndpoint : IWorkspaceEndpoint
@@ -36,7 +36,7 @@ namespace Consent.Domain.Workspaces
             return created;
         }
 
-        public async Task<WorkspaceEntity?> WorkspaceGet(int id, Context ctx)
+        public async Task<WorkspaceEntity?> WorkspaceGet(WorkspaceId id, Context ctx)
         {
             using var uow = _createUnitOfWork.Create();
 
@@ -49,14 +49,14 @@ namespace Consent.Domain.Workspaces
             return await _workspaceRepository.Get(id);
         }
 
-        public async Task<WorkspacePermission[]> WorkspacePermissionsGet(int workspaceId, Context ctx)
+        public async Task<WorkspacePermission[]> WorkspacePermissionsGet(WorkspaceId workspaceId, Context ctx)
         {
             using var uow = _createUnitOfWork.Create();
 
             return await _workspaceRepository.PermissionsGet(ctx.UserId, workspaceId);
         }
 
-        public async Task<WorkspaceMembership[]?> WorkspaceMembersGet(int workspaceId, Context ctx)
+        public async Task<WorkspaceMembership[]?> WorkspaceMembersGet(WorkspaceId workspaceId, Context ctx)
         {
             using var uow = _createUnitOfWork.Create();
 

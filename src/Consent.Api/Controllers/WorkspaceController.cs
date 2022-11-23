@@ -1,5 +1,6 @@
 ﻿using Consent.Api.Models;
 using Consent.Domain;
+using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,7 @@ namespace Consent.Api.Controllers
         [HttpGet("Workspace/{id}", Name = "GetWorkspace")]
         public async Task<ActionResult<WorkspaceModel>> WorkspaceGet(int id, [FromHeader] int userId)
         {
-            var workspace = await _workspaceEndpoint.WorkspaceGet(id, new Context { UserId = userId });
+            var workspace = await _workspaceEndpoint.WorkspaceGet(new WorkspaceId(id), new Context { UserId = new UserId(userId) });
 
             if (workspace == null) return NotFound();
 
@@ -45,7 +46,7 @@ namespace Consent.Api.Controllers
 
             if (request?.Name == null) return Problem();
 
-            var workspace = await _workspaceEndpoint.WorkspaceCreate(new Workspace(request.Name), new Context { UserId = userId });
+            var workspace = await _workspaceEndpoint.WorkspaceCreate(new Workspace(request.Name), new Context { UserId = new UserId(userId) });
 
             return Ok(workspace.ToModel());
         }
@@ -53,7 +54,7 @@ namespace Consent.Api.Controllers
         [HttpGet("Workspace/{id}/Permissions", Name = "PermissionsGet")]
         public async Task<ActionResult<WorkspacePermission[]>> PermissionsGet(int workspaceId, [FromHeader] int userId)
         {
-            var permissions = await _workspaceEndpoint.WorkspacePermissionsGet(workspaceId, new Context { UserId = userId });
+            var permissions = await _workspaceEndpoint.WorkspacePermissionsGet(new WorkspaceId(workspaceId), new Context { UserId = new UserId(userId) });
 
             if (permissions == null || !permissions.Any()) return NotFound();
 

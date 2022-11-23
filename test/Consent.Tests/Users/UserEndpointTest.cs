@@ -10,14 +10,12 @@ namespace Consent.Tests.Users
     [Collection("DatabaseTest")]
     public class UserEndpointTest
     {
-        private readonly DatabaseFixture _fixture;
         private readonly UserEndpoint _sut;
 
         public UserEndpointTest(DatabaseFixture fixture)
         {
-            _fixture = fixture;
-            var userRepository = new UserRepository(_fixture.GetConnection);
-            _sut = new UserEndpoint(userRepository, _fixture.CreateUnitOfWork);
+            var userRepository = new UserRepository(fixture.GetConnection);
+            _sut = new UserEndpoint(userRepository, fixture.CreateUnitOfWork);
         }
 
         [Fact]
@@ -34,6 +32,5 @@ namespace Consent.Tests.Users
             fetched.Id.ShouldBe(created.Id);
             fetched.Name.ShouldBe(created.Name);
         }
-
     }
 }

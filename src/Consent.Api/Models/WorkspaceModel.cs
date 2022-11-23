@@ -12,7 +12,7 @@ namespace Consent.Api.Models
     {
         public static WorkspaceModel ToModel(this WorkspaceEntity entity)
         {
-            return new WorkspaceModel { Id = entity.Id, Name = entity.Name };
+            return new WorkspaceModel { Id = entity.Id.Value, Name = entity.Name };
         }
     }
 }

@@ -5,6 +5,7 @@ using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Consent.Tests.StorageContext;
 using Shouldly;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Consent.Tests.Workspaces
@@ -12,19 +13,16 @@ namespace Consent.Tests.Workspaces
     [Collection("DatabaseTest")]
     public class WorkspaceEndpointTest
     {
-        private readonly DatabaseFixture _fixture;
         private readonly WorkspaceEndpoint _sut;
         private readonly UserEndpoint _userEndpoint;
 
         public WorkspaceEndpointTest(DatabaseFixture fixture)
         {
-            _fixture = fixture;
+            var workspaceRepository = new WorkspaceRepository(fixture.GetConnection);
+            _sut = new WorkspaceEndpoint(workspaceRepository, fixture.CreateUnitOfWork);
 
-            var workspaceRepository = new WorkspaceRepository(_fixture.GetConnection);
-            _sut = new WorkspaceEndpoint(workspaceRepository, _fixture.CreateUnitOfWork);
-
-            var userRepository = new UserRepository(_fixture.GetConnection);
-            _userEndpoint = new UserEndpoint(userRepository, _fixture.CreateUnitOfWork);
+            var userRepository = new UserRepository(fixture.GetConnection);
+            _userEndpoint = new UserEndpoint(userRepository, fixture.CreateUnitOfWork);
         }
 
         [Fact]
@@ -65,7 +63,7 @@ namespace Consent.Tests.Workspaces
 
             var created = await _sut.WorkspaceCreate(new Workspace("someworkspacename"), ctx);
 
-            var permissionsForNonexistant = await _sut.WorkspacePermissionsGet(-1, ctx);
+            var permissionsForNonexistant = await _sut.WorkspacePermissionsGet(new WorkspaceId(-1), ctx);
             permissionsForNonexistant.ShouldBeEmpty();
 
             var anotherUserCtx = await CreateUserContext();
@@ -84,12 +82,11 @@ namespace Consent.Tests.Workspaces
             memberships.ShouldNotBeNull();
             memberships[0].UserId.ShouldBe(ctx.UserId);
             // todo etc
-
-
         }
 
         // to check only admin can Can_get_workspace_memberships
 
-        private async Task<Context> CreateUserContext() => new Context { UserId = (await _userEndpoint.UserCreate(new User("somename"))).Id };
+        private async Task<Context> CreateUserContext([CallerMemberName] string callerName = "") =>
+            new Context { UserId = (await _userEndpoint.UserCreate(new User(callerName))).Id };
     }
 }

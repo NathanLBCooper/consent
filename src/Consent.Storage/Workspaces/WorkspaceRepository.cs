@@ -1,4 +1,5 @@
-﻿using Consent.Domain.Workspaces;
+﻿using Consent.Domain.Users;
+using Consent.Domain.Workspaces;
 using Consent.Storage.UnitOfWork;
 using Dapper;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Consent.Storage.Workspaces
             _getConnection = getConnection;
         }
 
-        public async Task<WorkspaceEntity?> Get(int id)
+        public async Task<WorkspaceEntity?> Get(WorkspaceId id)
         {
             var (connection, transaction) = _getConnection.GetConnection();
 
@@ -34,7 +35,7 @@ select * from [dbo].[Workspace] where [Id] = @id;
 insert into [dbo].[Workspace] ([Name]) values (@name);
 select SCOPE_IDENTITY();
 ";
-            var id = await connection.QuerySingleAsync<int>(query, new WorkspaceEntity(default, workspace), transaction);
+            var id = await connection.QuerySingleAsync<WorkspaceId>(query, new WorkspaceEntity(default, workspace), transaction);
 
             return new WorkspaceEntity(id, workspace);
         }
@@ -51,7 +52,7 @@ select * from [dbo].[UserWorkspaceMembership] where [UserId] = @id;
          * 
          */
 
-        public async Task<WorkspacePermission[]> PermissionsGet(int userId, int workspaceId)
+        public async Task<WorkspacePermission[]> PermissionsGet(UserId userId, WorkspaceId workspaceId)
         {
             var (connection, transaction) = _getConnection.GetConnection();
 
@@ -64,7 +65,7 @@ select * from [dbo].[UserWorkspaceMembership] where [UserId] = @userId and [Work
             return rows.Select(r => r.Permission).ToArray();
         }
 
-        public async Task<WorkspaceMembership[]> MembershipsGet(int workspaceId)
+        public async Task<WorkspaceMembership[]> MembershipsGet(WorkspaceId workspaceId)
         {
             var (connection, transaction) = _getConnection.GetConnection();
 
@@ -73,13 +74,13 @@ select * from [dbo].[UserWorkspaceMembership] where [WorkspaceId] = @workspaceId
 ";
             var membershipRows = await connection.QueryAsync<UserWorkspaceMembershipRow>(query, new { workspaceId }, transaction);
             var memberships = membershipRows.GroupBy(r => r.UserId).Select(
-                            g => new WorkspaceMembership(workspaceId, g.Key, g.Select(a => a.Permission).ToArray())
+                            g => new WorkspaceMembership(g.Key, workspaceId, g.Select(a => a.Permission).ToArray())
                         ).ToArray();
 
             return memberships;
         }
 
-        public async Task PermissionsCreate(int userId, int workspaceId, WorkspacePermission[] permissions)
+        public async Task PermissionsCreate(UserId userId, WorkspaceId workspaceId, WorkspacePermission[] permissions)
         {
             var (connection, transaction) = _getConnection.GetConnection();
 

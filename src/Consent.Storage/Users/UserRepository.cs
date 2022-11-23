@@ -14,7 +14,7 @@ namespace Consent.Storage.Users
             _getConnection = getConnection;
         }
 
-        public async Task<UserEntity?> Get(int id)
+        public async Task<UserEntity?> Get(UserId id)
         {
             var (connection, transaction) = _getConnection.GetConnection();
 
@@ -28,11 +28,12 @@ select * from [dbo].[User] where [Id] = @id;
         {
             var (connection, transaction) = _getConnection.GetConnection();
 
-            var userQuery = @"
+            var query = @"
 insert into [dbo].[User] ([Name]) values (@name);
 select SCOPE_IDENTITY();
 ";
-            var id = await connection.QuerySingleAsync<int>(userQuery, new UserEntity(default, user.Name), transaction);
+
+            var id = await connection.QuerySingleAsync<UserId>(query, new UserEntity(default, user.Name), transaction);
             return new UserEntity(id, user);
         }
     }

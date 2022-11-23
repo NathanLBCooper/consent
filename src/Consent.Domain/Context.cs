@@ -1,7 +1,9 @@
-﻿namespace Consent.Domain
+﻿using Consent.Domain.Users;
+
+namespace Consent.Domain
 {
     public record Context
     {
-        public int UserId { get; init; }
+        public UserId UserId { get; init; }
     }
 }
