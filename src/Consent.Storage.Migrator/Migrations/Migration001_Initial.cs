@@ -2,8 +2,8 @@
 
 namespace Consent.Storage.Migrator.Migrations
 {
-    [Migration(1, "Accounts")]
-    internal class Migration001_Account : Migration
+    [Migration(1, "Initial")]
+    internal class Migration001_Initial : Migration
     {
         protected override void Up()
         {
