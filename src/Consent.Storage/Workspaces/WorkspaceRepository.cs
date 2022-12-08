@@ -23,8 +23,21 @@ public class WorkspaceRepository : IWorkspaceRepository
         var query = @"
 select * from [dbo].[Workspace] where [Id] = @id;
 ";
+        var row = await connection.QuerySingleOrDefaultAsync<WorkspaceRow?>(query, new { id }, transaction);
+        if (row == null)
+        {
+            return null;
+        }
 
-        return await connection.QuerySingleOrDefaultAsync<WorkspaceEntity?>(query, new { id }, transaction);
+        var membership = @"
+select * from [dbo].[UserWorkspaceMembership] where [WorkspaceId] = @id;
+";
+        var membershipRows = await connection.QueryAsync<UserWorkspaceMembershipRow>(membership, new { id }, transaction);
+        var memberships = membershipRows.GroupBy(r => r.UserId).Select(
+                        g => new WorkspaceMembership(g.Key, g.Select(a => a.Permission).ToArray())
+                    ).ToArray();
+
+        return new WorkspaceEntity(row.Id, new Workspace(row.Name, memberships));
     }
 
     public async Task<WorkspaceEntity> Create(Workspace workspace)
@@ -37,7 +50,20 @@ select SCOPE_IDENTITY();
 ";
         var id = await connection.QuerySingleAsync<WorkspaceId>(query, new WorkspaceEntity(default, workspace), transaction);
 
+        var membershipQuery = @"
+        insert into [dbo].[UserWorkspaceMembership] ([UserId], [WorkspaceId], [Permission])
+            values (@userId, @workspaceId, @permission);
+        ";
+        var membershipRows = workspace.Memberships.SelectMany(m => m.Permissions.Select(p => new UserWorkspaceMembershipRow(m.UserId, id, p)));
+        _ = await connection.ExecuteAsync(membershipQuery, membershipRows, transaction);
+
         return new WorkspaceEntity(id, workspace);
+    }
+
+    public async Task Update(WorkspaceEntity workspace)
+    {
+        await Task.CompletedTask;
+        throw new System.NotImplementedException();
     }
 
     // todo some way of getting to the workspace from the user:
@@ -51,45 +77,8 @@ select * from [dbo].[UserWorkspaceMembership] where [UserId] = @id;
                     ).ToArray();
      * 
      */
-
-    public async Task<WorkspacePermission[]> PermissionsGet(UserId userId, WorkspaceId workspaceId)
-    {
-        var (connection, transaction) = _getConnection.GetConnection();
-
-        var query = @"
-select * from [dbo].[UserWorkspaceMembership] where [UserId] = @userId and [WorkspaceId] = @workspaceId;
-";
-
-        var rows = await connection.QueryAsync<UserWorkspaceMembershipRow>(query, new { userId, workspaceId }, transaction);
-
-        return rows.Select(r => r.Permission).ToArray();
-    }
-
-    public async Task<WorkspaceMembership[]> MembershipsGet(WorkspaceId workspaceId)
-    {
-        var (connection, transaction) = _getConnection.GetConnection();
-
-        var query = @"
-select * from [dbo].[UserWorkspaceMembership] where [WorkspaceId] = @workspaceId;
-";
-        var membershipRows = await connection.QueryAsync<UserWorkspaceMembershipRow>(query, new { workspaceId }, transaction);
-        var memberships = membershipRows.GroupBy(r => r.UserId).Select(
-                        g => new WorkspaceMembership(g.Key, workspaceId, g.Select(a => a.Permission).ToArray())
-                    ).ToArray();
-
-        return memberships;
-    }
-
-    public async Task PermissionsCreate(UserId userId, WorkspaceId workspaceId, WorkspacePermission[] permissions)
-    {
-        var (connection, transaction) = _getConnection.GetConnection();
-
-        var query = @"
-insert into [dbo].[UserWorkspaceMembership] ([UserId], [WorkspaceId], [Permission])
-    values (@userId, @workspaceId, @permission);
-";
-        var rows = permissions.Select(p => new UserWorkspaceMembershipRow(userId, workspaceId, p)).ToArray();
-
-        _ = await connection.ExecuteAsync(query, rows, transaction);
-    }
 }
+
+internal record WorkspaceRow(WorkspaceId Id, string Name);
+
+internal record UserWorkspaceMembershipRow(UserId UserId, WorkspaceId WorkspaceId, WorkspacePermission Permission);

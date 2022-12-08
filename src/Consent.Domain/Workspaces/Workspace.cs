@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Consent.Domain.Users;
 
 namespace Consent.Domain.Workspaces;
 
@@ -8,9 +11,10 @@ namespace Consent.Domain.Workspaces;
 
 public record Workspace
 {
-    public string Name { get; private init; }
+    public string Name { get; }
+    public WorkspaceMembership[] Memberships;
 
-    public Workspace(string name)
+    public Workspace(string name, WorkspaceMembership[] memberships)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -18,22 +22,24 @@ public record Workspace
         }
 
         Name = name;
+        Memberships = memberships;
+    }
+
+    public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)
+    {
+        return Memberships.SingleOrDefault(m => m.UserId == userId)?.Permissions ?? Enumerable.Empty<WorkspacePermission>();
     }
 }
+
+public record struct WorkspaceId(int Value);
+
 
 public record WorkspaceEntity : Workspace
 {
     public WorkspaceId Id { get; private init; }
 
-    public WorkspaceEntity(WorkspaceId id, Workspace workspace) : base(workspace)
-    {
-        Id = id;
-    }
-
-    public WorkspaceEntity(WorkspaceId id, string name) : base(name)
+    public WorkspaceEntity(WorkspaceId id, Workspace participant) : base(participant)
     {
         Id = id;
     }
 }
-
-public record struct WorkspaceId(int Value);

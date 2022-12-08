@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Consent.Api.Models;
-using Consent.Domain;
+using Consent.Domain.UnitOfWork;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Mvc;
@@ -14,22 +14,37 @@ namespace Consent.Api.Controllers;
 public class WorkspaceController : ControllerBase // [FromHeader] int userId is honestly based auth
 {
     private readonly ILogger<WorkspaceController> _logger;
-    private readonly IWorkspaceEndpoint _workspaceEndpoint;
+    private readonly IWorkspaceRepository _workspaceRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly ICreateUnitOfWork _createUnitOfWork;
     private readonly UserCreateRequestModelValidator _userCreateRequestModelValidator = new();
     private readonly WorkspaceCreateRequestModelValidator _workspaceCreateRequestModelValidator = new();
 
-    public WorkspaceController(ILogger<WorkspaceController> logger, IWorkspaceEndpoint workspaceEndpoint)
+    public WorkspaceController(ILogger<WorkspaceController> logger,
+        IWorkspaceRepository workspaceRepository, IUserRepository userRepository,
+        ICreateUnitOfWork createUnitOfWork)
     {
         _logger = logger;
-        _workspaceEndpoint = workspaceEndpoint;
+        _workspaceRepository = workspaceRepository;
+        _userRepository = userRepository;
+        _createUnitOfWork = createUnitOfWork;
     }
 
     [HttpGet("{id}", Name = "GetWorkspace")]
     public async Task<ActionResult<WorkspaceModel>> WorkspaceGet(int id, [FromHeader] int userId)
     {
-        var workspace = await _workspaceEndpoint.WorkspaceGet(new WorkspaceId(id), new Context { UserId = new UserId(userId) });
+        var workspaceId = new WorkspaceId(id);
+        var userIdentity = new UserId(userId);
 
-        return workspace == null ? (ActionResult<WorkspaceModel>)NotFound() : (ActionResult<WorkspaceModel>)Ok(workspace.ToModel());
+        using var uow = _createUnitOfWork.Create();
+
+        var workspace = await _workspaceRepository.Get(workspaceId);
+        if (workspace == null || !workspace.GetUserPermissions(userIdentity).Contains(WorkspacePermission.View))
+        {
+            return NotFound();
+        }
+
+        return Ok(workspace.ToModel());
     }
 
     [HttpPost("", Name = "CreateWorkspace")]
@@ -46,16 +61,24 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
             return Problem();
         }
 
-        var workspace = await _workspaceEndpoint.WorkspaceCreate(new Workspace(request.Name), new Context { UserId = new UserId(userId) });
+        using var uow = _createUnitOfWork.Create();
+        var userIdentity = new UserId(userId);
+        var user = await _userRepository.Get(userIdentity);
 
-        return Ok(workspace.ToModel());
-    }
+        if (user == null)
+        {
+            return NotFound();
+        }
 
-    [HttpGet("{id}/Permissions", Name = "PermissionsGet")]
-    public async Task<ActionResult<WorkspacePermission[]>> PermissionsGet(int id, [FromHeader] int userId)
-    {
-        var permissions = await _workspaceEndpoint.WorkspacePermissionsGet(new WorkspaceId(id), new Context { UserId = new UserId(userId) });
+        var creatorPermissions = new[] {
+            WorkspacePermission.View, WorkspacePermission.Edit, WorkspacePermission.Admin, WorkspacePermission.Buyer
+        };
+        var workspace = new Workspace(request.Name, new[] { new WorkspaceMembership(user.Id, creatorPermissions) });
 
-        return permissions == null || !permissions.Any() ? (ActionResult<WorkspacePermission[]>)NotFound() : (ActionResult<WorkspacePermission[]>)Ok(permissions);
+        var entity = await _workspaceRepository.Create(workspace);
+
+        await uow.CommitAsync();
+
+        return Ok(entity.ToModel());
     }
 }
