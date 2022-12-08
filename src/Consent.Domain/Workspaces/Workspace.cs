@@ -9,7 +9,7 @@ namespace Consent.Domain.Workspaces;
  *  A container for ... something todo
  */
 
-public record Workspace
+public class Workspace
 {
     public string Name { get; }
     public WorkspaceMembership[] Memberships;
@@ -34,11 +34,11 @@ public record Workspace
 public record struct WorkspaceId(int Value);
 
 
-public record WorkspaceEntity : Workspace
+public class WorkspaceEntity : Workspace
 {
     public WorkspaceId Id { get; private init; }
 
-    public WorkspaceEntity(WorkspaceId id, Workspace participant) : base(participant)
+    public WorkspaceEntity(WorkspaceId id, string name, WorkspaceMembership[] memberships) : base(name, memberships)
     {
         Id = id;
     }

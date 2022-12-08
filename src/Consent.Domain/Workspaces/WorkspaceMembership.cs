@@ -2,7 +2,7 @@
 
 namespace Consent.Domain.Workspaces;
 
-public record WorkspaceMembership
+public class WorkspaceMembership
 {
     public UserId UserId { get; private init; }
     public WorkspacePermission[] Permissions { get; private init; }

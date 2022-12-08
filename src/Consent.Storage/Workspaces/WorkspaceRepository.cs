@@ -37,7 +37,7 @@ select * from [dbo].[UserWorkspaceMembership] where [WorkspaceId] = @id;
                         g => new WorkspaceMembership(g.Key, g.Select(a => a.Permission).ToArray())
                     ).ToArray();
 
-        return new WorkspaceEntity(row.Id, new Workspace(row.Name, memberships));
+        return new WorkspaceEntity(row.Id, row.Name, memberships);
     }
 
     public async Task<WorkspaceEntity> Create(Workspace workspace)
@@ -48,7 +48,7 @@ select * from [dbo].[UserWorkspaceMembership] where [WorkspaceId] = @id;
 insert into [dbo].[Workspace] ([Name]) values (@name);
 select SCOPE_IDENTITY();
 ";
-        var id = await connection.QuerySingleAsync<WorkspaceId>(query, new WorkspaceEntity(default, workspace), transaction);
+        var id = await connection.QuerySingleAsync<WorkspaceId>(query, workspace, transaction);
 
         var membershipQuery = @"
         insert into [dbo].[UserWorkspaceMembership] ([UserId], [WorkspaceId], [Permission])
@@ -57,7 +57,7 @@ select SCOPE_IDENTITY();
         var membershipRows = workspace.Memberships.SelectMany(m => m.Permissions.Select(p => new UserWorkspaceMembershipRow(m.UserId, id, p)));
         _ = await connection.ExecuteAsync(membershipQuery, membershipRows, transaction);
 
-        return new WorkspaceEntity(id, workspace);
+        return new WorkspaceEntity(id, workspace.Name, workspace.Memberships);
     }
 
     public async Task Update(WorkspaceEntity workspace)
