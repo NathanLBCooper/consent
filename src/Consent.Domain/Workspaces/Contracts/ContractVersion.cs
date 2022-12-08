@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Consent.Domain.Contracts;
+namespace Consent.Domain.Workspaces.Contracts;
 
 /*
  * An entity that contains all the wording requested for informed consent on one or many provisions 

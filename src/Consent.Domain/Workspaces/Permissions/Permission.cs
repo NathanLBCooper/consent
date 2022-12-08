@@ -1,7 +1,6 @@
 ﻿using System;
-using Consent.Domain.Workspaces;
 
-namespace Consent.Domain.Permissions;
+namespace Consent.Domain.Workspaces.Permissions;
 
 /*
  *  A specific idea that can be agreed to

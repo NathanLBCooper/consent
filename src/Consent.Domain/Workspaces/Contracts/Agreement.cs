@@ -1,8 +1,8 @@
 ﻿using System;
 using Consent.Domain.Participants;
-using Consent.Domain.Permissions;
+using Consent.Domain.Workspaces.Permissions;
 
-namespace Consent.Domain.Contracts;
+namespace Consent.Domain.Workspaces.Contracts;
 
 /*
  * The response of a Participant to a Provision

@@ -1,7 +1,7 @@
 ﻿using System;
-using Consent.Domain.Permissions;
+using Consent.Domain.Workspaces.Permissions;
 
-namespace Consent.Domain.Contracts;
+namespace Consent.Domain.Workspaces.Contracts;
 
 /*
  * A yes or no choice to accept one or many permissions. May not contain all information required for informed consent

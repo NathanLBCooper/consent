@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Consent.Domain.Contracts;
+namespace Consent.Domain.Workspaces.Contracts;
 
 public record Contract
 {
