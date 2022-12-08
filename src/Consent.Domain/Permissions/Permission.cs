@@ -39,7 +39,7 @@ public record PermissionEntity : Permission
         Id = id;
     }
 
-    public PermissionEntity(PermissionId id, string name) : base(name)
+    public PermissionEntity(PermissionId id, WorkspaceId workspaceId, string name, string description) : base(workspaceId, name, description)
     {
         Id = id;
     }
