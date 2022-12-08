@@ -1,46 +1,45 @@
-﻿using Consent.Domain.UnitOfWork;
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Consent.Domain.UnitOfWork;
 
-namespace Consent.Storage.UnitOfWork
+namespace Consent.Storage.UnitOfWork;
+
+public class UnitOfWork : IUnitOfWork, IGetConnection, IDisposable
 {
-    public class UnitOfWork : IUnitOfWork, IGetConnection, IDisposable
+    private readonly SqlConnection _connection;
+    private readonly SqlTransaction _transaction;
+
+    public bool IsDisposed { get; private set; } = false;
+
+    public UnitOfWork(string connectionString)
     {
-        private readonly SqlConnection _connection;
-        private readonly SqlTransaction _transaction;
+        _connection = new SqlConnection(connectionString);
+        _connection.Open();
+        _transaction = _connection.BeginTransaction();
+    }
 
-        public bool IsDisposed { get; private set; } = false;
+    public async Task RollBackAsync()
+    {
+        await _transaction.RollbackAsync();
+    }
 
-        public UnitOfWork(string connectionString)
-        {
-            _connection = new SqlConnection(connectionString);
-            _connection.Open();
-            _transaction = _connection.BeginTransaction();
-        }
+    public async Task CommitAsync()
+    {
+        await _transaction.CommitAsync();
+    }
 
-        public async Task RollBackAsync()
-        {
-            await _transaction.RollbackAsync();
-        }
+    public (IDbConnection connection, IDbTransaction transaction) GetConnection()
+    {
+        return (_connection, _transaction);
+    }
 
-        public async Task CommitAsync()
-        {
-            await _transaction.CommitAsync();
-        }
+    public void Dispose()
+    {
+        _connection?.Dispose();
+        _transaction?.Dispose();
 
-        public (IDbConnection connection, IDbTransaction transaction) GetConnection()
-        {
-            return (_connection, _transaction);
-        }
-
-        public void Dispose()
-        {
-            _connection?.Dispose();
-            _transaction?.Dispose();
-
-            IsDisposed = true;
-        }
+        IsDisposed = true;
     }
 }

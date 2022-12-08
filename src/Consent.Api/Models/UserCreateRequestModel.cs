@@ -1,18 +1,17 @@
 ﻿using FluentValidation;
 
-namespace Consent.Api.Models
-{
-    public record UserCreateRequestModel
-    {
-        public string? Name { get; init; }
-    }
+namespace Consent.Api.Models;
 
-    public class UserCreateRequestModelValidator : AbstractValidator<UserCreateRequestModel>
+public record UserCreateRequestModel
+{
+    public string? Name { get; init; }
+}
+
+public class UserCreateRequestModelValidator : AbstractValidator<UserCreateRequestModel>
+{
+    public UserCreateRequestModelValidator()
     {
-        public UserCreateRequestModelValidator()
-        {
-            RuleFor(q => q).NotEmpty();
-            RuleFor(q => q.Name).NotNull().NotEmpty();
-        }
+        _ = RuleFor(q => q).NotEmpty();
+        _ = RuleFor(q => q.Name).NotNull().NotEmpty();
     }
 }

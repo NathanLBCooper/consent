@@ -1,9 +1,8 @@
 ﻿using Consent.Domain.Users;
 
-namespace Consent.Domain
+namespace Consent.Domain;
+
+public record Context
 {
-    public record Context
-    {
-        public UserId UserId { get; init; }
-    }
+    public UserId UserId { get; init; }
 }

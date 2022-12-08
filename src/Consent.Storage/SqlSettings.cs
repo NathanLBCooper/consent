@@ -1,7 +1,6 @@
-﻿namespace Consent.Storage
+﻿namespace Consent.Storage;
+
+public record SqlSettings
 {
-    public record SqlSettings
-    {
-        public string? ConnectionString { get; init; }
-    }
+    public string? ConnectionString { get; init; }
 }

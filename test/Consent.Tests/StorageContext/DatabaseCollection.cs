@@ -1,7 +1,6 @@
-﻿namespace Consent.Tests.StorageContext
+﻿namespace Consent.Tests.StorageContext;
+
+[CollectionDefinition("DatabaseTest")]
+public class DatabaseCollection : ICollectionFixture<DatabaseFixture>
 {
-    [CollectionDefinition("DatabaseTest")]
-    public class DatabaseCollection : ICollectionFixture<DatabaseFixture>
-    {
-    }
 }

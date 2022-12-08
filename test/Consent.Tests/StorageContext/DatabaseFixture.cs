@@ -1,34 +1,36 @@
-﻿using Consent.Storage;
+﻿using System;
+using Consent.Storage;
 using Consent.Storage.TypeHandlers;
 using Consent.Storage.UnitOfWork;
-using System;
 
-namespace Consent.Tests.StorageContext
+namespace Consent.Tests.StorageContext;
+
+public class DatabaseFixture : IDisposable
 {
-    public class DatabaseFixture : IDisposable
+    private readonly TestDatabaseContext _testDatabaseContext;
+    private readonly SqlSettings _sqlSettings;
+
+    public UnitOfWorkContext CreateUnitOfWorkContext()
     {
-        private readonly TestDatabaseContext _testDatabaseContext;
-        private readonly SqlSettings _sqlSettings;
+        return new UnitOfWorkContext(_sqlSettings);
+    }
 
-        public UnitOfWorkContext CreateUnitOfWorkContext() => new UnitOfWorkContext(_sqlSettings);
+    public DatabaseFixture()
+    {
+        _testDatabaseContext = new TestDatabaseContext();
+        _testDatabaseContext.InitializeTestDatabase();
+        var connectionString = _testDatabaseContext.ConnectionString;
 
-        public DatabaseFixture()
-        {
-            _testDatabaseContext = new TestDatabaseContext();
-            _testDatabaseContext.InitializeTestDatabase();
-            var connectionString = _testDatabaseContext.ConnectionString;
+        _sqlSettings = new SqlSettings { ConnectionString = connectionString };
+    }
 
-            _sqlSettings = new SqlSettings { ConnectionString = connectionString };
-        }
+    static DatabaseFixture()
+    {
+        TypeHandlers.Setup();
+    }
 
-        static DatabaseFixture()
-        {
-            TypeHandlers.Setup();
-        }
-
-        public void Dispose()
-        {
-            _testDatabaseContext.Dispose();
-        }
+    public void Dispose()
+    {
+        _testDatabaseContext.Dispose();
     }
 }

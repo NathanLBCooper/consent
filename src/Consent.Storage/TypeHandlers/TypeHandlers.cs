@@ -1,13 +1,12 @@
 ﻿using Dapper;
 
-namespace Consent.Storage.TypeHandlers
+namespace Consent.Storage.TypeHandlers;
+
+public static class TypeHandlers
 {
-    public static class TypeHandlers
+    public static void Setup()
     {
-        public static void Setup()
-        {
-            SqlMapper.AddTypeHandler(new UserIdTypeHandler());
-            SqlMapper.AddTypeHandler(new WorkspaceIdTypeHandler());
-        }
+        SqlMapper.AddTypeHandler(new UserIdTypeHandler());
+        SqlMapper.AddTypeHandler(new WorkspaceIdTypeHandler());
     }
 }

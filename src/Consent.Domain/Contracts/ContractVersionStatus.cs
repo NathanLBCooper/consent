@@ -1,11 +1,10 @@
-﻿namespace Consent.Domain.Contracts
+﻿namespace Consent.Domain.Contracts;
+
+public enum ContractVersionStatus
 {
-    public enum ContractVersionStatus
-    {
-        Draft = 0,
-        Active,
-        Legacy,
-        Deprecated,
-        Obsolete
-    }
+    Draft = 0,
+    Active,
+    Legacy,
+    Deprecated,
+    Obsolete
 }

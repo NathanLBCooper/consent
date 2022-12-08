@@ -1,13 +1,13 @@
 ﻿using SimpleMigrations;
 
-namespace Consent.Storage.Migrator.Migrations
+namespace Consent.Storage.Migrator.Migrations;
+
+[Migration(1, "Initial")]
+internal class Migration001_Initial : Migration
 {
-    [Migration(1, "Initial")]
-    internal class Migration001_Initial : Migration
+    protected override void Up()
     {
-        protected override void Up()
-        {
-            Execute(@"
+        Execute(@"
 create table [dbo].[User](
     [Id] int identity primary key,
     [Name] nvarchar(max) not null,
@@ -25,15 +25,14 @@ create table [dbo].[UserWorkspaceMembership](
     unique nonclustered ([UserId],[WorkspaceId],[Permission]) 
     );
 ");
-        }
+    }
 
-        protected override void Down()
-        {
-            Execute(@"
+    protected override void Down()
+    {
+        Execute(@"
 drop table [dbo].[User];
 drop table [dbo].[Workspace];
 drop table [dbo].[UserWorkspaceMembership];
 ");
-        }
     }
 }

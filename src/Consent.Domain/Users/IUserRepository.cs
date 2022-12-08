@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 
-namespace Consent.Domain.Users
+namespace Consent.Domain.Users;
+
+public interface IUserRepository
 {
-    public interface IUserRepository
-    {
-        Task<UserEntity?> Get(UserId id);
-        Task<UserEntity> Create(User user);
-    }
+    Task<UserEntity?> Get(UserId id);
+    Task<UserEntity> Create(User user);
 }

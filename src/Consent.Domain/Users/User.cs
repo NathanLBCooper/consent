@@ -1,36 +1,39 @@
 ﻿using System;
 
-namespace Consent.Domain.Users
+namespace Consent.Domain.Users;
+
+/**
+ *  A user of the system who manages and sets up things
+ */
+
+public record User
 {
-    /**
-     *  A user of the system who manages and sets up things
-     */
+    public string Name { get; private init; }
 
-    public record User
+    public User(string name)
     {
-        public string Name { get; private init; }
-
-        public User(string name)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException(nameof(Name));
-            Name = name;
+            throw new ArgumentException(nameof(Name));
         }
+
+        Name = name;
+    }
+}
+
+public record struct UserId(int Value);
+
+public record UserEntity : User
+{
+    public UserId Id { get; private init; }
+
+    public UserEntity(UserId id, User user) : base(user)
+    {
+        Id = id;
     }
 
-    public record struct UserId(int Value);
-
-    public record UserEntity : User
+    public UserEntity(UserId id, string name) : base(name)
     {
-        public UserId Id { get; private init; }
-
-        public UserEntity(UserId id, User user) : base(user)
-        {
-            Id = id;
-        }
-
-        public UserEntity(UserId id, string name) : base(name)
-        {
-            Id = id;
-        }
+        Id = id;
     }
 }

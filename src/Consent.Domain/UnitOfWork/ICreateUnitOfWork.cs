@@ -1,7 +1,6 @@
-﻿namespace Consent.Domain.UnitOfWork
+﻿namespace Consent.Domain.UnitOfWork;
+
+public interface ICreateUnitOfWork
 {
-    public interface ICreateUnitOfWork
-    {
-        IUnitOfWork Create();
-    }
+    IUnitOfWork Create();
 }

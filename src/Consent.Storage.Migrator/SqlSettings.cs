@@ -1,7 +1,6 @@
-﻿namespace Consent.Storage.Migrator
+﻿namespace Consent.Storage.Migrator;
+
+internal class SqlSettings
 {
-    internal class SqlSettings
-    {
-        public string? ConnectionString { get; set; }
-    }
+    public string? ConnectionString { get; set; }
 }
