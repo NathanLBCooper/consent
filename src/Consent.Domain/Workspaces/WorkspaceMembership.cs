@@ -14,16 +14,14 @@ public class WorkspaceMembership
 
     public UserId UserId { get; }
     public WorkspacePermission[] Permissions { get; }
+    public bool IsSuperUser { get; }
 
     public WorkspaceMembership(UserId userId, WorkspacePermission[] permissions)
     {
         UserId = userId;
         Permissions = permissions;
-    }
 
-    public bool IsSuperUser()
-    {
-        return SuperUser.All(p => Permissions.Contains(p));
+        IsSuperUser = SuperUser.All(p => Permissions.Contains(p));
     }
 }
 

@@ -20,7 +20,6 @@ public class User
     public User(string name)
     {
         ValidateName(name);
-
         Name = name;
     }
 }

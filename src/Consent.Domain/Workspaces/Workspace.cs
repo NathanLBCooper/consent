@@ -29,7 +29,7 @@ public class Workspace
             throw new ArgumentException("Cannot have more than one membership for a user", nameof(Memberships));
         }
 
-        if (!memberships.Any(m => m.IsSuperUser()))
+        if (!memberships.Any(m => m.IsSuperUser))
         {
             throw new ArgumentException("Workspace must have at least one superuser", nameof(Memberships));
         }
@@ -38,17 +38,17 @@ public class Workspace
     public Workspace(string name, WorkspaceMembership[] memberships)
     {
         ValidateName(name);
-        ValidateMemberships(memberships);
-
         Name = name;
+
+        ValidateMemberships(memberships);
         Memberships = memberships;
     }
 
     public Workspace(string name, UserId creatorId)
     {
         ValidateName(name);
-
         Name = name;
+
         Memberships = new[] { new WorkspaceMembership(creatorId, WorkspaceMembership.SuperUser) };
     }
 

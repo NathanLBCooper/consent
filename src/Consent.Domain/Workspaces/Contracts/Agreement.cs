@@ -12,9 +12,9 @@ namespace Consent.Domain.Workspaces.Contracts;
 public record Agreement
 {
     // todo ProvisionId
-    public ContractId ContractId { get; private init; }
-    public PermissionId PermissionsId { get; private init; }
-    public ParticipantId ParticipantId { get; private init; }
-    public DateTime DecisionTime { get; private init; }
-    public bool Accepted { get; private init; }
+    public ContractId ContractId { get; }
+    public PermissionId PermissionsId { get; }
+    public ParticipantId ParticipantId { get; }
+    public DateTime DecisionTime { get; }
+    public bool Accepted { get; }
 }

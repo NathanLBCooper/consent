@@ -6,31 +6,29 @@ namespace Consent.Domain.Participants;
  *  A person who agrees to things
  */
 
-public record Participant
+public class Participant
 {
     public string ExternalId { get; }
-
-    public Participant(string externalId)
+    private static void ValidateExternalId(string externalId)
     {
         if (string.IsNullOrWhiteSpace(externalId))
         {
             throw new ArgumentException(nameof(ExternalId));
         }
+    }
 
+    public Participant(string externalId)
+    {
+        ValidateExternalId(externalId);
         ExternalId = externalId;
     }
 }
 
 public record struct ParticipantId(int Value);
 
-public record ParticipantEntity : Participant
+public class ParticipantEntity : Participant
 {
     public ParticipantId Id { get; }
-
-    public ParticipantEntity(ParticipantId id, Participant participant) : base(participant)
-    {
-        Id = id;
-    }
 
     public ParticipantEntity(ParticipantId id, string externalId) : base(externalId)
     {

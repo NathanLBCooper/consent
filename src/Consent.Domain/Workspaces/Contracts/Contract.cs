@@ -2,31 +2,29 @@
 
 namespace Consent.Domain.Workspaces.Contracts;
 
-public record Contract
+public class Contract
 {
-    public string Name { get; private init; }
-
-    public Contract(string name)
+    public string Name { get; }
+    private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException(nameof(Name));
         }
+    }
 
+    public Contract(string name)
+    {
+        ValidateName(name);
         Name = name;
     }
 }
 
 public record struct ContractId(int Value);
 
-public record ContractEntity : Contract
+public class ContractEntity : Contract
 {
     public ContractId Id { get; private init; }
-
-    public ContractEntity(ContractId id, Contract contract) : base(contract)
-    {
-        Id = id;
-    }
 
     public ContractEntity(ContractId id, string name) : base(name)
     {
