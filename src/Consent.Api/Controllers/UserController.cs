@@ -15,16 +15,19 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
     private readonly IUserRepository _userRepository;
     private readonly ICreateUnitOfWork _createUnitOfWork;
     private readonly UserCreateRequestModelValidator _userCreateRequestModelValidator = new();
+    private readonly EtagHelper _etagHelper;
 
     public UserController(ILogger<UserController> logger, IUserRepository userRepository, ICreateUnitOfWork createUnitOfWork)
     {
         _logger = logger;
         _userRepository = userRepository;
         _createUnitOfWork = createUnitOfWork;
+        _etagHelper = new EtagHelper();
     }
 
     [HttpGet("", Name = "GetUser")]
-    public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId)
+    public async Task<ActionResult<UserModel>> UserGet(
+        [FromHeader] int userId, [FromHeader(Name = HttpHeaderNames.IfNoneMatch)] string? ifNoneMatch)
     {
         using var uow = _createUnitOfWork.Create();
         var user = await _userRepository.Get(new UserId(userId));
@@ -34,7 +37,16 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
             return NotFound();
         }
 
-        return Ok(user.ToModel());
+        var model = user.ToModel();
+        var etag = _etagHelper.Get("user", model);
+
+        if (ifNoneMatch != null && etag == ifNoneMatch)
+        {
+            return StatusCode(304);
+        }
+
+        Response.Headers.Add(HttpHeaderNames.ETag, etag);
+        return Ok(model);
     }
 
     [HttpPost("", Name = "CreateUser")]
@@ -55,6 +67,10 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         var created = await _userRepository.Create(new User(request.Name));
         await uow.CommitAsync();
 
-        return Ok(created.ToModel());
+        var model = created.ToModel();
+        var etag = _etagHelper.Get("user", model);
+
+        Response.Headers.Add(HttpHeaderNames.ETag, etag);
+        return Ok(model);
     }
 }

@@ -6,6 +6,7 @@ using Consent.Api.Models;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Consent.Tests.StorageContext;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 
@@ -24,7 +25,10 @@ public class WorkspaceControllerTest
         var workspaceRepository = new WorkspaceRepository(unitOfWorkContext);
         var userRepository = new UserRepository(unitOfWorkContext);
         _sut = new WorkspaceController(new NullLogger<WorkspaceController>(), workspaceRepository, userRepository, unitOfWorkContext);
-        _userController = new UserController(new NullLogger<UserController>(), userRepository, unitOfWorkContext);
+        _userController = new UserController(new NullLogger<UserController>(), userRepository, unitOfWorkContext)
+        {
+            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
+        };
     }
 
     [Fact]
@@ -87,8 +91,11 @@ public class WorkspaceControllerTest
     private async Task<UserModel> CreateUser([CallerMemberName] string callerName = "")
     {
         var request = new UserCreateRequestModel { Name = $"{callerName}-workspace" };
-        var user = (await _userController.UserCreate(request)).GetValue<UserModel>();
+        var user = (await _userController.UserCreate(request)).GetValue();
         _ = user.ShouldNotBeNull();
+
+        _userController.HttpContext.Request.Headers.Clear();
+        _userController.HttpContext.Response.Headers.Clear();
 
         return user;
     }
