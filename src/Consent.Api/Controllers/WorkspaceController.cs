@@ -62,20 +62,14 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
         }
 
         using var uow = _createUnitOfWork.Create();
-        var userIdentity = new UserId(userId);
-        var user = await _userRepository.Get(userIdentity);
 
+        var user = await _userRepository.Get(new UserId(userId));
         if (user == null)
         {
             return NotFound();
         }
 
-        var creatorPermissions = new[] {
-            WorkspacePermission.View, WorkspacePermission.Edit, WorkspacePermission.Admin, WorkspacePermission.Buyer
-        };
-        var workspace = new Workspace(request.Name, new[] { new WorkspaceMembership(user.Id, creatorPermissions) });
-
-        var entity = await _workspaceRepository.Create(workspace);
+        var entity = await _workspaceRepository.Create(new Workspace(request.Name, user.Id));
 
         await uow.CommitAsync();
 
