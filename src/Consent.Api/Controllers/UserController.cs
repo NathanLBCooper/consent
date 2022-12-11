@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Consent.Api.Models;
-using Consent.Domain;
+using Consent.Domain.UnitOfWork;
 using Consent.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,21 +12,29 @@ namespace Consent.Api.Controllers;
 public class UserController : ControllerBase // [FromHeader] int userId is honestly based auth
 {
     private readonly ILogger<UserController> _logger;
-    private readonly IUserEndpoint _userEndpoint;
+    private readonly IUserRepository _userRepository;
+    private readonly ICreateUnitOfWork _createUnitOfWork;
     private readonly UserCreateRequestModelValidator _userCreateRequestModelValidator = new();
 
-    public UserController(ILogger<UserController> logger, IUserEndpoint userEndpoint)
+    public UserController(ILogger<UserController> logger, IUserRepository userRepository, ICreateUnitOfWork createUnitOfWork)
     {
         _logger = logger;
-        _userEndpoint = userEndpoint;
+        _userRepository = userRepository;
+        _createUnitOfWork = createUnitOfWork;
     }
 
     [HttpGet("", Name = "GetUser")]
     public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId)
     {
-        var user = await _userEndpoint.UserGet(new Context { UserId = new UserId(userId) });
+        using var uow = _createUnitOfWork.Create();
+        var user = await _userRepository.Get(new UserId(userId));
 
-        return user == null ? (ActionResult<UserModel>)NotFound() : (ActionResult<UserModel>)Ok(user.ToModel());
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user.ToModel());
     }
 
     [HttpPost("", Name = "CreateUser")]
@@ -43,8 +51,10 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
             return Problem();
         }
 
-        var user = await _userEndpoint.UserCreate(new User(request.Name));
+        using var uow = _createUnitOfWork.Create();
+        var created = await _userRepository.Create(new User(request.Name));
+        await uow.CommitAsync();
 
-        return Ok(user.ToModel());
+        return Ok(created.ToModel());
     }
 }

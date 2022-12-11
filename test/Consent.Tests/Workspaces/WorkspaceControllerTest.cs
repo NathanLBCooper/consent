@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Consent.Api.Controllers;
 using Consent.Api.Models;
-using Consent.Domain.Users;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Consent.Tests.StorageContext;
@@ -16,7 +15,7 @@ namespace Consent.Tests.Workspaces;
 public class WorkspaceControllerTest
 {
     private readonly WorkspaceController _sut;
-    private readonly UserEndpoint _userEndpoint;
+    private readonly UserController _userController;
 
     public WorkspaceControllerTest(DatabaseFixture fixture)
     {
@@ -25,7 +24,7 @@ public class WorkspaceControllerTest
         var workspaceRepository = new WorkspaceRepository(unitOfWorkContext);
         var userRepository = new UserRepository(unitOfWorkContext);
         _sut = new WorkspaceController(new NullLogger<WorkspaceController>(), workspaceRepository, userRepository, unitOfWorkContext);
-        _userEndpoint = new UserEndpoint(userRepository, unitOfWorkContext);
+        _userController = new UserController(new NullLogger<UserController>(), userRepository, unitOfWorkContext);
     }
 
     [Fact]
@@ -34,13 +33,13 @@ public class WorkspaceControllerTest
         var user = await CreateUser();
         var request = WorkspaceRequest();
 
-        var created = (await _sut.WorkspaceCreate(request, user.Id.Value)).GetValue<WorkspaceModel>();
+        var created = (await _sut.WorkspaceCreate(request, user.Id)).GetValue<WorkspaceModel>();
 
         _ = created.ShouldNotBeNull();
         created.Name.ShouldBe(request.Name);
         created.Memberships.ShouldNotBeEmpty();
 
-        var fetched = (await _sut.WorkspaceGet(created.Id, user.Id.Value)).GetValue<WorkspaceModel>();
+        var fetched = (await _sut.WorkspaceGet(created.Id, user.Id)).GetValue<WorkspaceModel>();
 
         _ = fetched.ShouldNotBeNull();
         fetched.Id.ShouldBe(created.Id);
@@ -62,10 +61,10 @@ public class WorkspaceControllerTest
     {
         var user = await CreateUser();
         var otherUser = await CreateUser();
-        var created = (await _sut.WorkspaceCreate(WorkspaceRequest(), user.Id.Value)).GetValue<WorkspaceModel>();
+        var created = (await _sut.WorkspaceCreate(WorkspaceRequest(), user.Id)).GetValue<WorkspaceModel>();
         _ = created.ShouldNotBeNull();
 
-        var response = await _sut.WorkspaceGet(created.Id, otherUser.Id.Value);
+        var response = await _sut.WorkspaceGet(created.Id, otherUser.Id);
 
         _ = response.Result.ShouldBeOfType<NotFoundResult>();
     }
@@ -76,18 +75,22 @@ public class WorkspaceControllerTest
         var user = await CreateUser();
         var request = WorkspaceRequest();
 
-        var created = (await _sut.WorkspaceCreate(request, user.Id.Value)).GetValue<WorkspaceModel>();
+        var created = (await _sut.WorkspaceCreate(request, user.Id)).GetValue<WorkspaceModel>();
         _ = created.ShouldNotBeNull();
-        var userPermissions = created.Memberships.Single(m => m.UserId == user.Id.Value).Permissions;
+        var userPermissions = created.Memberships.Single(m => m.UserId == user.Id).Permissions;
 
         userPermissions.ShouldBeEquivalentTo(
             new[] { WorkspacePermissionModel.View, WorkspacePermissionModel.Edit, WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
             );
     }
 
-    private async Task<UserEntity> CreateUser([CallerMemberName] string callerName = "")
+    private async Task<UserModel> CreateUser([CallerMemberName] string callerName = "")
     {
-        return await _userEndpoint.UserCreate(new User($"{callerName}-user"));
+        var request = new UserCreateRequestModel { Name = $"{callerName}-workspace" };
+        var user = (await _userController.UserCreate(request)).GetValue<UserModel>();
+        _ = user.ShouldNotBeNull();
+
+        return user;
     }
 
     private WorkspaceCreateRequestModel WorkspaceRequest([CallerMemberName] string callerName = "")

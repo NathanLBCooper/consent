@@ -25,8 +25,6 @@ internal static class Dependencies
         container.AddRegistration(typeof(ICreateUnitOfWork), uowRegistration);
         container.AddRegistration(typeof(IGetConnection), uowRegistration);
         RegisterByConvention(typeof(Consent.Storage.Users.UserRepository).Assembly, container, t => t.Name.EndsWith("Repository"));
-
-        RegisterByConvention(typeof(Consent.Domain.Users.UserEndpoint).Assembly, container, t => t.Name.EndsWith("Endpoint"));
     }
 
     private static void RegisterByConvention(Assembly assembly, Container container, Func<Type, bool> condition)

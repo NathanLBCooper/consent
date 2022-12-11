@@ -34,6 +34,6 @@ select SCOPE_IDENTITY();
 ";
 
         var id = await connection.QuerySingleAsync<UserId>(query, new UserEntity(default, user.Name), transaction);
-        return new UserEntity(id, user);
+        return new UserEntity(id, user.Name);
     }
 }
