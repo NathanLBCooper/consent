@@ -17,7 +17,6 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IUserRepository _userRepository;
     private readonly ICreateUnitOfWork _createUnitOfWork;
-    private readonly UserCreateRequestModelValidator _userCreateRequestModelValidator = new();
     private readonly WorkspaceCreateRequestModelValidator _workspaceCreateRequestModelValidator = new();
 
     public WorkspaceController(ILogger<WorkspaceController> logger,
