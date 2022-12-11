@@ -4,8 +4,8 @@ namespace Consent.Domain.Workspaces;
 
 public class WorkspaceMembership
 {
-    public UserId UserId { get; private init; }
-    public WorkspacePermission[] Permissions { get; private init; }
+    public UserId UserId { get; }
+    public WorkspacePermission[] Permissions { get; }
 
     public WorkspaceMembership(UserId userId, WorkspacePermission[] permissions)
     {

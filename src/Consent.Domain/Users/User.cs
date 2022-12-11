@@ -8,7 +8,7 @@ namespace Consent.Domain.Users;
 
 public record User
 {
-    public string Name { get; private init; }
+    public string Name { get; }
 
     public User(string name)
     {
@@ -25,7 +25,7 @@ public record struct UserId(int Value);
 
 public record UserEntity : User
 {
-    public UserId Id { get; private init; }
+    public UserId Id { get; }
 
     public UserEntity(UserId id, User user) : base(user)
     {

@@ -8,7 +8,7 @@ namespace Consent.Domain.Participants;
 
 public record Participant
 {
-    public string ExternalId { get; private init; }
+    public string ExternalId { get; }
 
     public Participant(string externalId)
     {
@@ -25,7 +25,7 @@ public record struct ParticipantId(int Value);
 
 public record ParticipantEntity : Participant
 {
-    public ParticipantId Id { get; private init; }
+    public ParticipantId Id { get; }
 
     public ParticipantEntity(ParticipantId id, Participant participant) : base(participant)
     {
