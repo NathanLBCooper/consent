@@ -56,7 +56,7 @@ public record struct ContractVersionId(int Value);
 
 public class ContractVersionEntity : ContractVersion
 {
-    public ContractVersionId Id { get; private init; }
+    public ContractVersionId Id { get; }
 
     public ContractVersionEntity(ContractVersionId id, string name, string text, Provision[] provisions, ContractVersionStatus status) :
         base(name, text, provisions, status)

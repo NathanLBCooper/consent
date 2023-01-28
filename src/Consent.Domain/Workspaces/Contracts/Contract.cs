@@ -24,7 +24,7 @@ public record struct ContractId(int Value);
 
 public class ContractEntity : Contract
 {
-    public ContractId Id { get; private init; }
+    public ContractId Id { get; }
 
     public ContractEntity(ContractId id, string name) : base(name)
     {
