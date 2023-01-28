@@ -102,6 +102,6 @@ public class WorkspaceControllerTest
 
     private WorkspaceCreateRequestModel WorkspaceRequest([CallerMemberName] string callerName = "")
     {
-        return new WorkspaceCreateRequestModel { Name = $"{callerName}-workspace" };
+        return new WorkspaceCreateRequestModel { Name = $"{nameof(WorkspaceControllerTest)}-{callerName}-workspace" };
     }
 }

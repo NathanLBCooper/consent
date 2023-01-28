@@ -20,8 +20,8 @@ public class Workspace
         }
     }
 
-    public WorkspaceMembership[] Memberships;
-    private static void ValidateMemberships(WorkspaceMembership[] memberships)
+    public Membership[] Memberships;
+    private static void ValidateMemberships(Membership[] memberships)
     {
         var users = memberships.Select(m => m.UserId);
         if (users.Count() != users.Distinct().Count())
@@ -35,7 +35,7 @@ public class Workspace
         }
     }
 
-    public Workspace(string name, WorkspaceMembership[] memberships)
+    public Workspace(string name, Membership[] memberships)
     {
         ValidateName(name);
         Name = name;
@@ -49,7 +49,7 @@ public class Workspace
         ValidateName(name);
         Name = name;
 
-        Memberships = new[] { new WorkspaceMembership(creatorId, WorkspaceMembership.SuperUser) };
+        Memberships = new[] { new Membership(creatorId, Membership.SuperUser) };
     }
 
     public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)
@@ -65,7 +65,7 @@ public class WorkspaceEntity : Workspace
 {
     public WorkspaceId Id { get; }
 
-    public WorkspaceEntity(WorkspaceId id, string name, WorkspaceMembership[] memberships)
+    public WorkspaceEntity(WorkspaceId id, string name, Membership[] memberships)
         : base(name, memberships)
     {
         Id = id;

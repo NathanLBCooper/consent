@@ -4,9 +4,9 @@ using Consent.Domain.Workspaces;
 
 namespace Consent.Api.Models;
 
-public record WorkspaceModel(int Id, string Name, WorkspaceMembershipModel[] Memberships);
+public record WorkspaceModel(int Id, string Name, MembershipModel[] Memberships);
 
-public record WorkspaceMembershipModel(int UserId, WorkspacePermissionModel[] Permissions);
+public record MembershipModel(int UserId, WorkspacePermissionModel[] Permissions);
 
 public enum WorkspacePermissionModel
 {
@@ -23,12 +23,12 @@ internal static class WorkspaceModelMapper
         return new WorkspaceModel(entity.Id.Value, entity.Name, entity.Memberships.Select(m => m.ToModel()).ToArray());
     }
 
-    private static WorkspaceMembershipModel ToModel(this WorkspaceMembership membership)
+    public static MembershipModel ToModel(this Membership membership)
     {
-        return new WorkspaceMembershipModel(membership.UserId.Value, membership.Permissions.Select(p => p.ToModel()).ToArray());
+        return new MembershipModel(membership.UserId.Value, membership.Permissions.Select(p => p.ToModel()).ToArray());
     }
 
-    private static WorkspacePermissionModel ToModel(this WorkspacePermission permission)
+    public static WorkspacePermissionModel ToModel(this WorkspacePermission permission)
     {
         return permission switch
         {

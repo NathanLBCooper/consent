@@ -13,7 +13,7 @@ public class WorkspaceTest
     [InlineData("  ")]
     public void Cannot_create_workspace_with_empty_name(string name)
     {
-        var ctor = () => new Workspace(name, Array.Empty<WorkspaceMembership>());
+        var ctor = () => new Workspace(name, Array.Empty<Membership>());
         _ = ctor.ShouldThrow<ArgumentException>();
 
         var user_ctor = () => new Workspace(name, new UserId(1));
@@ -25,9 +25,9 @@ public class WorkspaceTest
     {
         var userId = new UserId(1);
         var permissions = new[] { WorkspacePermission.Edit, WorkspacePermission.View };
-        var workspace = new Workspace("myworkspace", new WorkspaceMembership[] {
+        var workspace = new Workspace("myworkspace", new Membership[] {
             new(userId, permissions ),
-            new(new UserId(2), WorkspaceMembership.SuperUser)
+            new(new UserId(2), Membership.SuperUser)
         });
 
         workspace.GetUserPermissions(userId).ShouldBe(permissions);
@@ -50,9 +50,9 @@ public class WorkspaceTest
     [Fact]
     public void Cannot_create_workspace_without_a_superUser()
     {
-        var empty = () => new Workspace("myworkspace", Array.Empty<WorkspaceMembership>());
+        var empty = () => new Workspace("myworkspace", Array.Empty<Membership>());
         var nonSuper = () => new Workspace("myworkspace",
-            new[] { new WorkspaceMembership(new UserId(1), new[] { WorkspacePermission.Edit, WorkspacePermission.View }) }
+            new[] { new Membership(new UserId(1), new[] { WorkspacePermission.Edit, WorkspacePermission.View }) }
             );
 
         _ = empty.ShouldThrow<ArgumentException>();
@@ -63,8 +63,8 @@ public class WorkspaceTest
     public void Cannot_create_workspace_with_duplicate_user()
     {
         var duplicate = () => new Workspace("myworkspace",
-            new[] { new WorkspaceMembership(new UserId(1), WorkspaceMembership.SuperUser),
-                new WorkspaceMembership(new UserId(1), WorkspaceMembership.SuperUser) }
+            new[] { new Membership(new UserId(1), Membership.SuperUser),
+                new Membership(new UserId(1), Membership.SuperUser) }
             );
 
         _ = duplicate.ShouldThrow<ArgumentException>();

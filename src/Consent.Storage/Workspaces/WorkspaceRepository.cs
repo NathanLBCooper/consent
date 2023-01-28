@@ -34,7 +34,7 @@ select * from [dbo].[UserWorkspaceMembership] where [WorkspaceId] = @id;
 ";
         var membershipRows = await connection.QueryAsync<UserWorkspaceMembershipRow>(membership, new { id }, transaction);
         var memberships = membershipRows.GroupBy(r => r.UserId).Select(
-                        g => new WorkspaceMembership(g.Key, g.Select(a => a.Permission).ToArray())
+                        g => new Membership(g.Key, g.Select(a => a.Permission).ToArray())
                     ).ToArray();
 
         return new WorkspaceEntity(row.Id, row.Name, memberships);

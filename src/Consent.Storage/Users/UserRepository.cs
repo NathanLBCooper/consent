@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Consent.Domain.Users;
 using Consent.Storage.UnitOfWork;
+using Consent.Storage.Workspaces;
 using Dapper;
 
 namespace Consent.Storage.Users;
@@ -21,7 +24,21 @@ public class UserRepository : IUserRepository
         var userQuery = @"
 select * from [dbo].[User] where [Id] = @id;
 ";
-        return await connection.QuerySingleOrDefaultAsync<UserEntity?>(userQuery, new { id }, transaction);
+        var user = await connection.QuerySingleOrDefaultAsync<UserEntity?>(userQuery, new { id }, transaction);
+        if (user == null)
+        {
+            return null;
+        }
+
+        var membership = @"
+select * from [dbo].[UserWorkspaceMembership] where [UserId] = @id;
+";
+        var membershipRows = await connection.QueryAsync<UserWorkspaceMembershipRow>(membership, new { id }, transaction);
+        var memberships = membershipRows.GroupBy(r => r.WorkspaceId).Select(
+                        g => new WorkspaceMembership(g.Key, g.Select(a => a.Permission).ToArray())
+                    ).ToArray();
+
+        return new UserEntity(id, user.Name, memberships);
     }
 
     public async Task<UserEntity> Create(User user)
@@ -33,7 +50,7 @@ insert into [dbo].[User] ([Name]) values (@name);
 select SCOPE_IDENTITY();
 ";
 
-        var id = await connection.QuerySingleAsync<UserId>(query, new UserEntity(default, user.Name), transaction);
-        return new UserEntity(id, user.Name);
+        var id = await connection.QuerySingleAsync<UserId>(query, user, transaction);
+        return new UserEntity(id, user.Name, Array.Empty<WorkspaceMembership>());
     }
 }

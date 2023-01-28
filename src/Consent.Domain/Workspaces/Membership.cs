@@ -3,7 +3,7 @@ using Consent.Domain.Users;
 
 namespace Consent.Domain.Workspaces;
 
-public class WorkspaceMembership
+public class Membership
 {
     public static WorkspacePermission[] SuperUser { get; } = new[] {
         WorkspacePermission.View,
@@ -16,7 +16,7 @@ public class WorkspaceMembership
     public WorkspacePermission[] Permissions { get; }
     public bool IsSuperUser { get; }
 
-    public WorkspaceMembership(UserId userId, WorkspacePermission[] permissions)
+    public Membership(UserId userId, WorkspacePermission[] permissions)
     {
         UserId = userId;
         Permissions = permissions;
