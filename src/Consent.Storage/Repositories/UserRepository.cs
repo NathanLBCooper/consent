@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Consent.Domain.Users;
 using Consent.Storage.UnitOfWork;
-using Consent.Storage.Workspaces;
 using Dapper;
 
-namespace Consent.Storage.Users;
+namespace Consent.Storage.Repositories;
 
 public class UserRepository : IUserRepository
 {

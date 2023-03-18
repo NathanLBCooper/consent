@@ -1,7 +1,7 @@
 ﻿using System;
-using Consent.Domain.Workspaces.Permissions;
+using Consent.Domain.Permissions;
 
-namespace Consent.Domain.Workspaces.Contracts;
+namespace Consent.Domain.Contracts;
 
 /*
  * A yes or no choice to accept one or many permissions. May not contain all information required for informed consent
@@ -25,5 +25,18 @@ public class Provision
         Text = text;
 
         Permissions = permissions;
+    }
+}
+
+public record struct ProvisionId(int Value);
+
+public class ProvisionEntity : Provision
+{
+    public ProvisionId Id { get; }
+
+    public ProvisionEntity(ProvisionId id, string text, PermissionId[] permissions)
+        : base(text, permissions)
+    {
+        Id = id;
     }
 }

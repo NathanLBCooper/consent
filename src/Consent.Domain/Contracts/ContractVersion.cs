@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace Consent.Domain.Workspaces.Contracts;
+namespace Consent.Domain.Contracts;
 
 /*
- * An entity that contains all the wording requested for informed consent on one or many provisions 
+ * A specific version of a Contract, which contains all wording required for informed consent on one or many provisions 
  */
 
 public class ContractVersion
@@ -26,12 +27,12 @@ public class ContractVersion
         }
     }
 
-    public Provision[] Provisions { get; }
+    public IReadOnlyCollection<Provision> Provisions { get; }
 
     public ContractVersionStatus Status { get; }
     private static void ValidateStatus(ContractVersionStatus status)
     {
-        if (Enum.IsDefined(typeof(ContractVersionStatus), status))
+        if (!Enum.IsDefined(typeof(ContractVersionStatus), status))
         {
             throw new ArgumentException(nameof(Status));
         }
@@ -58,9 +59,12 @@ public class ContractVersionEntity : ContractVersion
 {
     public ContractVersionId Id { get; }
 
-    public ContractVersionEntity(ContractVersionId id, string name, string text, Provision[] provisions, ContractVersionStatus status) :
+    public IReadOnlyCollection<ProvisionEntity> ProvisionEntities { get; }
+
+    public ContractVersionEntity(ContractVersionId id, string name, string text, ProvisionEntity[] provisions, ContractVersionStatus status) :
         base(name, text, provisions, status)
     {
         Id = id;
+        ProvisionEntities = provisions;
     }
 }

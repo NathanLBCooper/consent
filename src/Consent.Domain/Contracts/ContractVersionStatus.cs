@@ -1,4 +1,4 @@
-﻿namespace Consent.Domain.Workspaces.Contracts;
+﻿namespace Consent.Domain.Contracts;
 
 public enum ContractVersionStatus
 {

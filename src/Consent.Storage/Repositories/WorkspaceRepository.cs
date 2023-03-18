@@ -5,7 +5,7 @@ using Consent.Domain.Workspaces;
 using Consent.Storage.UnitOfWork;
 using Dapper;
 
-namespace Consent.Storage.Workspaces;
+namespace Consent.Storage.Repositories;
 
 public class WorkspaceRepository : IWorkspaceRepository
 {
@@ -29,10 +29,10 @@ select * from [dbo].[Workspace] where [Id] = @id;
             return null;
         }
 
-        var membership = @"
+        var membershipQuery = @"
 select * from [dbo].[UserWorkspaceMembership] where [WorkspaceId] = @id;
 ";
-        var membershipRows = await connection.QueryAsync<UserWorkspaceMembershipRow>(membership, new { id }, transaction);
+        var membershipRows = await connection.QueryAsync<UserWorkspaceMembershipRow>(membershipQuery, new { id }, transaction);
         var memberships = membershipRows.GroupBy(r => r.UserId).Select(
                         g => new Membership(g.Key, g.Select(a => a.Permission).ToArray())
                     ).ToArray();
