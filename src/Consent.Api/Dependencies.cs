@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Consent.Domain.UnitOfWork;
 using Consent.Storage;
-using Consent.Storage.UnitOfWork;
+using Consent.Storage.Users;
 using Microsoft.Extensions.Configuration;
 using SimpleInjector;
 
@@ -20,11 +19,9 @@ internal static class Dependencies
         }
 
         container.RegisterInstance<SqlSettings>(sqlSettings);
-        var uowRegistration = Lifestyle.Scoped.CreateRegistration<UnitOfWorkContext>(
-            () => new UnitOfWorkContext(container.GetInstance<SqlSettings>()), container);
-        container.AddRegistration(typeof(ICreateUnitOfWork), uowRegistration);
-        container.AddRegistration(typeof(IGetConnection), uowRegistration);
-        RegisterByConvention(typeof(Storage.Repositories.UserRepository).Assembly, container, t => t.Name.EndsWith("Repository"));
+        // todo register EF stuff
+
+        RegisterByConvention(typeof(UserRepository).Assembly, container, t => t.Name.EndsWith("Repository"));
     }
 
     private static void RegisterByConvention(Assembly assembly, Container container, Func<Type, bool> condition)

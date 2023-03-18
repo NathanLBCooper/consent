@@ -9,6 +9,8 @@ namespace Consent.Domain.Contracts;
 
 public class Contract
 {
+    public ContractId? Id { get; init; }
+
     public string Name { get; }
     private static void ValidateName(string name)
     {
@@ -30,16 +32,3 @@ public class Contract
 }
 
 public record struct ContractId(int Value);
-
-public class ContractEntity : Contract
-{
-    public ContractId Id { get; }
-
-    public IReadOnlyCollection<ContractVersionEntity> VersionEntities { get; }
-
-    public ContractEntity(ContractId id, string name, ContractVersionEntity[] versions) : base(name, versions)
-    {
-        Id = id;
-        VersionEntities = versions;
-    }
-}

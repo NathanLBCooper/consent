@@ -4,7 +4,7 @@ namespace Consent.Domain.Contracts;
 
 public interface IContractRepository
 {
-    Task<ContractEntity?> Get(ContractId id);
-    Task<ContractEntity> Create(Contract contract);
-    Task Update(ContractEntity contract);
+    Task<Contract?> Get(ContractId id);
+    Task<Contract> Create(Contract contract);
+    Task Update(Contract contract);
 }

@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Consent.Api.Models;
-using Consent.Domain.UnitOfWork;
 using Consent.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,15 +12,13 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
 {
     private readonly ILogger<UserController> _logger;
     private readonly IUserRepository _userRepository;
-    private readonly ICreateUnitOfWork _createUnitOfWork;
     private readonly UserCreateRequestModelValidator _userCreateRequestModelValidator = new();
     private readonly EtagHelper _etagHelper;
 
-    public UserController(ILogger<UserController> logger, IUserRepository userRepository, ICreateUnitOfWork createUnitOfWork)
+    public UserController(ILogger<UserController> logger, IUserRepository userRepository)
     {
         _logger = logger;
         _userRepository = userRepository;
-        _createUnitOfWork = createUnitOfWork;
         _etagHelper = new EtagHelper();
     }
 
@@ -29,9 +26,7 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
     public async Task<ActionResult<UserModel>> UserGet(
         [FromHeader] int userId, [FromHeader(Name = HttpHeaderNames.IfNoneMatch)] string? ifNoneMatch)
     {
-        using var uow = _createUnitOfWork.Create();
         var user = await _userRepository.Get(new UserId(userId));
-
         if (user == null)
         {
             return NotFound();
@@ -63,9 +58,7 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
             return Problem();
         }
 
-        using var uow = _createUnitOfWork.Create();
         var created = await _userRepository.Create(new User(request.Name));
-        await uow.CommitAsync();
 
         var model = created.ToModel();
         var etag = _etagHelper.Get("user", model);

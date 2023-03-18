@@ -3,7 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Consent.Api.Controllers;
 using Consent.Api.Models;
-using Consent.Storage.Repositories;
+using Consent.Storage.Users;
+using Consent.Storage.Workspaces;
 using Consent.Tests.StorageContext;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +20,10 @@ public class WorkspaceControllerTest
 
     public WorkspaceControllerTest(DatabaseFixture fixture)
     {
-        var unitOfWorkContext = fixture.CreateUnitOfWorkContext();
-
-        var workspaceRepository = new WorkspaceRepository(unitOfWorkContext);
-        var userRepository = new UserRepository(unitOfWorkContext);
-        _sut = new WorkspaceController(new NullLogger<WorkspaceController>(), workspaceRepository, userRepository, unitOfWorkContext);
-        _userController = new UserController(new NullLogger<UserController>(), userRepository, unitOfWorkContext)
+        var workspaceRepository = new WorkspaceRepository(fixture.WorkspaceDbContext);
+        var userRepository = new UserRepository(fixture.UserDbContext);
+        _sut = new WorkspaceController(new NullLogger<WorkspaceController>(), workspaceRepository, userRepository);
+        _userController = new UserController(new NullLogger<UserController>(), userRepository)
         {
             ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
         };

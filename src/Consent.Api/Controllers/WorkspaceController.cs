@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Consent.Api.Models;
-using Consent.Domain.UnitOfWork;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Mvc;
@@ -16,17 +15,14 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
     private readonly ILogger<WorkspaceController> _logger;
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IUserRepository _userRepository;
-    private readonly ICreateUnitOfWork _createUnitOfWork;
     private readonly WorkspaceCreateRequestModelValidator _workspaceCreateRequestModelValidator = new();
 
     public WorkspaceController(ILogger<WorkspaceController> logger,
-        IWorkspaceRepository workspaceRepository, IUserRepository userRepository,
-        ICreateUnitOfWork createUnitOfWork)
+        IWorkspaceRepository workspaceRepository, IUserRepository userRepository)
     {
         _logger = logger;
         _workspaceRepository = workspaceRepository;
         _userRepository = userRepository;
-        _createUnitOfWork = createUnitOfWork;
     }
 
     [HttpGet("{id}", Name = "GetWorkspace")]
@@ -34,8 +30,6 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
     {
         var workspaceId = new WorkspaceId(id);
         var userIdentity = new UserId(userId);
-
-        using var uow = _createUnitOfWork.Create();
 
         var workspace = await _workspaceRepository.Get(workspaceId);
         if (workspace == null || !workspace.GetUserPermissions(userIdentity).Contains(WorkspacePermission.View))
@@ -60,17 +54,13 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
             return Problem();
         }
 
-        using var uow = _createUnitOfWork.Create();
-
         var user = await _userRepository.Get(new UserId(userId));
         if (user == null)
         {
             return NotFound();
         }
 
-        var entity = await _workspaceRepository.Create(new Workspace(request.Name, user.Id));
-
-        await uow.CommitAsync();
+        var entity = await _workspaceRepository.Create(new Workspace(request.Name, user.Id!.Value));
 
         return Ok(entity.ToModel());
     }

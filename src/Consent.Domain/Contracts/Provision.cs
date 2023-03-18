@@ -8,6 +8,8 @@ namespace Consent.Domain.Contracts;
  */
 public class Provision
 {
+    public ProvisionId? Id { get; init; }
+
     public string Text { get; }
     private static void ValidateText(string text)
     {
@@ -29,14 +31,3 @@ public class Provision
 }
 
 public record struct ProvisionId(int Value);
-
-public class ProvisionEntity : Provision
-{
-    public ProvisionId Id { get; }
-
-    public ProvisionEntity(ProvisionId id, string text, PermissionId[] permissions)
-        : base(text, permissions)
-    {
-        Id = id;
-    }
-}

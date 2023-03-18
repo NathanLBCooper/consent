@@ -9,6 +9,7 @@ namespace Consent.Domain.Permissions;
 
 public class Permission
 {
+    public PermissionId? Id { get; init; }
     public WorkspaceId WorkspaceId { get; }
 
     public string Name { get; }
@@ -34,14 +35,3 @@ public class Permission
 }
 
 public record struct PermissionId(int Value);
-
-public class PermissionEntity : Permission
-{
-    public PermissionId Id { get; }
-
-    public PermissionEntity(PermissionId id, WorkspaceId workspaceId, string name, string description)
-        : base(workspaceId, name, description)
-    {
-        Id = id;
-    }
-}

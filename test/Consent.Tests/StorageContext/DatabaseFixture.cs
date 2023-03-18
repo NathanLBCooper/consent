@@ -1,19 +1,18 @@
 ﻿using System;
-using Consent.Storage;
-using Consent.Storage.TypeHandlers;
-using Consent.Storage.UnitOfWork;
+using Consent.Storage.Contacts;
+using Consent.Storage.Users;
+using Consent.Storage.Workspaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Consent.Tests.StorageContext;
 
 public class DatabaseFixture : IDisposable
 {
     private readonly TestDatabaseContext _testDatabaseContext;
-    private readonly SqlSettings _sqlSettings;
 
-    public UnitOfWorkContext CreateUnitOfWorkContext()
-    {
-        return new UnitOfWorkContext(_sqlSettings);
-    }
+    public UserDbContext UserDbContext { get; }
+    public WorkspaceDbContext WorkspaceDbContext { get; }
+    public ContractDbContext ContractDbContext { get; }
 
     public DatabaseFixture()
     {
@@ -21,12 +20,19 @@ public class DatabaseFixture : IDisposable
         _testDatabaseContext.InitializeTestDatabase();
         var connectionString = _testDatabaseContext.ConnectionString;
 
-        _sqlSettings = new SqlSettings { ConnectionString = connectionString };
-    }
+        UserDbContext = new UserDbContext(
+            new DbContextOptionsBuilder<UserDbContext>().UseSqlServer(connectionString).Options
+            );
 
-    static DatabaseFixture()
-    {
-        TypeHandlers.Setup();
+        WorkspaceDbContext = new WorkspaceDbContext(
+            new DbContextOptionsBuilder<WorkspaceDbContext>().UseSqlServer(connectionString).Options
+            );
+
+        ContractDbContext = new ContractDbContext(
+            new DbContextOptionsBuilder<ContractDbContext>().UseSqlServer(connectionString).Options
+            );
+
+        // todo EF stuff
     }
 
     public void Dispose()

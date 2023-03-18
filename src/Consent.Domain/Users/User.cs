@@ -1,5 +1,4 @@
 ﻿using System;
-using Consent.Domain.Workspaces;
 
 namespace Consent.Domain.Users;
 
@@ -9,6 +8,8 @@ namespace Consent.Domain.Users;
 
 public class User
 {
+    public UserId? Id { get; init; }
+
     public string Name { get; }
     private static void ValidateName(string name)
     {
@@ -26,24 +27,3 @@ public class User
 }
 
 public record struct UserId(int Value);
-
-public record WorkspaceMembership(WorkspaceId WorkspaceId, WorkspacePermission[] Permissions);
-
-public class UserEntity : User
-{
-    public UserId Id { get; }
-
-    public WorkspaceMembership[] WorkspaceMemberships { get; }
-
-    public UserEntity(UserId id, string name) : base(name)
-    {
-        Id = id;
-        WorkspaceMemberships = Array.Empty<WorkspaceMembership>();
-    }
-
-    public UserEntity(UserId id, string name, WorkspaceMembership[] workspaceMemberships) : base(name)
-    {
-        Id = id;
-        WorkspaceMemberships = workspaceMemberships;
-    }
-}

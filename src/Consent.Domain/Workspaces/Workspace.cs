@@ -11,6 +11,8 @@ namespace Consent.Domain.Workspaces;
 
 public class Workspace
 {
+    public WorkspaceId? Id { get; init; }
+
     public string Name { get; }
     private static void ValidateName(string name)
     {
@@ -60,14 +62,3 @@ public class Workspace
 }
 
 public record struct WorkspaceId(int Value);
-
-public class WorkspaceEntity : Workspace
-{
-    public WorkspaceId Id { get; }
-
-    public WorkspaceEntity(WorkspaceId id, string name, Membership[] memberships)
-        : base(name, memberships)
-    {
-        Id = id;
-    }
-}
