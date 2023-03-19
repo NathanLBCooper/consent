@@ -4,7 +4,7 @@ using Consent.Api.Controllers;
 using Consent.Api.Models;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
-using Consent.Tests.StorageContext;
+using Consent.Tests.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;

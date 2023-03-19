@@ -20,5 +20,20 @@ public class ContractDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         _ = modelBuilder.HasDefaultSchema("contracts");
+
+        _ = modelBuilder.Entity<Contract>().HasKey(e => e.Id);
+        _ = modelBuilder.Entity<Contract>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
+
+        _ = modelBuilder.Entity<ContractVersion>().HasKey(e => e.Id);
+        _ = modelBuilder.Entity<ContractVersion>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
+
+        _ = modelBuilder.Entity<Provision>().HasKey(e => e.Id);
+        _ = modelBuilder.Entity<Provision>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
     }
 }

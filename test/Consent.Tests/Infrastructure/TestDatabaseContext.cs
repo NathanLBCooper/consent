@@ -5,7 +5,7 @@ using Dapper;
 using SimpleMigrations;
 using SimpleMigrations.DatabaseProvider;
 
-namespace Consent.Tests.StorageContext;
+namespace Consent.Tests.Infrastructure;
 
 internal class TestDatabaseContext : IDisposable
 {
@@ -40,7 +40,7 @@ internal class TestDatabaseContext : IDisposable
     {
         using var connection = new SqlConnection(connectionString);
         var databaseProvider = new MssqlDatabaseProvider(connection);
-        var migrator = new SimpleMigrator(typeof(Consent.Storage.Migrator.Program).GetTypeInfo().Assembly, databaseProvider);
+        var migrator = new SimpleMigrator(typeof(Storage.Migrator.Program).GetTypeInfo().Assembly, databaseProvider);
         migrator.Load();
         migrator.MigrateToLatest();
     }
@@ -61,7 +61,8 @@ internal class TestDatabaseContext : IDisposable
             DataSource = DataSource,
             UserID = "sa",
             Password = "Password1!",
-            InitialCatalog = database
+            InitialCatalog = database,
+            TrustServerCertificate = true,
         }.ToString();
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Consent.Storage.Migrations.Users
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230319122931_Initital")]
+    [Migration("20230319125525_Initital")]
     partial class Initital
     {
         /// <inheritdoc />
@@ -28,7 +28,10 @@ namespace Consent.Storage.Migrations.Users
             modelBuilder.Entity("Consent.Domain.Users.User", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()

@@ -20,5 +20,10 @@ public class UserDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         _ = modelBuilder.HasDefaultSchema("users");
+
+        _ = modelBuilder.Entity<User>().HasKey(e => e.Id);
+        _ = modelBuilder.Entity<User>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
     }
 }

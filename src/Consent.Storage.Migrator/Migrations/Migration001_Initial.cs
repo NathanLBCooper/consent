@@ -11,7 +11,7 @@ internal class Migration001_Initial : Migration
 IF SCHEMA_ID(N'users') IS NULL EXEC(N'CREATE SCHEMA [users];');
 
 CREATE TABLE [users].[Users] (
-    [Id] int NOT NULL,
+    [Id] int NOT NULL IDENTITY,
     [Name] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
 );
@@ -22,13 +22,13 @@ CREATE TABLE [users].[Users] (
 IF SCHEMA_ID(N'workspaces') IS NULL EXEC(N'CREATE SCHEMA [workspaces];');
 
 CREATE TABLE [workspaces].[Workspaces] (
-    [Id] int NOT NULL,
+    [Id] int NOT NULL IDENTITY,
     [Name] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_Workspaces] PRIMARY KEY ([Id])
 );
 
 CREATE TABLE [workspaces].[Membership] (
-    [Id] int NOT NULL,
+    [Id] int NOT NULL IDENTITY,
     [User] int NOT NULL,
     [WorkspaceId] int NULL,
     CONSTRAINT [PK_Membership] PRIMARY KEY ([Id]),
@@ -43,13 +43,13 @@ CREATE INDEX [IX_Membership_WorkspaceId] ON [workspaces].[Membership] ([Workspac
 IF SCHEMA_ID(N'contracts') IS NULL EXEC(N'CREATE SCHEMA [contracts];');
 
 CREATE TABLE [contracts].[Contracts] (
-    [Id] int NOT NULL,
+    [Id] int NOT NULL IDENTITY,
     [Name] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_Contracts] PRIMARY KEY ([Id])
 );
 
 CREATE TABLE [contracts].[ContractVersion] (
-    [Id] int NOT NULL,
+    [Id] int NOT NULL IDENTITY,
     [Name] nvarchar(max) NOT NULL,
     [Text] nvarchar(max) NOT NULL,
     [Status] int NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE [contracts].[ContractVersion] (
 );
 
 CREATE TABLE [contracts].[Provision] (
-    [Id] int NOT NULL,
+    [Id] int NOT NULL IDENTITY,
     [Text] nvarchar(max) NOT NULL,
     [ContractVersionId] int NULL,
     CONSTRAINT [PK_Provision] PRIMARY KEY ([Id]),

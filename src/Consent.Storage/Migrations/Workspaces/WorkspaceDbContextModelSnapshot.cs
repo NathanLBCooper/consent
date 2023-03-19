@@ -25,7 +25,10 @@ namespace Consent.Storage.Migrations.Workspaces
             modelBuilder.Entity("Consent.Domain.Workspaces.Membership", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("User")
                         .HasColumnType("int");
@@ -43,7 +46,10 @@ namespace Consent.Storage.Migrations.Workspaces
             modelBuilder.Entity("Consent.Domain.Workspaces.Workspace", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()

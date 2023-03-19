@@ -4,7 +4,7 @@ using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Consent.Tests.StorageContext;
+namespace Consent.Tests.Infrastructure;
 
 public class DatabaseFixture : IDisposable
 {

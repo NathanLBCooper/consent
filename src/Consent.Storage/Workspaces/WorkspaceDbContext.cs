@@ -20,5 +20,15 @@ public class WorkspaceDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         _ = modelBuilder.HasDefaultSchema("workspaces");
+
+        _ = modelBuilder.Entity<Workspace>().HasKey(e => e.Id);
+        _ = modelBuilder.Entity<Workspace>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
+
+        _ = modelBuilder.Entity<Membership>().HasKey(e => e.Id);
+        _ = modelBuilder.Entity<Membership>()
+            .Property(e => e.Id)
+            .ValueGeneratedOnAdd();
     }
 }

@@ -25,7 +25,10 @@ namespace Consent.Storage.Migrations.Users
             modelBuilder.Entity("Consent.Domain.Users.User", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()

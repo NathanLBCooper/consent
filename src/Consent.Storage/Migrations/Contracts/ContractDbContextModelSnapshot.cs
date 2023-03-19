@@ -25,7 +25,10 @@ namespace Consent.Storage.Migrations.Contracts
             modelBuilder.Entity("Consent.Domain.Contracts.Contract", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -39,7 +42,10 @@ namespace Consent.Storage.Migrations.Contracts
             modelBuilder.Entity("Consent.Domain.Contracts.ContractVersion", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("ContractId")
                         .HasColumnType("int");
@@ -65,7 +71,10 @@ namespace Consent.Storage.Migrations.Contracts
             modelBuilder.Entity("Consent.Domain.Contracts.Provision", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("ContractVersionId")
                         .HasColumnType("int");
