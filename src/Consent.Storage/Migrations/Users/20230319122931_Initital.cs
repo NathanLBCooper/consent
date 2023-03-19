@@ -5,13 +5,17 @@
 namespace Consent.Storage.Migrations.Users
 {
     /// <inheritdoc />
-    public partial class NameOfTheNewMigration : Migration
+    public partial class Initital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "users");
+
             migrationBuilder.CreateTable(
                 name: "Users",
+                schema: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -27,7 +31,8 @@ namespace Consent.Storage.Migrations.Users
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Users",
+                schema: "users");
         }
     }
 }

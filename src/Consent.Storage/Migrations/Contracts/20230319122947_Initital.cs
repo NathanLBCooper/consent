@@ -5,13 +5,17 @@
 namespace Consent.Storage.Migrations.Contracts
 {
     /// <inheritdoc />
-    public partial class NameOfTheNewMigration : Migration
+    public partial class Initital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "contracts");
+
             migrationBuilder.CreateTable(
                 name: "Contracts",
+                schema: "contracts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -24,6 +28,7 @@ namespace Consent.Storage.Migrations.Contracts
 
             migrationBuilder.CreateTable(
                 name: "ContractVersion",
+                schema: "contracts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -38,12 +43,14 @@ namespace Consent.Storage.Migrations.Contracts
                     table.ForeignKey(
                         name: "FK_ContractVersion_Contracts_ContractId",
                         column: x => x.ContractId,
+                        principalSchema: "contracts",
                         principalTable: "Contracts",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "Provision",
+                schema: "contracts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -56,17 +63,20 @@ namespace Consent.Storage.Migrations.Contracts
                     table.ForeignKey(
                         name: "FK_Provision_ContractVersion_ContractVersionId",
                         column: x => x.ContractVersionId,
+                        principalSchema: "contracts",
                         principalTable: "ContractVersion",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ContractVersion_ContractId",
+                schema: "contracts",
                 table: "ContractVersion",
                 column: "ContractId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Provision_ContractVersionId",
+                schema: "contracts",
                 table: "Provision",
                 column: "ContractVersionId");
         }
@@ -75,13 +85,16 @@ namespace Consent.Storage.Migrations.Contracts
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Provision");
+                name: "Provision",
+                schema: "contracts");
 
             migrationBuilder.DropTable(
-                name: "ContractVersion");
+                name: "ContractVersion",
+                schema: "contracts");
 
             migrationBuilder.DropTable(
-                name: "Contracts");
+                name: "Contracts",
+                schema: "contracts");
         }
     }
 }

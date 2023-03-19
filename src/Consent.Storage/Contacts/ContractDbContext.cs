@@ -16,4 +16,9 @@ public class ContractDbContext : DbContext
     {
         TypeConverters.Configure(configurationBuilder);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        _ = modelBuilder.HasDefaultSchema("contracts");
+    }
 }

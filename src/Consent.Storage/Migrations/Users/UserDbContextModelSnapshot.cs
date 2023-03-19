@@ -16,6 +16,7 @@ namespace Consent.Storage.Migrations.Users
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("users")
                 .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -32,7 +33,7 @@ namespace Consent.Storage.Migrations.Users
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", "users");
                 });
 #pragma warning restore 612, 618
         }

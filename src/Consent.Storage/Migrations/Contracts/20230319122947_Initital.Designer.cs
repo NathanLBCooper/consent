@@ -11,14 +11,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Consent.Storage.Migrations.Contracts
 {
     [DbContext(typeof(ContractDbContext))]
-    [Migration("20230319122328_NameOfTheNewMigration")]
-    partial class NameOfTheNewMigration
+    [Migration("20230319122947_Initital")]
+    partial class Initital
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("contracts")
                 .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -35,7 +36,7 @@ namespace Consent.Storage.Migrations.Contracts
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contracts");
+                    b.ToTable("Contracts", "contracts");
                 });
 
             modelBuilder.Entity("Consent.Domain.Contracts.ContractVersion", b =>
@@ -61,7 +62,7 @@ namespace Consent.Storage.Migrations.Contracts
 
                     b.HasIndex("ContractId");
 
-                    b.ToTable("ContractVersion");
+                    b.ToTable("ContractVersion", "contracts");
                 });
 
             modelBuilder.Entity("Consent.Domain.Contracts.Provision", b =>
@@ -80,7 +81,7 @@ namespace Consent.Storage.Migrations.Contracts
 
                     b.HasIndex("ContractVersionId");
 
-                    b.ToTable("Provision");
+                    b.ToTable("Provision", "contracts");
                 });
 
             modelBuilder.Entity("Consent.Domain.Contracts.ContractVersion", b =>

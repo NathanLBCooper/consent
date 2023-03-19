@@ -16,6 +16,7 @@ namespace Consent.Storage.Migrations.Workspaces
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("workspaces")
                 .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -36,7 +37,7 @@ namespace Consent.Storage.Migrations.Workspaces
 
                     b.HasIndex("WorkspaceId");
 
-                    b.ToTable("Membership");
+                    b.ToTable("Membership", "workspaces");
                 });
 
             modelBuilder.Entity("Consent.Domain.Workspaces.Workspace", b =>
@@ -50,7 +51,7 @@ namespace Consent.Storage.Migrations.Workspaces
 
                     b.HasKey("Id");
 
-                    b.ToTable("Workspaces");
+                    b.ToTable("Workspaces", "workspaces");
                 });
 
             modelBuilder.Entity("Consent.Domain.Workspaces.Membership", b =>

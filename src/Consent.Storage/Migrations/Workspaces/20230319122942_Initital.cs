@@ -5,13 +5,17 @@
 namespace Consent.Storage.Migrations.Workspaces
 {
     /// <inheritdoc />
-    public partial class NameOfTheNewMigration : Migration
+    public partial class Initital : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "workspaces");
+
             migrationBuilder.CreateTable(
                 name: "Workspaces",
+                schema: "workspaces",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -24,6 +28,7 @@ namespace Consent.Storage.Migrations.Workspaces
 
             migrationBuilder.CreateTable(
                 name: "Membership",
+                schema: "workspaces",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
@@ -36,12 +41,14 @@ namespace Consent.Storage.Migrations.Workspaces
                     table.ForeignKey(
                         name: "FK_Membership_Workspaces_WorkspaceId",
                         column: x => x.WorkspaceId,
+                        principalSchema: "workspaces",
                         principalTable: "Workspaces",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Membership_WorkspaceId",
+                schema: "workspaces",
                 table: "Membership",
                 column: "WorkspaceId");
         }
@@ -50,10 +57,12 @@ namespace Consent.Storage.Migrations.Workspaces
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Membership");
+                name: "Membership",
+                schema: "workspaces");
 
             migrationBuilder.DropTable(
-                name: "Workspaces");
+                name: "Workspaces",
+                schema: "workspaces");
         }
     }
 }
