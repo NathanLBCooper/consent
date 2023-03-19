@@ -5,9 +5,15 @@ namespace Consent.Storage.Workspaces;
 
 public class WorkspaceDbContext : DbContext
 {
+    public DbSet<Workspace> Workspaces => Set<Workspace>();
+
     public WorkspaceDbContext(DbContextOptions<WorkspaceDbContext> options) : base(options)
     {
+        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
-    public DbSet<Workspace> Workspaces => Set<Workspace>();
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        TypeConverters.Configure(configurationBuilder);
+    }
 }

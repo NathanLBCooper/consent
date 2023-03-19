@@ -5,10 +5,15 @@ namespace Consent.Storage.Users;
 
 public class UserDbContext : DbContext
 {
+    public DbSet<User> Users => Set<User>();
+
     public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
     {
-        this.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
-    public DbSet<User> Users => Set<User>();
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        TypeConverters.Configure(configurationBuilder);
+    }
 }

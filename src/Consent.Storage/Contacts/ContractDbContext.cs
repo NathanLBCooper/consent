@@ -5,10 +5,15 @@ namespace Consent.Storage.Contacts;
 
 public class ContractDbContext : DbContext
 {
+    public DbSet<Contract> Contracts => Set<Contract>();
+
     public ContractDbContext(DbContextOptions<ContractDbContext> options) : base(options)
     {
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
-    public DbSet<Contract> Contracts => Set<Contract>();
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        TypeConverters.Configure(configurationBuilder);
+    }
 }

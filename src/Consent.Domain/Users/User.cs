@@ -26,4 +26,4 @@ public class User
     }
 }
 
-public record struct UserId(int Value);
+public readonly record struct UserId(int Value) : IIdentifier;

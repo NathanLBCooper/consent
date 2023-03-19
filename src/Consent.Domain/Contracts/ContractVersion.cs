@@ -55,4 +55,4 @@ public class ContractVersion
     }
 }
 
-public record struct ContractVersionId(int Value);
+public readonly record struct ContractVersionId(int Value) : IIdentifier;

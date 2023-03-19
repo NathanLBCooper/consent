@@ -34,4 +34,4 @@ public class Permission
     }
 }
 
-public record struct PermissionId(int Value);
+public readonly record struct PermissionId(int Value) : IIdentifier;

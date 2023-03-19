@@ -31,4 +31,4 @@ public class Contract
     }
 }
 
-public record struct ContractId(int Value);
+public readonly record struct ContractId(int Value) : IIdentifier;

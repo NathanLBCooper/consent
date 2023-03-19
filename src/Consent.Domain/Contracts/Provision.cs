@@ -30,4 +30,4 @@ public class Provision
     }
 }
 
-public record struct ProvisionId(int Value);
+public readonly record struct ProvisionId(int Value) : IIdentifier;

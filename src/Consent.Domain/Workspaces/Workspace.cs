@@ -61,4 +61,4 @@ public class Workspace
     }
 }
 
-public record struct WorkspaceId(int Value);
+public readonly record struct WorkspaceId(int Value) : IIdentifier;
