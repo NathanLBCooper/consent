@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Consent.Domain.Permissions;
 
 namespace Consent.Domain.Contracts;
@@ -10,7 +11,7 @@ public class Provision
 {
     public ProvisionId? Id { get; init; }
 
-    public string Text { get; }
+    public string Text { get; private set; }
     private static void ValidateText(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -19,14 +20,19 @@ public class Provision
         }
     }
 
-    public PermissionId[] Permissions { get; }
+    private readonly List<PermissionId> _permissions;
+    public IReadOnlyCollection<PermissionId> Permissions => _permissions;
 
-    public Provision(string text, PermissionId[] permissions)
+    public Provision(string text, List<PermissionId> permissions)
     {
         ValidateText(text);
         Text = text;
 
-        Permissions = permissions;
+        _permissions = permissions;
+    }
+
+    public Provision(string text) : this(text, new List<PermissionId>())
+    {
     }
 }
 

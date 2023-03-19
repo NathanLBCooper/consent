@@ -21,4 +21,10 @@
     <ProjectReference Include="..\Consent.Domain\Consent.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\Contracts\" />
+    <Folder Include="Migrations\Users\" />
+    <Folder Include="Migrations\Workspaces\" />
+  </ItemGroup>
+
 </Project>

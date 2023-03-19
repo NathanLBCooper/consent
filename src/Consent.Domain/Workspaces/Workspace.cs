@@ -13,7 +13,7 @@ public class Workspace
 {
     public WorkspaceId? Id { get; init; }
 
-    public string Name { get; }
+    public string Name { get; private set; }
     private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -22,10 +22,12 @@ public class Workspace
         }
     }
 
-    public Membership[] Memberships;
-    private static void ValidateMemberships(Membership[] memberships)
+    private readonly List<Membership> _memberships;
+    public IReadOnlyCollection<Membership> Memberships => _memberships;
+
+    private static void ValidateMemberships(List<Membership> memberships)
     {
-        var users = memberships.Select(m => m.UserId);
+        var users = memberships.Select(m => m.User);
         if (users.Count() != users.Distinct().Count())
         {
             throw new ArgumentException("Cannot have more than one membership for a user", nameof(Memberships));
@@ -37,26 +39,36 @@ public class Workspace
         }
     }
 
-    public Workspace(string name, Membership[] memberships)
+    public Workspace(string name, List<Membership> memberships)
     {
         ValidateName(name);
         Name = name;
 
         ValidateMemberships(memberships);
-        Memberships = memberships;
+        _memberships = memberships;
     }
 
-    public Workspace(string name, UserId creatorId)
+    public Workspace(string name, UserId creator)
     {
         ValidateName(name);
         Name = name;
 
-        Memberships = new[] { new Membership(creatorId, Membership.SuperUser) };
+        _memberships = new List<Membership> { new Membership(creator, Membership.SuperUser.ToList()) };
     }
 
-    public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)
+    // todo for EF, compromises validity
+    protected Workspace(string name)
     {
-        return Memberships.SingleOrDefault(m => m.UserId == userId)?.Permissions
+        ValidateName(name);
+        Name = name;
+
+        // todo invalid
+        _memberships = new List<Membership>();
+    }
+
+    public IEnumerable<WorkspacePermission> GetUserPermissions(UserId user)
+    {
+        return Memberships.SingleOrDefault(m => m.User == user)?.Permissions
             ?? Enumerable.Empty<WorkspacePermission>();
     }
 }

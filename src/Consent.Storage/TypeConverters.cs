@@ -19,6 +19,9 @@ internal static class TypeConverters
             .Properties<WorkspaceId>()
             .HaveConversion<IdentifierTypeConverter<WorkspaceId>>();
         _ = configurationBuilder
+            .Properties<MembershipId>()
+            .HaveConversion<IdentifierTypeConverter<MembershipId>>();
+        _ = configurationBuilder
             .Properties<PermissionId>()
             .HaveConversion<IdentifierTypeConverter<PermissionId>>();
         _ = configurationBuilder

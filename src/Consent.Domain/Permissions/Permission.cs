@@ -10,9 +10,9 @@ namespace Consent.Domain.Permissions;
 public class Permission
 {
     public PermissionId? Id { get; init; }
-    public WorkspaceId WorkspaceId { get; }
+    public WorkspaceId WorkspaceId { get; private init; }
 
-    public string Name { get; }
+    public string Name { get; private init; }
     private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -21,7 +21,7 @@ public class Permission
         }
     }
 
-    public string Description { get; }
+    public string Description { get; private init; }
 
     public Permission(WorkspaceId workspaceId, string name, string description)
     {

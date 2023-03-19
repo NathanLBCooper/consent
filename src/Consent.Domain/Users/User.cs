@@ -10,7 +10,7 @@ public class User
 {
     public UserId? Id { get; init; }
 
-    public string Name { get; }
+    public string Name { get; private set; }
     private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
