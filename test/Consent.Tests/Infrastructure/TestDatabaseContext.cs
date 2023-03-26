@@ -16,7 +16,7 @@ internal class TestDatabaseContext : IDisposable
 
     public TestDatabaseContext()
     {
-        _databaseName = $"uow-mssql-test{Guid.NewGuid()}";
+        _databaseName = $"consent-db-test{Guid.NewGuid()}";
     }
 
     public void InitializeTestDatabase()
