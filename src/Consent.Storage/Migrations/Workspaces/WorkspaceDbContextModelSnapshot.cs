@@ -30,6 +30,10 @@ namespace Consent.Storage.Migrations.Workspaces
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Permissions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("User")
                         .HasColumnType("int");
 

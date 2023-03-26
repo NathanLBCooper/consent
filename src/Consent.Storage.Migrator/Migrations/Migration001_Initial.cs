@@ -18,7 +18,6 @@ CREATE TABLE [users].[Users] (
 
 
 
-
 IF SCHEMA_ID(N'workspaces') IS NULL EXEC(N'CREATE SCHEMA [workspaces];');
 
 CREATE TABLE [workspaces].[Workspaces] (
@@ -30,13 +29,13 @@ CREATE TABLE [workspaces].[Workspaces] (
 CREATE TABLE [workspaces].[Membership] (
     [Id] int NOT NULL IDENTITY,
     [User] int NOT NULL,
+    [Permissions] nvarchar(max) NOT NULL,
     [WorkspaceId] int NULL,
     CONSTRAINT [PK_Membership] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Membership_Workspaces_WorkspaceId] FOREIGN KEY ([WorkspaceId]) REFERENCES [workspaces].[Workspaces] ([Id])
 );
 
 CREATE INDEX [IX_Membership_WorkspaceId] ON [workspaces].[Membership] ([WorkspaceId]);
-
 
 
 
@@ -61,6 +60,7 @@ CREATE TABLE [contracts].[ContractVersion] (
 CREATE TABLE [contracts].[Provision] (
     [Id] int NOT NULL IDENTITY,
     [Text] nvarchar(max) NOT NULL,
+    [Permissions] nvarchar(max) NOT NULL,
     [ContractVersionId] int NULL,
     CONSTRAINT [PK_Provision] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Provision_ContractVersion_ContractVersionId] FOREIGN KEY ([ContractVersionId]) REFERENCES [contracts].[ContractVersion] ([Id])

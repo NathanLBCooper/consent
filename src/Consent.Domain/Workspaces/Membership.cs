@@ -18,7 +18,7 @@ public class Membership
     public UserId User { get; private init; }
 
     private readonly List<WorkspacePermission> _permissions;
-    public IReadOnlyCollection<WorkspacePermission> Permissions => _permissions;
+    public IReadOnlyCollection<WorkspacePermission> Permissions => _permissions.AsReadOnly();
 
     public bool IsSuperUser { get; }
 

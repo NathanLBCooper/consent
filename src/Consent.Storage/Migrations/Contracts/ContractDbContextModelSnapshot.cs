@@ -79,6 +79,10 @@ namespace Consent.Storage.Migrations.Contracts
                     b.Property<int?>("ContractVersionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Permissions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

@@ -23,7 +23,7 @@ public class Workspace
     }
 
     private readonly List<Membership> _memberships;
-    public IReadOnlyCollection<Membership> Memberships => _memberships;
+    public IReadOnlyCollection<Membership> Memberships => _memberships.AsReadOnly();
 
     private static void ValidateMemberships(List<Membership> memberships)
     {
