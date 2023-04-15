@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using Consent.Domain.Users;
 
 namespace Consent.Api.Models;
@@ -20,14 +20,14 @@ internal static class UserModelMapper
         {
             Id = entity.Id!.Value.Value,
             Name = entity.Name,
-            WorkspaceMemberships = Array.Empty<UserWorkspaceMembershipModel>() // todo entity.WorkspaceMemberships.Select(ToModel).ToArray()
+            WorkspaceMemberships = entity.WorkspaceMemberships.Select(ToModel).ToArray()
         };
     }
 
-    //public static UserWorkspaceMembershipModel ToModel(this WorkspaceMembership entity)
-    //{
-    //    return new UserWorkspaceMembershipModel(entity.WorkspaceId.Value,
-    //        entity.Permissions.Select(p => p.ToModel()).ToArray()
-    //        );
-    //}
+    public static UserWorkspaceMembershipModel ToModel(this WorkspaceMembership entity)
+    {
+        return new UserWorkspaceMembershipModel(entity.WorkspaceId.Value,
+            entity.Permissions.Select(p => p.ToModel()).ToArray()
+            );
+    }
 }

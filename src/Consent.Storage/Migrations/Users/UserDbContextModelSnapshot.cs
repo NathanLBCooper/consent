@@ -38,6 +38,42 @@ namespace Consent.Storage.Migrations.Users
 
                     b.ToTable("Users", "users");
                 });
+
+            modelBuilder.Entity("Consent.Domain.Users.WorkspaceMembership", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Permissions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkspaceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("WorkspaceMembership", "users");
+                });
+
+            modelBuilder.Entity("Consent.Domain.Users.WorkspaceMembership", b =>
+                {
+                    b.HasOne("Consent.Domain.Users.User", null)
+                        .WithMany("WorkspaceMemberships")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Consent.Domain.Users.User", b =>
+                {
+                    b.Navigation("WorkspaceMemberships");
+                });
 #pragma warning restore 612, 618
         }
     }

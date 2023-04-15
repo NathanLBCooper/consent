@@ -18,6 +18,7 @@ CREATE TABLE [users].[Users] (
 
 
 
+
 IF SCHEMA_ID(N'workspaces') IS NULL EXEC(N'CREATE SCHEMA [workspaces];');
 
 CREATE TABLE [workspaces].[Workspaces] (
@@ -70,11 +71,19 @@ CREATE INDEX [IX_ContractVersion_ContractId] ON [contracts].[ContractVersion] ([
 
 CREATE INDEX [IX_Provision_ContractVersionId] ON [contracts].[Provision] ([ContractVersionId]);
 ");
+
+        Execute(@"
+CREATE VIEW [users].[WorkspaceMembership] AS
+SELECT [Id], [WorkspaceId], [Permissions], [User] AS [UserId]
+FROM [workspaces].[Membership]
+");
     }
 
     protected override void Down()
     {
         Execute(@"
+DROP TABLE [users].[WorkspaceMembership];
+
 DROP TABLE [users].[Users];
 
 
@@ -90,6 +99,8 @@ DROP TABLE [contracts].[Provision];
 DROP TABLE [contracts].[ContractVersion];
 
 DROP TABLE [contracts].[Contracts];
+
+DROP VIEW [users].[WorkspaceMembership]
 ");
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Consent.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace Consent.Storage.Users;
 
@@ -14,12 +15,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> Get(UserId id)
     {
-        if (await _dbContext.Users.FindAsync(id) is User user)
-        {
-            return user;
-        }
-
-        return null;
+        return await _dbContext.Users.FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task<User> Create(User user)

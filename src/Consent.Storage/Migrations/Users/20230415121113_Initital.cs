@@ -26,6 +26,12 @@ public partial class Initital : Migration
             {
                 _ = table.PrimaryKey("PK_Users", x => x.Id);
             });
+
+        _ = migrationBuilder.Sql(@"
+CREATE VIEW [users].[WorkspaceMembership] AS
+SELECT [Id], [WorkspaceId], [Permissions], [User] AS [UserId]
+FROM [workspaces].[Membership]
+");
     }
 
     /// <inheritdoc />
@@ -34,5 +40,9 @@ public partial class Initital : Migration
         _ = migrationBuilder.DropTable(
             name: "Users",
             schema: "users");
+
+        _ = migrationBuilder.Sql(@"
+DROP VIEW [users].[WorkspaceMembership]
+");
     }
 }

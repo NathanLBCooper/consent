@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Consent.Storage.Migrations.Users
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20230319125525_Initital")]
+    [Migration("20230415121113_Initital")]
     partial class Initital
     {
         /// <inheritdoc />
@@ -40,6 +40,42 @@ namespace Consent.Storage.Migrations.Users
                     b.HasKey("Id");
 
                     b.ToTable("Users", "users");
+                });
+
+            modelBuilder.Entity("Consent.Domain.Users.WorkspaceMembership", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Permissions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WorkspaceId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable((string)null);
+
+                    b.ToView("WorkspaceMembership", "users");
+                });
+
+            modelBuilder.Entity("Consent.Domain.Users.WorkspaceMembership", b =>
+                {
+                    b.HasOne("Consent.Domain.Users.User", null)
+                        .WithMany("WorkspaceMemberships")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Consent.Domain.Users.User", b =>
+                {
+                    b.Navigation("WorkspaceMemberships");
                 });
 #pragma warning restore 612, 618
         }

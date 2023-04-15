@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Consent.Domain.Workspaces;
 
 namespace Consent.Domain.Users;
 
@@ -19,11 +21,25 @@ public class User
         }
     }
 
+    private readonly List<WorkspaceMembership> _workspaceMemberships;
+    public IReadOnlyCollection<WorkspaceMembership> WorkspaceMemberships => _workspaceMemberships.AsReadOnly();
+
     public User(string name)
     {
         ValidateName(name);
         Name = name;
+
+        _workspaceMemberships = new List<WorkspaceMembership>();
     }
 }
 
 public readonly record struct UserId(int Value) : IIdentifier;
+
+public class WorkspaceMembership
+{
+    public MembershipId Id { get; init; }
+    public WorkspaceId WorkspaceId { get; init; }
+
+    private readonly List<WorkspacePermission> _permissions = new();
+    public IReadOnlyCollection<WorkspacePermission> Permissions => _permissions.AsReadOnly();
+}
