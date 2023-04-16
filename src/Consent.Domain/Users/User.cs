@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Consent.Domain.Workspaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Consent.Domain.Users;
 
@@ -12,34 +12,35 @@ public class User
 {
     public UserId? Id { get; init; }
 
-    public string Name { get; private set; }
-    private static void ValidateName(string name)
+    private readonly string _name;
+    public string Name
     {
-        if (string.IsNullOrWhiteSpace(name))
+        get => _name;
+        [MemberNotNull(nameof(_name))]
+        init
         {
-            throw new ArgumentException(nameof(Name));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                _name = value;
+                throw new ArgumentException(nameof(Name));
+            }
+
+            _name = value;
         }
     }
 
     private readonly List<WorkspaceMembership> _workspaceMemberships;
     public IReadOnlyCollection<WorkspaceMembership> WorkspaceMemberships => _workspaceMemberships.AsReadOnly();
 
-    public User(string name)
+    public User(string name, List<WorkspaceMembership> workspaceMemberships)
     {
-        ValidateName(name);
         Name = name;
+        _workspaceMemberships = workspaceMemberships;
+    }
 
-        _workspaceMemberships = new List<WorkspaceMembership>();
+    public User(string name) : this(name, new())
+    {
     }
 }
 
 public readonly record struct UserId(int Value) : IIdentifier;
-
-public class WorkspaceMembership
-{
-    public MembershipId Id { get; init; }
-    public WorkspaceId WorkspaceId { get; init; }
-
-    private readonly List<WorkspacePermission> _permissions = new();
-    public IReadOnlyCollection<WorkspacePermission> Permissions => _permissions.AsReadOnly();
-}
