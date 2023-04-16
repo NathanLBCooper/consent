@@ -9,7 +9,9 @@ namespace Consent.Domain.Contracts;
 
 public class Contract
 {
-    public string Name { get; }
+    public ContractId? Id { get; init; }
+
+    public string Name { get; private set; }
     private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -18,28 +20,20 @@ public class Contract
         }
     }
 
-    public IReadOnlyCollection<ContractVersion> Versions { get; }
+    private readonly List<ContractVersion> _versions;
+    public IReadOnlyCollection<ContractVersion> Versions => _versions;
 
-    public Contract(string name, ContractVersion[] versions)
+    public Contract(string name, List<ContractVersion> versions)
     {
         ValidateName(name);
         Name = name;
 
-        Versions = versions;
+        _versions = versions;
     }
-}
 
-public record struct ContractId(int Value);
-
-public class ContractEntity : Contract
-{
-    public ContractId Id { get; }
-
-    public IReadOnlyCollection<ContractVersionEntity> VersionEntities { get; }
-
-    public ContractEntity(ContractId id, string name, ContractVersionEntity[] versions) : base(name, versions)
+    public Contract(string name) : this(name, new List<ContractVersion>())
     {
-        Id = id;
-        VersionEntities = versions;
     }
 }
+
+public readonly record struct ContractId(int Value) : IIdentifier;

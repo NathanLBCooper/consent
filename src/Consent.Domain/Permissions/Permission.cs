@@ -9,9 +9,10 @@ namespace Consent.Domain.Permissions;
 
 public class Permission
 {
-    public WorkspaceId WorkspaceId { get; }
+    public PermissionId? Id { get; init; }
+    public WorkspaceId WorkspaceId { get; private init; }
 
-    public string Name { get; }
+    public string Name { get; private init; }
     private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -20,7 +21,7 @@ public class Permission
         }
     }
 
-    public string Description { get; }
+    public string Description { get; private init; }
 
     public Permission(WorkspaceId workspaceId, string name, string description)
     {
@@ -33,15 +34,4 @@ public class Permission
     }
 }
 
-public record struct PermissionId(int Value);
-
-public class PermissionEntity : Permission
-{
-    public PermissionId Id { get; }
-
-    public PermissionEntity(PermissionId id, WorkspaceId workspaceId, string name, string description)
-        : base(workspaceId, name, description)
-    {
-        Id = id;
-    }
-}
+public readonly record struct PermissionId(int Value) : IIdentifier;

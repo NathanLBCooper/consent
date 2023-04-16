@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Shouldly;
@@ -13,7 +15,7 @@ public class WorkspaceTest
     [InlineData("  ")]
     public void Cannot_create_workspace_with_empty_name(string name)
     {
-        var ctor = () => new Workspace(name, Array.Empty<Membership>());
+        var ctor = () => new Workspace(name, new List<Membership>());
         _ = ctor.ShouldThrow<ArgumentException>();
 
         var user_ctor = () => new Workspace(name, new UserId(1));
@@ -24,10 +26,10 @@ public class WorkspaceTest
     public void Can_get_user_permissions()
     {
         var userId = new UserId(1);
-        var permissions = new[] { WorkspacePermission.Edit, WorkspacePermission.View };
-        var workspace = new Workspace("myworkspace", new Membership[] {
+        var permissions = new List<WorkspacePermission> { WorkspacePermission.Edit, WorkspacePermission.View };
+        var workspace = new Workspace("myworkspace", new List<Membership> {
             new(userId, permissions ),
-            new(new UserId(2), Membership.SuperUser)
+            new(new UserId(2), Membership.SuperUser.ToList())
         });
 
         workspace.GetUserPermissions(userId).ShouldBe(permissions);
@@ -50,9 +52,9 @@ public class WorkspaceTest
     [Fact]
     public void Cannot_create_workspace_without_a_superUser()
     {
-        var empty = () => new Workspace("myworkspace", Array.Empty<Membership>());
+        var empty = () => new Workspace("myworkspace", new List<Membership>());
         var nonSuper = () => new Workspace("myworkspace",
-            new[] { new Membership(new UserId(1), new[] { WorkspacePermission.Edit, WorkspacePermission.View }) }
+            new List<Membership> { new Membership(new UserId(1), new List<WorkspacePermission> { WorkspacePermission.Edit, WorkspacePermission.View }) }
             );
 
         _ = empty.ShouldThrow<ArgumentException>();
@@ -63,8 +65,8 @@ public class WorkspaceTest
     public void Cannot_create_workspace_with_duplicate_user()
     {
         var duplicate = () => new Workspace("myworkspace",
-            new[] { new Membership(new UserId(1), Membership.SuperUser),
-                new Membership(new UserId(1), Membership.SuperUser) }
+            new List<Membership> { new Membership(new UserId(1), Membership.SuperUser.ToList()),
+                new Membership(new UserId(1), Membership.SuperUser.ToList()) }
             );
 
         _ = duplicate.ShouldThrow<ArgumentException>();
@@ -75,7 +77,7 @@ public class WorkspaceTest
     {
         var userId = new UserId(1);
         var workspace = new Workspace("myworkspace", userId);
-        var recreate = () => new Workspace(workspace.Name, workspace.Memberships);
+        var recreate = () => new Workspace(workspace.Name, workspace.Memberships.ToList());
 
         _ = recreate.ShouldNotThrow();
     }

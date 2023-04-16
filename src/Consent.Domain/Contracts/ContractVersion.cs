@@ -9,7 +9,9 @@ namespace Consent.Domain.Contracts;
 
 public class ContractVersion
 {
-    public string Name { get; }
+    public ContractVersionId? Id { get; init; }
+
+    public string Name { get; private set; }
     private static void ValidateName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -18,7 +20,7 @@ public class ContractVersion
         }
     }
 
-    public string Text { get; }
+    public string Text { get; private set; }
     private static void ValidateText(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -27,9 +29,7 @@ public class ContractVersion
         }
     }
 
-    public IReadOnlyCollection<Provision> Provisions { get; }
-
-    public ContractVersionStatus Status { get; }
+    public ContractVersionStatus Status { get; private set; }
     private static void ValidateStatus(ContractVersionStatus status)
     {
         if (!Enum.IsDefined(typeof(ContractVersionStatus), status))
@@ -38,7 +38,10 @@ public class ContractVersion
         }
     }
 
-    public ContractVersion(string name, string text, Provision[] provisions, ContractVersionStatus status)
+    private readonly List<Provision> _provisions;
+    public IReadOnlyCollection<Provision> Provisions => _provisions;
+
+    public ContractVersion(string name, string text, ContractVersionStatus status, List<Provision> provisions)
     {
         ValidateName(name);
         Name = name;
@@ -46,25 +49,15 @@ public class ContractVersion
         ValidateText(text);
         Text = text;
 
-        Provisions = provisions;
-
         ValidateStatus(status);
         Status = status;
+
+        _provisions = provisions;
     }
-}
 
-public record struct ContractVersionId(int Value);
-
-public class ContractVersionEntity : ContractVersion
-{
-    public ContractVersionId Id { get; }
-
-    public IReadOnlyCollection<ProvisionEntity> ProvisionEntities { get; }
-
-    public ContractVersionEntity(ContractVersionId id, string name, string text, ProvisionEntity[] provisions, ContractVersionStatus status) :
-        base(name, text, provisions, status)
+    public ContractVersion(string name, string text, ContractVersionStatus status) : this(name, text, status, new List<Provision>())
     {
-        Id = id;
-        ProvisionEntities = provisions;
     }
 }
+
+public readonly record struct ContractVersionId(int Value) : IIdentifier;

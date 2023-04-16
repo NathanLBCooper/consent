@@ -21,7 +21,6 @@ public class Program
             .Build();
 
         ConfigureLogging(configuration);
-        Storage.TypeHandlers.TypeHandlers.Setup();
 
         try
         {

@@ -1,4 +1,4 @@
-﻿namespace Consent.Tests.StorageContext;
+﻿namespace Consent.Tests.Infrastructure;
 
 [CollectionDefinition("DatabaseTest")]
 public class DatabaseCollection : ICollectionFixture<DatabaseFixture>

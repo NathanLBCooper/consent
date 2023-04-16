@@ -8,7 +8,9 @@ namespace Consent.Domain.Participants;
 
 public class Participant
 {
-    public string ExternalId { get; }
+    public ParticipantId? Id { get; init; }
+
+    public string ExternalId { get; private set; }
     private static void ValidateExternalId(string externalId)
     {
         if (string.IsNullOrWhiteSpace(externalId))
@@ -24,14 +26,4 @@ public class Participant
     }
 }
 
-public record struct ParticipantId(int Value);
-
-public class ParticipantEntity : Participant
-{
-    public ParticipantId Id { get; }
-
-    public ParticipantEntity(ParticipantId id, string externalId) : base(externalId)
-    {
-        Id = id;
-    }
-}
+public readonly record struct ParticipantId(int Value) : IIdentifier;

@@ -1,5 +1,6 @@
 ﻿using System;
-using Consent.Domain.Workspaces;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Consent.Domain.Users;
 
@@ -9,41 +10,37 @@ namespace Consent.Domain.Users;
 
 public class User
 {
-    public string Name { get; }
-    private static void ValidateName(string name)
+    public UserId? Id { get; init; }
+
+    private readonly string _name;
+    public string Name
     {
-        if (string.IsNullOrWhiteSpace(name))
+        get => _name;
+        [MemberNotNull(nameof(_name))]
+        init
         {
-            throw new ArgumentException(nameof(Name));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                _name = value;
+                throw new ArgumentException(nameof(Name));
+            }
+
+            _name = value;
         }
     }
 
-    public User(string name)
+    private readonly List<WorkspaceMembership> _workspaceMemberships;
+    public IReadOnlyCollection<WorkspaceMembership> WorkspaceMemberships => _workspaceMemberships.AsReadOnly();
+
+    public User(string name, List<WorkspaceMembership> workspaceMemberships)
     {
-        ValidateName(name);
         Name = name;
+        _workspaceMemberships = workspaceMemberships;
+    }
+
+    public User(string name) : this(name, new())
+    {
     }
 }
 
-public record struct UserId(int Value);
-
-public record WorkspaceMembership(WorkspaceId WorkspaceId, WorkspacePermission[] Permissions);
-
-public class UserEntity : User
-{
-    public UserId Id { get; }
-
-    public WorkspaceMembership[] WorkspaceMemberships { get; }
-
-    public UserEntity(UserId id, string name) : base(name)
-    {
-        Id = id;
-        WorkspaceMemberships = Array.Empty<WorkspaceMembership>();
-    }
-
-    public UserEntity(UserId id, string name, WorkspaceMembership[] workspaceMemberships) : base(name)
-    {
-        Id = id;
-        WorkspaceMemberships = workspaceMemberships;
-    }
-}
+public readonly record struct UserId(int Value) : IIdentifier;

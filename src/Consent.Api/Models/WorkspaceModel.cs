@@ -18,9 +18,9 @@ public enum WorkspacePermissionModel
 
 internal static class WorkspaceModelMapper
 {
-    public static WorkspaceModel ToModel(this WorkspaceEntity entity)
+    public static WorkspaceModel ToModel(this Workspace entity)
     {
-        return new WorkspaceModel(entity.Id.Value, entity.Name, entity.Memberships.Select(m => m.ToModel()).ToArray());
+        return new WorkspaceModel(entity.Id!.Value.Value, entity.Name, entity.Memberships.Select(m => m.ToModel()).ToArray());
     }
 
     public static MembershipModel ToModel(this Membership membership)

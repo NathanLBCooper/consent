@@ -4,6 +4,6 @@ namespace Consent.Domain.Users;
 
 public interface IUserRepository
 {
-    Task<UserEntity?> Get(UserId id);
-    Task<UserEntity> Create(User user);
+    Task<User?> Get(UserId id);
+    Task<User> Create(User user);
 }

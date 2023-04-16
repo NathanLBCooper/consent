@@ -4,7 +4,7 @@ namespace Consent.Domain.Workspaces;
 
 public interface IWorkspaceRepository
 {
-    Task<WorkspaceEntity?> Get(WorkspaceId id);
-    Task<WorkspaceEntity> Create(Workspace workspace);
-    Task Update(WorkspaceEntity workspace);
+    Task<Workspace?> Get(WorkspaceId id);
+    Task<Workspace> Create(Workspace workspace);
+    Task Update(Workspace workspace);
 }

@@ -14,11 +14,11 @@ public record UserWorkspaceMembershipModel(int WorkspaceId, WorkspacePermissionM
 
 internal static class UserModelMapper
 {
-    public static UserModel ToModel(this UserEntity entity)
+    public static UserModel ToModel(this User entity)
     {
         return new UserModel
         {
-            Id = entity.Id.Value,
+            Id = entity.Id!.Value.Value,
             Name = entity.Name,
             WorkspaceMemberships = entity.WorkspaceMemberships.Select(ToModel).ToArray()
         };

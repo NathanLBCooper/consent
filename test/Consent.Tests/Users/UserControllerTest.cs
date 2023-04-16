@@ -2,8 +2,9 @@
 using System.Threading.Tasks;
 using Consent.Api.Controllers;
 using Consent.Api.Models;
-using Consent.Storage.Repositories;
-using Consent.Tests.StorageContext;
+using Consent.Storage.Users;
+using Consent.Storage.Workspaces;
+using Consent.Tests.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -20,17 +21,15 @@ public class UserControllerTest
 
     public UserControllerTest(DatabaseFixture fixture)
     {
-        var unitOfWorkContext = fixture.CreateUnitOfWorkContext();
-
-        var userRepository = new UserRepository(unitOfWorkContext);
-        _sut = new UserController(new NullLogger<UserController>(), userRepository, unitOfWorkContext)
+        var userRepository = new UserRepository(fixture.UserDbContext);
+        _sut = new UserController(new NullLogger<UserController>(), userRepository)
         {
             ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
         };
 
-        var workspaceRepository = new WorkspaceRepository(unitOfWorkContext);
+        var workspaceRepository = new WorkspaceRepository(fixture.WorkspaceDbContext);
         _workspaceController = new WorkspaceController(
-            new NullLogger<WorkspaceController>(), workspaceRepository, userRepository, unitOfWorkContext
+            new NullLogger<WorkspaceController>(), workspaceRepository, userRepository
             );
 
         _headerTestHelper = new HeaderTestHelper(_sut);
