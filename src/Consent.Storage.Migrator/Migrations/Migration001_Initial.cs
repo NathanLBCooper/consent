@@ -29,7 +29,7 @@ CREATE TABLE [workspaces].[Workspaces] (
 
 CREATE TABLE [workspaces].[Membership] (
     [Id] int NOT NULL IDENTITY,
-    [User] int NOT NULL,
+    [UserId] int NOT NULL,
     [Permissions] nvarchar(max) NOT NULL,
     [WorkspaceId] int NULL,
     CONSTRAINT [PK_Membership] PRIMARY KEY ([Id]),
@@ -74,7 +74,7 @@ CREATE INDEX [IX_Provision_ContractVersionId] ON [contracts].[Provision] ([Contr
 
         Execute(@"
 CREATE VIEW [users].[WorkspaceMembership] AS
-SELECT [Id], [WorkspaceId], [Permissions], [User] AS [UserId]
+SELECT [Id], [WorkspaceId], [Permissions], [UserId]
 FROM [workspaces].[Membership]
 ");
     }

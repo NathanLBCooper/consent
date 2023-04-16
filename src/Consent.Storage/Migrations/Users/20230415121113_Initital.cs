@@ -29,7 +29,7 @@ public partial class Initital : Migration
 
         _ = migrationBuilder.Sql(@"
 CREATE VIEW [users].[WorkspaceMembership] AS
-SELECT [Id], [WorkspaceId], [Permissions], [User] AS [UserId]
+SELECT [Id], [WorkspaceId], [Permissions], [UserId]
 FROM [workspaces].[Membership]
 ");
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Consent.Domain.Users;
 
@@ -13,62 +14,64 @@ public class Workspace
 {
     public WorkspaceId? Id { get; init; }
 
-    public string Name { get; private set; }
-    private static void ValidateName(string name)
+    private string _name;
+    public string Name
     {
-        if (string.IsNullOrWhiteSpace(name))
+        get => _name;
+        [MemberNotNull(nameof(_name))]
+        private init
         {
-            throw new ArgumentException(nameof(Name));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(nameof(Name));
+            }
+
+            _name = value;
         }
     }
 
-    private readonly List<Membership> _memberships;
-    public IReadOnlyCollection<Membership> Memberships => _memberships.AsReadOnly();
-
-    private static void ValidateMemberships(List<Membership> memberships)
+    private IReadOnlyCollection<Membership> _memberships;
+    public IReadOnlyCollection<Membership> Memberships
     {
-        var users = memberships.Select(m => m.User);
-        if (users.Count() != users.Distinct().Count())
+        get => _memberships;
+        [MemberNotNull(nameof(_memberships))]
+        private set
         {
-            throw new ArgumentException("Cannot have more than one membership for a user", nameof(Memberships));
-        }
+            var users = value.Select(m => m.UserId);
+            if (users.Count() != users.Distinct().Count())
+            {
+                throw new ArgumentException("Cannot have more than one membership for a user", nameof(Memberships));
+            }
 
-        if (!memberships.Any(m => m.IsSuperUser))
-        {
-            throw new ArgumentException("Workspace must have at least one superuser", nameof(Memberships));
+            if (!value.Any(m => m.IsSuperUser))
+            {
+                throw new ArgumentException("Workspace must have at least one superuser", nameof(Memberships));
+            }
+
+            _memberships = value;
         }
     }
 
     public Workspace(string name, List<Membership> memberships)
     {
-        ValidateName(name);
         Name = name;
-
-        ValidateMemberships(memberships);
-        _memberships = memberships;
+        Memberships = memberships.AsReadOnly();
     }
 
-    public Workspace(string name, UserId creator)
+    public Workspace(string name, UserId creator) :
+        this(name, new List<Membership> {
+            new Membership(creator, Membership.SuperUser.ToList())
+        })
     {
-        ValidateName(name);
-        Name = name;
-
-        _memberships = new List<Membership> { new Membership(creator, Membership.SuperUser.ToList()) };
     }
 
-    // todo for EF, compromises validity
-    protected Workspace(string name)
+    private Workspace(string name) : this(name, new List<Membership>())
     {
-        ValidateName(name);
-        Name = name;
-
-        // todo invalid
-        _memberships = new List<Membership>();
     }
 
-    public IEnumerable<WorkspacePermission> GetUserPermissions(UserId user)
+    public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)
     {
-        return Memberships.SingleOrDefault(m => m.User == user)?.Permissions
+        return Memberships.SingleOrDefault(m => m.UserId == userId)?.Permissions
             ?? Enumerable.Empty<WorkspacePermission>();
     }
 }

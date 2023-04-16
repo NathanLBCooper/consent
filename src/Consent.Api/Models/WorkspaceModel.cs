@@ -25,7 +25,7 @@ internal static class WorkspaceModelMapper
 
     public static MembershipModel ToModel(this Membership membership)
     {
-        return new MembershipModel(membership.User.Value, membership.Permissions.Select(p => p.ToModel()).ToArray());
+        return new MembershipModel(membership.UserId.Value, membership.Permissions.Select(p => p.ToModel()).ToArray());
     }
 
     public static WorkspacePermissionModel ToModel(this WorkspacePermission permission)

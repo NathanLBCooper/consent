@@ -34,7 +34,7 @@ namespace Consent.Storage.Migrations.Workspaces
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("User")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.Property<int?>("WorkspaceId")

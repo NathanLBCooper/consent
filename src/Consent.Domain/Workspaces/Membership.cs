@@ -15,22 +15,22 @@ public class Membership
     };
 
     public MembershipId Id { get; init; }
-    public UserId User { get; private init; }
+    public UserId UserId { get; private init; }
 
     private readonly List<WorkspacePermission> _permissions;
     public IReadOnlyCollection<WorkspacePermission> Permissions => _permissions.AsReadOnly();
 
     public bool IsSuperUser { get; }
 
-    public Membership(UserId user, List<WorkspacePermission> permissions)
+    public Membership(UserId userId, List<WorkspacePermission> permissions)
     {
-        User = user;
+        UserId = userId;
         _permissions = permissions;
 
         IsSuperUser = SuperUser.All(p => Permissions.Contains(p));
     }
 
-    public Membership(UserId user) : this(user, new List<WorkspacePermission>())
+    public Membership(UserId userId) : this(userId, new())
     {
     }
 }

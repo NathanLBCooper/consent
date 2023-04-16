@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Consent.Storage.Migrations.Workspaces
 {
     [DbContext(typeof(WorkspaceDbContext))]
-    [Migration("20230319125738_Initital")]
+    [Migration("20230416114102_Initital")]
     partial class Initital
     {
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace Consent.Storage.Migrations.Workspaces
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("User")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.Property<int?>("WorkspaceId")
