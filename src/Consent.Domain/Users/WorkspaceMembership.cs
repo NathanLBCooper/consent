@@ -7,15 +7,13 @@ public class WorkspaceMembership
 {
     public MembershipId Id { get; private init; }
     public WorkspaceId WorkspaceId { get; private init; }
-
-    private readonly List<WorkspacePermission> _permissions = new();
-    public IReadOnlyCollection<WorkspacePermission> Permissions => _permissions.AsReadOnly();
+    public IReadOnlyCollection<WorkspacePermission> Permissions { get; private init; }
 
     public WorkspaceMembership(MembershipId id, WorkspaceId workspaceId, List<WorkspacePermission> permissions)
     {
         Id = id;
         WorkspaceId = workspaceId;
-        _permissions = permissions;
+        Permissions = permissions.AsReadOnly();
     }
 
     private WorkspaceMembership() : this(default, default, new())
