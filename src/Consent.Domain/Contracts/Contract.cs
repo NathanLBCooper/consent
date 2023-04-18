@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Consent.Domain.Contracts;
 
@@ -11,28 +12,37 @@ public class Contract
 {
     public ContractId? Id { get; init; }
 
-    public string Name { get; private set; }
-    private static void ValidateName(string name)
+    private readonly string _name;
+    public string Name
     {
-        if (string.IsNullOrWhiteSpace(name))
+        get => _name;
+        [MemberNotNull(nameof(_name))]
+        private init
         {
-            throw new ArgumentException(nameof(Name));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(nameof(Name));
+            }
+
+            _name = value;
         }
     }
 
-    private readonly List<ContractVersion> _versions;
-    public IReadOnlyCollection<ContractVersion> Versions => _versions;
+    public ImmutableArray<ContractVersion> Versions { get; private set; }
 
-    public Contract(string name, List<ContractVersion> versions)
+    public Contract(string name, ContractVersion[] versions)
     {
-        ValidateName(name);
         Name = name;
-
-        _versions = versions;
+        Versions = ImmutableArray.Create(versions);
     }
 
-    public Contract(string name) : this(name, new List<ContractVersion>())
+    public Contract(string name) : this(name, Array.Empty<ContractVersion>())
     {
+    }
+
+    public void AddContractVersion(ContractVersion version)
+    {
+        Versions = Versions.Add(version);
     }
 }
 

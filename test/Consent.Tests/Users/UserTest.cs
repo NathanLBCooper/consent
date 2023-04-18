@@ -12,7 +12,7 @@ public class UserTest
     [InlineData("  ")]
     public void Cannot_create_user_with_empty_name(string name)
     {
-        var action = () => new User(name);
-        _ = action.ShouldThrow<ArgumentException>();
+        var ctor = () => new User(name);
+        _ = ctor.ShouldThrow<ArgumentException>();
     }
 }

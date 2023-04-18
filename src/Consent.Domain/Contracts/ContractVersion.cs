@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Consent.Domain.Contracts;
 
@@ -11,52 +12,76 @@ public class ContractVersion
 {
     public ContractVersionId? Id { get; init; }
 
-    public string Name { get; private set; }
-    private static void ValidateName(string name)
+    private readonly string _name;
+    public string Name
     {
-        if (string.IsNullOrWhiteSpace(name))
+        get => _name;
+        [MemberNotNull(nameof(_name))]
+        private init
         {
-            throw new ArgumentException(nameof(Name));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(nameof(Name));
+            }
+
+            _name = value;
         }
     }
 
-    public string Text { get; private set; }
-    private static void ValidateText(string text)
+    // todo is this "Text". Is it something more specific like a introduction?
+    private string _text;
+    public string Text
     {
-        if (string.IsNullOrWhiteSpace(text))
+        get => _text;
+        [MemberNotNull(nameof(_text))]
+        set
         {
-            throw new ArgumentException(nameof(Text));
+            if (Status != ContractVersionStatus.Draft)
+            {
+                throw new InvalidOperationException("Cannot mutate a non-draft Version");
+            }
+
+            _text = value;
         }
     }
 
-    public ContractVersionStatus Status { get; private set; }
-    private static void ValidateStatus(ContractVersionStatus status)
+    private ContractVersionStatus _status = ContractVersionStatus.Draft;
+    public ContractVersionStatus Status
     {
-        if (!Enum.IsDefined(typeof(ContractVersionStatus), status))
+        get => _status;
+        set
         {
-            throw new ArgumentException(nameof(Status));
+            if (value == Status)
+            {
+                return;
+            }
+
+            if (!Enum.IsDefined(typeof(ContractVersionStatus), value))
+            {
+                throw new ArgumentException(nameof(Status));
+            }
+
+            if (value == ContractVersionStatus.Draft)
+            {
+                throw new InvalidOperationException("Cannot change a non-draft Version back to draft");
+            }
+
+            _status = value;
         }
     }
 
-    private readonly List<Provision> _provisions;
-    public IReadOnlyCollection<Provision> Provisions => _provisions;
+    public ImmutableArray<Provision> Provisions { get; private init; }
 
-    public ContractVersion(string name, string text, ContractVersionStatus status, List<Provision> provisions)
+    public ContractVersion(string name, string text, ContractVersionStatus status, Provision[] provisions) : this(name, text, provisions)
     {
-        ValidateName(name);
-        Name = name;
-
-        ValidateText(text);
-        Text = text;
-
-        ValidateStatus(status);
         Status = status;
-
-        _provisions = provisions;
     }
 
-    public ContractVersion(string name, string text, ContractVersionStatus status) : this(name, text, status, new List<Provision>())
+    public ContractVersion(string name, string text, Provision[] provisions)
     {
+        Name = name;
+        Text = text;
+        Provisions = ImmutableArray.Create(provisions);
     }
 }
 

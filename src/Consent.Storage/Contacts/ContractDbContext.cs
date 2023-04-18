@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text.Json;
 using Consent.Domain.Contracts;
@@ -52,7 +53,7 @@ public class ContractDbContext : DbContext
             .Property(e => e.Permissions)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                v => JsonSerializer.Deserialize<List<PermissionId>>(v, (JsonSerializerOptions)null!)!,
+                v => JsonSerializer.Deserialize<ImmutableArray<PermissionId>>(v, (JsonSerializerOptions)null!)!,
                 new ValueComparer<IReadOnlyCollection<PermissionId>>(
                     (c1, c2) => c1!.SequenceEqual(c2!),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),

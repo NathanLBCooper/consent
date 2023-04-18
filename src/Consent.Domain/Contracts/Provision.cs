@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Consent.Domain.Permissions;
 
 namespace Consent.Domain.Contracts;
@@ -11,28 +12,28 @@ public class Provision
 {
     public ProvisionId? Id { get; init; }
 
-    public string Text { get; private set; }
-    private static void ValidateText(string text)
+    private string _text;
+    public string Text
     {
-        if (string.IsNullOrWhiteSpace(text))
+        get => _text;
+        [MemberNotNull(nameof(_text))]
+        private set
         {
-            throw new ArgumentException(nameof(Text));
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(nameof(Text));
+            }
+
+            _text = value;
         }
     }
 
-    private readonly List<PermissionId> _permissions;
-    public IReadOnlyCollection<PermissionId> Permissions => _permissions;
+    public ImmutableArray<PermissionId> Permissions { get; private init; }
 
-    public Provision(string text, List<PermissionId> permissions)
+    public Provision(string text, params PermissionId[] permissions)
     {
-        ValidateText(text);
         Text = text;
-
-        _permissions = permissions;
-    }
-
-    public Provision(string text) : this(text, new List<PermissionId>())
-    {
+        Permissions = ImmutableArray.Create(permissions);
     }
 }
 
