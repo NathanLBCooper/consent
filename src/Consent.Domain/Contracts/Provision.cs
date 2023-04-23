@@ -12,13 +12,17 @@ public class Provision
 {
     public ProvisionId? Id { get; init; }
 
+    private ContractVersion? _version;
+
     private string _text;
     public string Text
     {
         get => _text;
         [MemberNotNull(nameof(_text))]
-        private set
+        set
         {
+            ThrowIfNotDraft();
+
             if (string.IsNullOrWhiteSpace(value))
             {
                 throw new ArgumentException(nameof(Text));
@@ -28,12 +32,37 @@ public class Provision
         }
     }
 
-    public ImmutableArray<PermissionId> Permissions { get; private init; }
+    public ImmutableList<PermissionId> PermissionIds { get; private set; }
 
-    public Provision(string text, params PermissionId[] permissions)
+    public Provision(string text, params PermissionId[] permissionIds)
     {
         Text = text;
-        Permissions = ImmutableArray.Create(permissions);
+        PermissionIds = permissionIds.ToImmutableList();
+    }
+
+    public void OnAddedToVersion(ContractVersion version)
+    {
+        if (_version != null)
+        {
+            throw new InvalidOperationException("Provision is already attached to a version");
+        }
+
+        _version = version;
+    }
+
+    public void AddPermissionIds(params PermissionId[] permissionIds)
+    {
+        ThrowIfNotDraft();
+
+        PermissionIds = PermissionIds.AddRange(permissionIds);
+    }
+
+    private void ThrowIfNotDraft()
+    {
+        if (_version != null && _version.Status != ContractVersionStatus.Draft)
+        {
+            throw new InvalidOperationException("Cannot mutate a non-draft Version");
+        }
     }
 }
 

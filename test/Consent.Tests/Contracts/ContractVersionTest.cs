@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Consent.Domain.Contracts;
 using Shouldly;
 
@@ -24,7 +23,7 @@ public class ContractVersionTest
 
         version.Status = ContractVersionStatus.Draft;
 
-        foreach (var status in NonDraftStatuses)
+        foreach (var status in Util.NonDraftStatuses)
         {
             version.Status = status;
 
@@ -32,7 +31,7 @@ public class ContractVersionTest
             _ = statusChange.ShouldThrow<InvalidOperationException>();
         }
 
-        ForAllNonDraftStatuses(() =>
+        Util.InvokeForAllNonDraftStatuses(() =>
         {
             var statusChange = () => { version.Text = "edited text"; };
             _ = statusChange.ShouldThrow<InvalidOperationException>();
@@ -49,30 +48,32 @@ public class ContractVersionTest
     }
 
     [Fact]
-    public void Cannot_change_text_when_not_in_draft()
+    public void Can_only_change_text_when_in_draft()
     {
         var version = new ContractVersionBuilder().Build();
         version.Text = "edited text in draft";
 
         version.Status = ContractVersionStatus.Active;
 
-        ForAllNonDraftStatuses(() =>
+        Util.InvokeForAllNonDraftStatuses(() =>
         {
             var statusChange = () => { version.Text = "edited text"; };
             _ = statusChange.ShouldThrow<InvalidOperationException>();
         }, version);
     }
 
-    // todo nothing should be mutable (including contained things) on a non-draft contract
-
-    private static readonly ContractVersionStatus[] NonDraftStatuses =
-        Enum.GetValues<ContractVersionStatus>().Where(s => s != ContractVersionStatus.Draft).ToArray();
-    private void ForAllNonDraftStatuses(Action action, ContractVersion version)
+    [Fact]
+    public void Can_only_change_name_when_in_draft()
     {
-        foreach (var status in NonDraftStatuses)
+        var version = new ContractVersionBuilder().Build();
+        version.Name = "edited name in draft";
+
+        version.Status = ContractVersionStatus.Active;
+
+        Util.InvokeForAllNonDraftStatuses(() =>
         {
-            version.Status = status;
-            action();
-        }
+            var nameChange = () => { version.Name = "edited name"; };
+            _ = nameChange.ShouldThrow<InvalidOperationException>();
+        }, version);
     }
 }

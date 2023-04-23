@@ -12,13 +12,15 @@ public class ContractVersion
 {
     public ContractVersionId? Id { get; init; }
 
-    private readonly string _name;
+    private string _name;
     public string Name
     {
         get => _name;
         [MemberNotNull(nameof(_name))]
-        private init
+        set
         {
+            ThrowIfNotDraft();
+
             if (string.IsNullOrWhiteSpace(value))
             {
                 throw new ArgumentException(nameof(Name));
@@ -36,11 +38,7 @@ public class ContractVersion
         [MemberNotNull(nameof(_text))]
         set
         {
-            if (Status != ContractVersionStatus.Draft)
-            {
-                throw new InvalidOperationException("Cannot mutate a non-draft Version");
-            }
-
+            ThrowIfNotDraft();
             _text = value;
         }
     }
@@ -70,7 +68,7 @@ public class ContractVersion
         }
     }
 
-    public ImmutableArray<Provision> Provisions { get; private init; }
+    public ImmutableList<Provision> Provisions { get; private set; }
 
     public ContractVersion(string name, string text, ContractVersionStatus status, Provision[] provisions) : this(name, text, provisions)
     {
@@ -81,7 +79,29 @@ public class ContractVersion
     {
         Name = name;
         Text = text;
-        Provisions = ImmutableArray.Create(provisions);
+
+        Provisions = provisions.ToImmutableList();
+        foreach (var p in provisions)
+        {
+            p.OnAddedToVersion(this);
+        }
+    }
+
+    public void AddProvisions(params Provision[] provisions)
+    {
+        Provisions = Provisions.AddRange(provisions);
+        foreach (var p in provisions)
+        {
+            p.OnAddedToVersion(this);
+        }
+    }
+
+    private void ThrowIfNotDraft()
+    {
+        if (Status != ContractVersionStatus.Draft)
+        {
+            throw new InvalidOperationException("Cannot mutate a non-draft Version");
+        }
     }
 }
 

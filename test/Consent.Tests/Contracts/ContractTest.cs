@@ -36,7 +36,7 @@ public class ContractTest
                 }
             );
 
-        contract.AddContractVersion(version);
+        contract.AddContractVersions(version);
 
         var expandedVersion = new ContractVersion(
             name: "Version #1",
@@ -47,7 +47,7 @@ public class ContractTest
                 }
             );
 
-        contract.AddContractVersion(expandedVersion);
+        contract.AddContractVersions(expandedVersion);
 
         version.Status = ContractVersionStatus.Deprecated;
         expandedVersion.Status = ContractVersionStatus.Active;

@@ -28,21 +28,21 @@ public class Contract
         }
     }
 
-    public ImmutableArray<ContractVersion> Versions { get; private set; }
+    public ImmutableList<ContractVersion> Versions { get; private set; }
 
     public Contract(string name, ContractVersion[] versions)
     {
         Name = name;
-        Versions = ImmutableArray.Create(versions);
+        Versions = versions.ToImmutableList();
     }
 
     public Contract(string name) : this(name, Array.Empty<ContractVersion>())
     {
     }
 
-    public void AddContractVersion(ContractVersion version)
+    public void AddContractVersions(params ContractVersion[] versions)
     {
-        Versions = Versions.Add(version);
+        Versions = Versions.AddRange(versions);
     }
 }
 

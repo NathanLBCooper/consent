@@ -50,10 +50,10 @@ public class ContractDbContext : DbContext
             .ValueGeneratedOnAdd();
 
         _ = modelBuilder.Entity<Provision>()
-            .Property(e => e.Permissions)
+            .Property(e => e.PermissionIds)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-                v => JsonSerializer.Deserialize<ImmutableArray<PermissionId>>(v, (JsonSerializerOptions)null!)!,
+                v => JsonSerializer.Deserialize<ImmutableList<PermissionId>>(v, (JsonSerializerOptions)null!)!,
                 new ValueComparer<IReadOnlyCollection<PermissionId>>(
                     (c1, c2) => c1!.SequenceEqual(c2!),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
