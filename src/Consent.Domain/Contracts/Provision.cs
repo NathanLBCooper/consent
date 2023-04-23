@@ -12,7 +12,7 @@ public class Provision
 {
     public ProvisionId? Id { get; init; }
 
-    private ContractVersion? _version;
+    public ContractVersion? ContractVersion { get; private set; }
 
     private string _text;
     public string Text
@@ -42,12 +42,12 @@ public class Provision
 
     public void OnAddedToVersion(ContractVersion version)
     {
-        if (_version != null)
+        if (ContractVersion != null)
         {
             throw new InvalidOperationException("Provision is already attached to a version");
         }
 
-        _version = version;
+        ContractVersion = version;
     }
 
     public void AddPermissionIds(params PermissionId[] permissionIds)
@@ -59,7 +59,7 @@ public class Provision
 
     private void ThrowIfNotDraft()
     {
-        if (_version != null && _version.Status != ContractVersionStatus.Draft)
+        if (ContractVersion != null && ContractVersion.Status != ContractVersionStatus.Draft)
         {
             throw new InvalidOperationException("Cannot mutate a non-draft Version");
         }

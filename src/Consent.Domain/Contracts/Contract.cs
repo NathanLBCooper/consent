@@ -12,12 +12,12 @@ public class Contract
 {
     public ContractId? Id { get; init; }
 
-    private readonly string _name;
+    private string _name;
     public string Name
     {
         get => _name;
         [MemberNotNull(nameof(_name))]
-        private init
+        set
         {
             if (string.IsNullOrWhiteSpace(value))
             {

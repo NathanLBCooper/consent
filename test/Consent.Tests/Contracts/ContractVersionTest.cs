@@ -17,6 +17,18 @@ public class ContractVersionTest
     }
 
     [Fact]
+    public void Can_add_provision()
+    {
+        var version = new ContractVersionBuilder().Build();
+        var provision = new ProvisionBuilder().Build();
+
+        version.AddProvisions(provision);
+
+        version.Provisions.ShouldContain(provision);
+        provision.ContractVersion.ShouldBe(version);
+    }
+
+    [Fact]
     public void Cannot_change_status_to_draft_from_any_other_status()
     {
         var version = new ContractVersionBuilder().Build();
