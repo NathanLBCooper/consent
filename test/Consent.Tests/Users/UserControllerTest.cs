@@ -22,7 +22,7 @@ public class UserControllerTest
     public UserControllerTest(DatabaseFixture fixture)
     {
         var userRepository = new UserRepository(fixture.UserDbContext);
-        _sut = new UserController(new NullLogger<UserController>(), userRepository)
+        _sut = new UserController(new NullLogger<UserController>(), new FakeLinkGenerator(), userRepository)
         {
             ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
         };
@@ -62,7 +62,8 @@ public class UserControllerTest
         _ = fetched.ShouldNotBeNull();
 
         var membership = fetched.WorkspaceMemberships.ShouldHaveSingleItem();
-        membership.WorkspaceId.ShouldBe(workspace.Id);
+        membership.Workspace.Id.ShouldBe(workspace.Id);
+        membership.Workspace.Href.ShouldBe("FakeLinkGenerator:Id:1,action:WorkspaceGet,controller:Workspace");
         membership.Permissions.ShouldBeEquivalentTo(
             new[] { WorkspacePermissionModel.View, WorkspacePermissionModel.Edit, WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
             );

@@ -23,7 +23,7 @@ public class WorkspaceControllerTest
         var workspaceRepository = new WorkspaceRepository(fixture.WorkspaceDbContext);
         var userRepository = new UserRepository(fixture.UserDbContext);
         _sut = new WorkspaceController(new NullLogger<WorkspaceController>(), workspaceRepository, userRepository);
-        _userController = new UserController(new NullLogger<UserController>(), userRepository)
+        _userController = new UserController(new NullLogger<UserController>(), new FakeLinkGenerator(), userRepository)
         {
             ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
         };
