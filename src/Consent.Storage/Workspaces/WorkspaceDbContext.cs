@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Consent.Domain.Workspaces;
@@ -46,11 +44,7 @@ public class WorkspaceDbContext : DbContext
             .Property(e => e.Permissions)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, enumToStr),
-                v => JsonSerializer.Deserialize<List<WorkspacePermission>>(v, enumToStr)!,
-                new ValueComparer<IReadOnlyCollection<WorkspacePermission>>(
-                    (c1, c2) => c1!.SequenceEqual(c2!),
-                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    c => c.ToHashSet())
+                v => JsonSerializer.Deserialize<ImmutableList<WorkspacePermission>>(v, enumToStr)!
                 );
     }
 }

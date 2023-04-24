@@ -31,6 +31,8 @@ public class Program
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
             );
 
+            _ = builder.Services.AddHealthChecks();
+
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
 
@@ -51,6 +53,7 @@ public class Program
             _ = app.Services.UseSimpleInjector(container);
             _ = app.UseAuthorization();
             _ = app.MapControllers();
+            _ = app.MapHealthChecks("/health");
 
             Dependencies.Register(container, configuration);
             container.Verify();
