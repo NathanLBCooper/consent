@@ -1,6 +1,6 @@
 ﻿namespace Consent.Api;
 
-public static class HttpHeaderNames
+internal static class HttpHeaderNames
 {
     /**
      * The name I need from HeaderNames, but as const strings so they can be used in attributes

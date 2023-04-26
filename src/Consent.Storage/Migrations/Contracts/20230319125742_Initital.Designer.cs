@@ -37,6 +37,9 @@ namespace Consent.Storage.Migrations.Contracts
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("WorkspaceId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Contracts", "contracts");
@@ -82,7 +85,7 @@ namespace Consent.Storage.Migrations.Contracts
                     b.Property<int?>("ContractVersionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Permissions")
+                    b.Property<string>("PermissionIds")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -106,9 +109,11 @@ namespace Consent.Storage.Migrations.Contracts
 
             modelBuilder.Entity("Consent.Domain.Contracts.Provision", b =>
                 {
-                    b.HasOne("Consent.Domain.Contracts.ContractVersion", null)
+                    b.HasOne("Consent.Domain.Contracts.ContractVersion", "ContractVersion")
                         .WithMany("Provisions")
                         .HasForeignKey("ContractVersionId");
+
+                    b.Navigation("ContractVersion");
                 });
 
             modelBuilder.Entity("Consent.Domain.Contracts.Contract", b =>

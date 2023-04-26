@@ -1,5 +1,6 @@
 ﻿using System;
 using Consent.Domain.Contracts;
+using Consent.Tests.Builders;
 using Shouldly;
 
 namespace Consent.Tests.Contracts;

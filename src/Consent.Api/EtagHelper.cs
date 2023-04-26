@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Consent.Api;
 
-public class EtagHelper
+internal class EtagHelper
 {
     public string Get(string resource, DateTime lastModified)
     {

@@ -44,6 +44,7 @@ IF SCHEMA_ID(N'contracts') IS NULL EXEC(N'CREATE SCHEMA [contracts];');
 
 CREATE TABLE [contracts].[Contracts] (
     [Id] int NOT NULL IDENTITY,
+    [WorkspaceId] int NOT NULL,
     [Name] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_Contracts] PRIMARY KEY ([Id])
 );
@@ -60,9 +61,9 @@ CREATE TABLE [contracts].[ContractVersion] (
 
 CREATE TABLE [contracts].[Provision] (
     [Id] int NOT NULL IDENTITY,
-    [Text] nvarchar(max) NOT NULL,
-    [Permissions] nvarchar(max) NOT NULL,
     [ContractVersionId] int NULL,
+    [Text] nvarchar(max) NOT NULL,
+    [PermissionIds] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_Provision] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Provision_ContractVersion_ContractVersionId] FOREIGN KEY ([ContractVersionId]) REFERENCES [contracts].[ContractVersion] ([Id])
 );
@@ -99,6 +100,8 @@ DROP TABLE [contracts].[Provision];
 DROP TABLE [contracts].[ContractVersion];
 
 DROP TABLE [contracts].[Contracts];
+
+
 
 DROP VIEW [users].[WorkspaceMembership]
 ");

@@ -2,6 +2,7 @@
 using System.Linq;
 using Consent.Domain.Contracts;
 using Consent.Domain.Permissions;
+using Consent.Tests.Builders;
 using Shouldly;
 
 namespace Consent.Tests.Contracts;
@@ -20,7 +21,7 @@ public class ContractsTest
         {
             Provisions = new[] { provision },
         }.Build();
-        var contract = new ContractBulder()
+        var contract = new ContractBuilder()
         {
             Versions = new[] { version }
         }.Build();
@@ -31,7 +32,7 @@ public class ContractsTest
         var newPermission = new PermissionId(2);
         var updatedVersionName = "updated version";
         version.Name = updatedVersionName;
-        version.Provisions[0].AddPermissionIds(newPermission);
+        version.Provisions[0].AddPermissionIds(new[] { newPermission });
 
         contract.Name.ShouldBe(updatedName);
         contract.Versions.Single().Name.ShouldBe(updatedVersionName);
@@ -50,7 +51,7 @@ public class ContractsTest
         {
             Provisions = new[] { provision },
         }.Build();
-        _ = new ContractBulder()
+        _ = new ContractBuilder()
         {
             Versions = new[] { version }
         }.Build();
@@ -58,7 +59,7 @@ public class ContractsTest
         version.Status = ContractVersionStatus.Active;
 
         var updateVersion = () => version.Name = "updated version";
-        var updateProvisionInVersion = () => version.Provisions[0].AddPermissionIds(new PermissionId(2));
+        var updateProvisionInVersion = () => version.Provisions[0].AddPermissionIds(new[] { new PermissionId(2) });
         _ = updateVersion.ShouldThrow<InvalidOperationException>();
         _ = updateProvisionInVersion.ShouldThrow<InvalidOperationException>();
     }

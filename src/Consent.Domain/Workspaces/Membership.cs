@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Consent.Domain.Users;
 
@@ -7,30 +8,28 @@ namespace Consent.Domain.Workspaces;
 
 public class Membership
 {
-    public static IReadOnlyCollection<WorkspacePermission> SuperUser { get; } = new List<WorkspacePermission> {
+    public static ImmutableArray<WorkspacePermission> SuperUser { get; } = ImmutableArray.Create(
         WorkspacePermission.View,
         WorkspacePermission.Edit,
         WorkspacePermission.Admin,
         WorkspacePermission.Buyer
-    };
+        );
 
     public MembershipId Id { get; init; }
     public UserId UserId { get; private init; }
-
-    private readonly List<WorkspacePermission> _permissions;
-    public IReadOnlyCollection<WorkspacePermission> Permissions => _permissions.AsReadOnly();
+    public ImmutableList<WorkspacePermission> Permissions { get; private init; }
 
     public bool IsSuperUser { get; }
 
-    public Membership(UserId userId, List<WorkspacePermission> permissions)
+    public Membership(UserId userId, IEnumerable<WorkspacePermission> permissions)
     {
         UserId = userId;
-        _permissions = permissions;
+        Permissions = permissions.ToImmutableList();
 
-        IsSuperUser = SuperUser.All(p => Permissions.Contains(p));
+        IsSuperUser = SuperUser.All(Permissions.Contains);
     }
 
-    public Membership(UserId userId) : this(userId, new())
+    private Membership(UserId userId) : this(userId, Array.Empty<WorkspacePermission>())
     {
     }
 }

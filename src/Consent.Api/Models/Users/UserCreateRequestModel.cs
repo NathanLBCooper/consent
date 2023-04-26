@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Consent.Api.Models;
+namespace Consent.Api.Models.Users;
 
-public record UserCreateRequestModel
-{
-    public string? Name { get; init; }
-}
+public record UserCreateRequestModel(
+    string? Name
+    );
 
 public class UserCreateRequestModelValidator : AbstractValidator<UserCreateRequestModel>
 {

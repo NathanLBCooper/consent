@@ -2,6 +2,7 @@
 using System.Linq;
 using Consent.Domain.Contracts;
 using Consent.Domain.Permissions;
+using Consent.Tests.Builders;
 using Shouldly;
 
 namespace Consent.Tests.Contracts;
@@ -23,16 +24,16 @@ public class ProvisionTest
     {
         var version = new ContractVersionBuilder()
         {
-            Provisions = new[] { new Provision("text", new PermissionId(1010)) }
+            Provisions = new[] { new Provision("text", new[] { new PermissionId(1010) }) }
         }.Build();
         var provision = version.Provisions.Single();
 
-        provision.AddPermissionIds(new PermissionId(1011));
+        provision.AddPermissionIds(new[] { new PermissionId(1011) });
         provision.Text = "new text";
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var addPermissionId = () => { provision.AddPermissionIds(new PermissionId(1012)); };
+            var addPermissionId = () => { provision.AddPermissionIds(new[] { new PermissionId(1012) }); };
             _ = addPermissionId.ShouldThrow<InvalidOperationException>();
         }, version);
 

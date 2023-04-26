@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using Consent.Domain.Contracts;
 using Consent.Domain.Participants;
 using Consent.Domain.Permissions;
@@ -10,26 +12,26 @@ namespace Consent.Domain.Agreements;
  * For a given participant, the sum total of these Agreements describes and audits what Permissions they have accepted
  */
 
-public record Agreement
+public class Agreement
 {
-    public ProvisionId ProvisionId { get; }
-    public ContractVersionId ContractVersionId { get; }
-    public ContractId ContractId { get; }
-    public PermissionId[] PermissionsIds { get; }
+    public ProvisionId ProvisionId { get; private init; }
+    public ContractVersionId ContractVersionId { get; private init; }
+    public ContractId ContractId { get; private init; }
+    public ImmutableArray<PermissionId> PermissionsIds { get; private init; }
 
-    public ParticipantId ParticipantId { get; }
+    public ParticipantId ParticipantId { get; private init; }
 
-    public DateTime DecisionTime { get; }
-    public bool Accepted { get; }
+    public DateTime DecisionTime { get; private init; }
+    public bool Accepted { get; private init; }
 
     public Agreement(ProvisionId provisionId, ContractVersionId contractVersionId,
-        ContractId contractId, PermissionId[] permissionsIds,
+        ContractId contractId, IEnumerable<PermissionId> permissionsIds,
         ParticipantId participantId, DateTime decisionTime, bool accepted)
     {
         ProvisionId = provisionId;
         ContractVersionId = contractVersionId;
         ContractId = contractId;
-        PermissionsIds = permissionsIds;
+        PermissionsIds = permissionsIds.ToImmutableArray();
         ParticipantId = participantId;
         DecisionTime = decisionTime;
         Accepted = accepted;

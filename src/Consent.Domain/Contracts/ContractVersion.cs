@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
@@ -70,12 +71,7 @@ public class ContractVersion
 
     public ImmutableList<Provision> Provisions { get; private set; }
 
-    public ContractVersion(string name, string text, ContractVersionStatus status, Provision[] provisions) : this(name, text, provisions)
-    {
-        Status = status;
-    }
-
-    public ContractVersion(string name, string text, Provision[] provisions)
+    public ContractVersion(string name, string text, IEnumerable<Provision> provisions)
     {
         Name = name;
         Text = text;
@@ -85,6 +81,11 @@ public class ContractVersion
         {
             p.OnAddedToVersion(this);
         }
+    }
+
+    private ContractVersion(string name, string text, ContractVersionStatus status) : this(name, text, Array.Empty<Provision>())
+    {
+        Status = status;
     }
 
     public void AddProvisions(params Provision[] provisions)

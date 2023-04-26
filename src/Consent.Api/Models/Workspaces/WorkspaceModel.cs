@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Linq;
+using Consent.Domain;
 using Consent.Domain.Workspaces;
 
-namespace Consent.Api.Models;
+namespace Consent.Api.Models.Workspaces;
 
-public record WorkspaceModel(int Id, string Name, MembershipModel[] Memberships);
+public record WorkspaceModel(
+    int Id,
+    string Name,
+    MembershipModel[] Memberships
+    );
 
-public record MembershipModel(int UserId, WorkspacePermissionModel[] Permissions);
+public record MembershipModel(
+    int UserId,
+    WorkspacePermissionModel[] Permissions
+    );
 
 public enum WorkspacePermissionModel
 {
@@ -20,7 +28,8 @@ internal static class WorkspaceModelMapper
 {
     public static WorkspaceModel ToModel(this Workspace entity)
     {
-        return new WorkspaceModel(entity.Id!.Value.Value, entity.Name, entity.Memberships.Select(m => m.ToModel()).ToArray());
+        var id = Guard.NotNull(entity.Id).Value.Value;
+        return new WorkspaceModel(id, entity.Name, entity.Memberships.Select(m => m.ToModel()).ToArray());
     }
 
     public static MembershipModel ToModel(this Membership membership)

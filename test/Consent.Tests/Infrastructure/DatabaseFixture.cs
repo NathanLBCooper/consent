@@ -31,8 +31,6 @@ public class DatabaseFixture : IDisposable
         ContractDbContext = new ContractDbContext(
             new DbContextOptionsBuilder<ContractDbContext>().UseSqlServer(connectionString).Options
             );
-
-        // todo EF stuff
     }
 
     public void Dispose()

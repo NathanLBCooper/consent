@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Routing;
 
 namespace Consent.Tests;
 
-public class FakeLinkGenerator : LinkGenerator
+internal class FakeLinkGenerator : LinkGenerator
 {
     public string MakePath(RouteValueDictionary values)
     {

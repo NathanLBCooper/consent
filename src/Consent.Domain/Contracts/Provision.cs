@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Consent.Domain.Permissions;
@@ -34,10 +35,14 @@ public class Provision
 
     public ImmutableList<PermissionId> PermissionIds { get; private set; }
 
-    public Provision(string text, params PermissionId[] permissionIds)
+    public Provision(string text, IEnumerable<PermissionId> permissionIds)
     {
         Text = text;
         PermissionIds = permissionIds.ToImmutableList();
+    }
+
+    private Provision(string text) : this(text, Array.Empty<PermissionId>())
+    {
     }
 
     public void OnAddedToVersion(ContractVersion version)
@@ -50,7 +55,7 @@ public class Provision
         ContractVersion = version;
     }
 
-    public void AddPermissionIds(params PermissionId[] permissionIds)
+    public void AddPermissionIds(IEnumerable<PermissionId> permissionIds)
     {
         ThrowIfNotDraft();
 

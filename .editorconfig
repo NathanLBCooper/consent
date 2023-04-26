@@ -22,3 +22,5 @@ csharp_style_namespace_declarations = file_scoped
 dotnet_sort_system_directives_first = true
 # Expression-level preferences
 dotnet_style_prefer_conditional_expression_over_return = false
+# Don't force `var (a, b) = Foo();` over `var aandbTuple = Foo();`
+csharp_style_deconstructed_variable_declaration = false

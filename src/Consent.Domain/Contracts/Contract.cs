@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using Consent.Domain.Workspaces;
 
 namespace Consent.Domain.Contracts;
 
@@ -11,6 +13,8 @@ namespace Consent.Domain.Contracts;
 public class Contract
 {
     public ContractId? Id { get; init; }
+
+    public WorkspaceId WorkspaceId { get; private init; }
 
     private string _name;
     public string Name
@@ -30,13 +34,14 @@ public class Contract
 
     public ImmutableList<ContractVersion> Versions { get; private set; }
 
-    public Contract(string name, ContractVersion[] versions)
+    public Contract(string name, WorkspaceId workspaceId, IEnumerable<ContractVersion> versions)
     {
         Name = name;
+        WorkspaceId = workspaceId;
         Versions = versions.ToImmutableList();
     }
 
-    public Contract(string name) : this(name, Array.Empty<ContractVersion>())
+    public Contract(string name, WorkspaceId workspaceId) : this(name, workspaceId, Array.Empty<ContractVersion>())
     {
     }
 

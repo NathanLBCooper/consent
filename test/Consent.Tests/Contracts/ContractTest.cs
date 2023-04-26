@@ -1,5 +1,7 @@
 ﻿using System;
 using Consent.Domain.Contracts;
+using Consent.Domain.Workspaces;
+using Consent.Tests.Builders;
 using Shouldly;
 
 namespace Consent.Tests.Contracts;
@@ -12,10 +14,10 @@ public class ContractTest
     [InlineData("  ")]
     public void Cannot_assign_contract_empty_name(string name)
     {
-        var ctor = () => new Contract(name);
+        var ctor = () => new Contract(name, new WorkspaceId(1));
         _ = ctor.ShouldThrow<ArgumentException>();
 
-        var contract = new ContractBulder().Build();
+        var contract = new ContractBuilder().Build();
         var setter = () => contract.Name = name;
         _ = setter.ShouldThrow<ArgumentException>();
     }
@@ -23,7 +25,7 @@ public class ContractTest
     [Fact]
     public void Can_add_version()
     {
-        var contract = new ContractBulder().Build();
+        var contract = new ContractBuilder().Build();
         var version = new ContractVersionBuilder().Build();
 
         contract.AddContractVersions(version);

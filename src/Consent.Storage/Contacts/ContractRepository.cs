@@ -23,11 +23,10 @@ public class ContractRepository : IContractRepository
 
     public async Task<Contract?> Get(ContractId id)
     {
-        //if (await _dbContext.Contracts.FindAsync(id) is Contract contract)
-        //{
-        //    return contract;
-        //}
-        await Task.CompletedTask;
+        if (await _dbContext.Contracts.FindAsync(id) is Contract contract)
+        {
+            return contract;
+        }
 
         return null;
     }

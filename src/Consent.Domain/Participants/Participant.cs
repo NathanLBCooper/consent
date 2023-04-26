@@ -10,7 +10,7 @@ public class Participant
 {
     public ParticipantId? Id { get; init; }
 
-    public string ExternalId { get; private set; }
+    public string ExternalId { get; private init; }
     private static void ValidateExternalId(string externalId)
     {
         if (string.IsNullOrWhiteSpace(externalId))

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Consent.Domain.Users;
@@ -30,8 +31,8 @@ public class Workspace
         }
     }
 
-    private IReadOnlyCollection<Membership> _memberships;
-    public IReadOnlyCollection<Membership> Memberships
+    private IImmutableList<Membership> _memberships;
+    public IImmutableList<Membership> Memberships
     {
         get => _memberships;
         [MemberNotNull(nameof(_memberships))]
@@ -52,20 +53,18 @@ public class Workspace
         }
     }
 
-    public Workspace(string name, List<Membership> memberships)
+    public Workspace(string name, IEnumerable<Membership> memberships)
     {
         Name = name;
-        Memberships = memberships.AsReadOnly();
+        Memberships = memberships.ToImmutableList();
     }
 
     public Workspace(string name, UserId creator) :
-        this(name, new List<Membership> {
-            new Membership(creator, Membership.SuperUser.ToList())
-        })
+        this(name, new[] { new Membership(creator, Membership.SuperUser) })
     {
     }
 
-    private Workspace(string name) : this(name, new List<Membership>())
+    private Workspace(string name) : this(name, Array.Empty<Membership>())
     {
     }
 

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using Consent.Api.Models;
+using Consent.Api.Models.Users;
+using Consent.Domain;
 using Consent.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -14,8 +15,10 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
     private readonly ILogger<UserController> _logger;
     private readonly LinkGenerator _linkGenerator;
     private readonly IUserRepository _userRepository;
-    private readonly UserCreateRequestModelValidator _userCreateRequestModelValidator = new();
+    private readonly UserCreateRequestModelValidator _validator = new();
     private readonly EtagHelper _etagHelper;
+
+    private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
     public UserController(ILogger<UserController> logger, LinkGenerator linkGenerator, IUserRepository userRepository)
     {
@@ -38,30 +41,25 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         var model = user.ToModel(Links);
         var etag = _etagHelper.Get("user", model);
 
+        Response.Headers.Add(HttpHeaderNames.ETag, etag);
         if (ifNoneMatch != null && etag == ifNoneMatch)
         {
             return StatusCode(304);
         }
 
-        Response.Headers.Add(HttpHeaderNames.ETag, etag);
         return Ok(model);
     }
 
     [HttpPost("", Name = "CreateUser")]
     public async Task<ActionResult<UserModel>> UserCreate(UserCreateRequestModel request)
     {
-        var validationResult = _userCreateRequestModelValidator.Validate(request);
+        var validationResult = _validator.Validate(request);
         if (!validationResult.IsValid)
         {
             return UnprocessableEntity(validationResult.ToString());
         }
 
-        if (request?.Name == null)
-        {
-            return Problem();
-        }
-
-        var created = await _userRepository.Create(new User(request.Name));
+        var created = await _userRepository.Create(new User(Guard.NotNull(request.Name)));
 
         var model = created.ToModel(Links);
         var etag = _etagHelper.Get("user", model);
@@ -69,6 +67,4 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         Response.Headers.Add(HttpHeaderNames.ETag, etag);
         return Ok(model);
     }
-
-    private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 }

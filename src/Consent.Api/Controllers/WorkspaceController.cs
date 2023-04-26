@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Consent.Api.Models;
+using Consent.Api.Models.Workspaces;
+using Consent.Domain;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Mvc;
@@ -49,18 +50,13 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
             return UnprocessableEntity(validationResult.ToString());
         }
 
-        if (request?.Name == null)
-        {
-            return Problem();
-        }
-
         var user = await _userRepository.Get(new UserId(userId));
         if (user == null)
         {
             return NotFound();
         }
 
-        var entity = await _workspaceRepository.Create(new Workspace(request.Name, user.Id!.Value));
+        var entity = await _workspaceRepository.Create(new Workspace(Guard.NotNull(request.Name), user.Id!.Value));
 
         return Ok(entity.ToModel());
     }

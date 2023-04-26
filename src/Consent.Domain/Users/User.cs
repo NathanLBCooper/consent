@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Consent.Domain.Users;
 
@@ -30,15 +31,15 @@ public class User
     }
 
     private readonly List<WorkspaceMembership> _workspaceMemberships;
-    public IReadOnlyCollection<WorkspaceMembership> WorkspaceMemberships => _workspaceMemberships.AsReadOnly();
+    public IReadOnlyList<WorkspaceMembership> WorkspaceMemberships => _workspaceMemberships.AsReadOnly();
 
-    public User(string name, List<WorkspaceMembership> workspaceMemberships)
+    public User(string name, IEnumerable<WorkspaceMembership> workspaceMemberships)
     {
         Name = name;
-        _workspaceMemberships = workspaceMemberships;
+        _workspaceMemberships = workspaceMemberships.ToList();
     }
 
-    public User(string name) : this(name, new())
+    public User(string name) : this(name, Array.Empty<WorkspaceMembership>())
     {
     }
 }

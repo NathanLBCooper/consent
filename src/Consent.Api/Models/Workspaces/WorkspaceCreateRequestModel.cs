@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Consent.Api.Models;
+namespace Consent.Api.Models.Workspaces;
 
-public record WorkspaceCreateRequestModel
-{
-    public string? Name { get; init; }
-}
+public record WorkspaceCreateRequestModel(
+    string? Name
+    );
 
 public class WorkspaceCreateRequestModelValidator : AbstractValidator<WorkspaceCreateRequestModel>
 {
