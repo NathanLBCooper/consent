@@ -1,39 +1,30 @@
-﻿using System.Threading.Tasks;
-using Consent.Api.Client.Models.Users;
+﻿using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Workspaces;
-using Consent.Api.Users;
-using Consent.Api.Workspaces;
 using Consent.Domain;
-using Consent.Storage.Users;
-using Consent.Storage.Workspaces;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
+using Refit;
 using Shouldly;
 
 namespace Consent.Tests.Users;
 
 [Collection("DatabaseTest")]
-public class UserControllerTest
+public class UserControllerTest : IDisposable
 {
-    private readonly UserControllerTestWrapper _sut;
-    private readonly WorkspaceController _workspaceController;
+    private readonly HttpClient _client;
+    private readonly IUserEndpoint _sut;
+    private readonly IWorkspaceEndpoint _workspaceEndpoint;
 
     public UserControllerTest(DatabaseFixture fixture)
     {
-        var userRepository = new UserRepository(fixture.UserDbContext);
-        var sut = new UserController(new NullLogger<UserController>(), new FakeLinkGenerator(), userRepository)
-        {
-            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
-        };
-        _sut = new UserControllerTestWrapper(sut);
-
-        var workspaceRepository = new WorkspaceRepository(fixture.WorkspaceDbContext);
-        _workspaceController = new WorkspaceController(
-            new NullLogger<WorkspaceController>(), workspaceRepository, userRepository
-            );
+        var factory = new TestWebApplicationFactory(new InMemoryConfigurationBuilder() { SqlSettings = fixture.SqlSettings }.Build());
+        _client = factory.CreateClient();
+        _sut = RestService.For<IUserEndpoint>(_client);
+        _workspaceEndpoint = RestService.For<IWorkspaceEndpoint>(_client);
     }
 
     [Fact]
@@ -41,10 +32,10 @@ public class UserControllerTest
     {
         var request = new UserCreateRequestModelBuilder().Build();
 
-        var created = await CreateUser(request);
+        var created = await _sut.UserCreate(request);
         created.Name.ShouldBe(request.Name);
 
-        var fetched = (await _sut.UserGet(created.Id, null)).GetValue();
+        var fetched = await _sut.UserGet(created.Id);
         _ = fetched.ShouldNotBeNull();
 
         fetched.Id.ShouldBe(created.Id);
@@ -54,14 +45,14 @@ public class UserControllerTest
     [Fact]
     public async Task Can_get_workspace_memberships_for_user()
     {
-        var created = Guard.NotNull(await CreateUser());
-        var workspace = Guard.NotNull((await _workspaceController.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), created.Id)).GetValue());
+        var created = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+        var workspace = await _workspaceEndpoint.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), created.Id);
 
-        var fetched = Guard.NotNull((await _sut.UserGet(created.Id, null)).GetValue());
+        var fetched = await _sut.UserGet(created.Id);
 
         var membership = fetched.WorkspaceMemberships.ShouldHaveSingleItem();
         membership.Workspace.Id.ShouldBe(workspace.Id);
-        membership.Workspace.Href.ShouldBe($"FakeLinkGenerator:Id:{workspace.Id},action:WorkspaceGet,controller:Workspace");
+        membership.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
         membership.Permissions.ShouldBeEquivalentTo(
             new[] { WorkspacePermissionModel.View, WorkspacePermissionModel.Edit, WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
             );
@@ -71,30 +62,34 @@ public class UserControllerTest
     public async Task Etags_work()
     {
         var request = new UserCreateRequestModelBuilder().Build();
-        var created = Guard.NotNull((await _sut.UserCreate(request)).GetValue());
-        var etag = _sut.LastResponseHeaders[HeaderNames.ETag];
 
-        var getWithEtag = await _sut.UserGet(created.Id, ifNoneMatch: etag);
-        var result = getWithEtag.Result as StatusCodeResult;
-        _ = result.ShouldNotBeNull();
-        result.StatusCode.ShouldBe(304);
-        _sut.LastResponseHeaders[HeaderNames.ETag].ShouldBe(etag);
+        var created = await _sut.UserCreateReq(request);
+        var etag = created.Headers.ETag?.ToString();
+        _ = etag.ShouldNotBeNull();
+        var user = Guard.NotNull(created.Content);
 
-        _ = (await _sut.UserGet(created.Id, ifNoneMatch: null)).Result.ShouldBeOfType<OkObjectResult>();
-        _sut.LastResponseHeaders[HeaderNames.ETag].ShouldBe(etag);
-        _ = (await _sut.UserGet(created.Id, "this is not the etag")).Result.ShouldBeOfType<OkObjectResult>();
-        _sut.LastResponseHeaders[HeaderNames.ETag].ShouldBe(etag);
+        var getWithEtag = await _sut.UserGetReq(user.Id, etag);
+        getWithEtag.StatusCode.ShouldBe(HttpStatusCode.NotModified);
+        getWithEtag.Content.ShouldBeNull();
 
-        var otherUser = Guard.NotNull((await _sut.UserCreate(request)).GetValue());
-        _ = (await _sut.UserGet(otherUser.Id, etag)).Result.ShouldBeOfType<OkObjectResult>();
-        _sut.LastResponseHeaders[HeaderNames.ETag].ShouldNotBe(etag);
+        var getWithoutEtag = await _sut.UserGetReq(user.Id, null);
+        getWithoutEtag.StatusCode.ShouldBe(HttpStatusCode.OK);
+        _ = getWithoutEtag.Content.ShouldNotBeNull();
+
+        var getWithWrongEtag = await _sut.UserGetReq(user.Id, "wrong etag");
+        getWithWrongEtag.StatusCode.ShouldBe(HttpStatusCode.OK);
+        _ = getWithWrongEtag.Content.ShouldNotBeNull();
+
+        var otherUser = await _sut.UserCreate(request);
+        var getWithOtherUser = await _sut.UserGetReq(otherUser.Id, etag);
+        getWithOtherUser.StatusCode.ShouldBe(HttpStatusCode.OK);
+        _ = getWithOtherUser.Content.ShouldNotBeNull();
+
+        // todo test that update invalidates etag
     }
 
-    private async Task<UserModel> CreateUser(UserCreateRequestModel? request = null)
+    public void Dispose()
     {
-        request ??= new UserCreateRequestModelBuilder().Build();
-        var user = Guard.NotNull((await _sut.UserCreate(request)).GetValue());
-
-        return user;
+        _client.Dispose();
     }
 }

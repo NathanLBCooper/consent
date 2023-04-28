@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Consent.Api;
 using Consent.Api.Client.Endpoints;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Consent.Tests.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Refit;
 using Shouldly;
@@ -32,14 +32,15 @@ public class ApiTest
     [Fact]
     public async Task Service_should_start()
     {
-        var factory = new WebApplicationFactory<Program>();
+        var factory = new TestWebApplicationFactory(new InMemoryConfigurationBuilder().Build());
         using var client = factory.CreateClient();
-
-        var healthEndpoint = RestService.For<IHealthEndpoint>(client);
-        var health = healthEndpoint.Get;
-        await health.ShouldNotThrowAsync();
 
         var response = await client.GetAsync("/Health");
         _ = response.EnsureSuccessStatusCode();
+
+        // and using refit
+        var healthEndpoint = RestService.For<IHealthEndpoint>(client);
+        var health = healthEndpoint.Get;
+        await health.ShouldNotThrowAsync();
     }
 }
