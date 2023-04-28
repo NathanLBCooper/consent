@@ -1,10 +1,7 @@
-﻿using FluentValidation;
+﻿using Consent.Api.Client.Models.Workspaces;
+using FluentValidation;
 
-namespace Consent.Api.Models.Workspaces;
-
-public record WorkspaceCreateRequestModel(
-    string? Name
-    );
+namespace Consent.Api.Workspaces;
 
 public class WorkspaceCreateRequestModelValidator : AbstractValidator<WorkspaceCreateRequestModel>
 {

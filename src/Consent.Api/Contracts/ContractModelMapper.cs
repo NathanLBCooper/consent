@@ -1,12 +1,10 @@
 ﻿using System.Linq;
+using Consent.Api.Client.Models;
+using Consent.Api.Client.Models.Contracts;
 using Consent.Domain;
 using Consent.Domain.Contracts;
 
-namespace Consent.Api.Models.Contracts;
-
-public record ContractModel(
-    int Id, string Name, ResourceLink Workspace, ResourceLink[] Versions
-    );
+namespace Consent.Api.Contracts;
 
 internal static class ContractModelMapper
 {
@@ -28,4 +26,3 @@ internal static class ContractModelMapper
             );
     }
 }
-

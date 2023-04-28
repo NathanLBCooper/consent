@@ -1,20 +1,12 @@
 ﻿using System.Linq;
-using Consent.Api.Models.Workspaces;
+using Consent.Api.Client.Models;
+using Consent.Api.Client.Models.Users;
+using Consent.Api.Users;
+using Consent.Api.Workspaces;
 using Consent.Domain;
 using Consent.Domain.Users;
 
-namespace Consent.Api.Models.Users;
-
-public record UserModel(
-    int Id,
-    string? Name,
-    UserWorkspaceMembershipModel[]? WorkspaceMemberships
-    );
-
-public record UserWorkspaceMembershipModel(
-    ResourceLink Workspace,
-    WorkspacePermissionModel[] Permissions
-    );
+namespace Consent.Api.Users;
 
 internal static class UserModelMapper
 {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Consent.Api.Controllers;
-using Consent.Api.Models.Users;
+using Consent.Api.Client.Models.Users;
+using Consent.Api.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Consent.Tests.Builders;

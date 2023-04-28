@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Consent.Api;
+using Consent.Api.Client.Endpoints;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Refit;
+using Shouldly;
 using SimpleInjector;
 
 namespace Consent.Tests.Api;
@@ -32,8 +35,11 @@ public class ApiTest
         var factory = new WebApplicationFactory<Program>();
         var client = factory.CreateClient();
 
-        var response = await client.GetAsync("/Health");
+        var healthEndpoint = RestService.For<IHealthEndpoint>(client);
+        var health = healthEndpoint.Get;
+        await health.ShouldNotThrowAsync();
 
+        var response = await client.GetAsync("/Health");
         _ = response.EnsureSuccessStatusCode();
     }
 }

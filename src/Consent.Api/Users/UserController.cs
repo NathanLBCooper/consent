@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
-using Consent.Api.Models.Users;
+using Consent.Api.Client.Models.Users;
 using Consent.Domain;
 using Consent.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
-namespace Consent.Api.Controllers;
+namespace Consent.Api.Users;
 
 [ApiController]
 [Route("[controller]")]

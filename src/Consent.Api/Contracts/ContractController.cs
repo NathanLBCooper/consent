@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Consent.Api.Models.Contracts;
+using Consent.Api.Client.Models.Contracts;
 using Consent.Domain;
 using Consent.Domain.Contracts;
 using Consent.Domain.Users;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 
-namespace Consent.Api.Controllers;
+namespace Consent.Api.Contracts;
 
 [ApiController]
 [Route("[controller]")]

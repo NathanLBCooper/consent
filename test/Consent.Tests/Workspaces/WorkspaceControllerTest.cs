@@ -1,7 +1,8 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Consent.Api.Controllers;
-using Consent.Api.Models.Workspaces;
+using Consent.Api.Client.Models.Workspaces;
+using Consent.Api.Users;
+using Consent.Api.Workspaces;
 using Consent.Domain;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
@@ -42,7 +43,7 @@ public class WorkspaceControllerTest
         created.Name.ShouldBe(request.Name);
         created.Memberships.ShouldNotBeEmpty();
 
-        var fetched = (await _sut.WorkspaceGet(created.Id, user.Id)).GetValue<WorkspaceModel>();
+        var fetched = (await _sut.WorkspaceGet(created.Id, user.Id)).GetValue();
 
         _ = fetched.ShouldNotBeNull();
         fetched.Id.ShouldBe(created.Id);
@@ -78,7 +79,7 @@ public class WorkspaceControllerTest
         var user = Guard.NotNull((await _userController.UserCreate(new UserCreateRequestModelBuilder().Build())).GetValue());
         var request = new WorkspaceCreateRequestModelBuilder().Build();
 
-        var created = Guard.NotNull((await _sut.WorkspaceCreate(request, user.Id)).GetValue<WorkspaceModel>());
+        var created = Guard.NotNull((await _sut.WorkspaceCreate(request, user.Id)).GetValue());
         var userPermissions = created.Memberships.Single(m => m.UserId == user.Id).Permissions;
 
         userPermissions.ShouldBeEquivalentTo(

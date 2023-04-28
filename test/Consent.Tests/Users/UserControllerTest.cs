@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Consent.Api.Controllers;
-using Consent.Api.Models.Users;
-using Consent.Api.Models.Workspaces;
+using Consent.Api.Client.Models.Users;
+using Consent.Api.Client.Models.Workspaces;
+using Consent.Api.Users;
+using Consent.Api.Workspaces;
 using Consent.Domain;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;

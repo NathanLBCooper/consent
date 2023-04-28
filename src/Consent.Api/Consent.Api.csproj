@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Consent.Api.Client\Consent.Api.Client.csproj" />
     <ProjectReference Include="..\Consent.Domain\Consent.Domain.csproj" />
     <ProjectReference Include="..\Consent.Storage\Consent.Storage.csproj" />
   </ItemGroup>
