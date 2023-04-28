@@ -33,7 +33,7 @@ public class ApiTest
     public async Task Service_should_start()
     {
         var factory = new WebApplicationFactory<Program>();
-        var client = factory.CreateClient();
+        using var client = factory.CreateClient();
 
         var healthEndpoint = RestService.For<IHealthEndpoint>(client);
         var health = healthEndpoint.Get;
