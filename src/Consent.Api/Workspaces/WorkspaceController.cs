@@ -53,7 +53,7 @@ public class WorkspaceController : ControllerBase // [FromHeader] int userId is 
         var user = await _userRepository.Get(new UserId(userId));
         if (user == null)
         {
-            return NotFound();
+            return Unauthorized();
         }
 
         var entity = await _workspaceRepository.Create(new Workspace(Guard.NotNull(request.Name), user.Id!.Value));

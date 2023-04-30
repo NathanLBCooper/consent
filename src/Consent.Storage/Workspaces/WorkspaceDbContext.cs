@@ -32,6 +32,7 @@ public class WorkspaceDbContext : DbContext
 
         modelBuilder.Entity<Workspace>().Metadata.FindNavigation(nameof(Workspace.Memberships))
             !.SetPropertyAccessMode(PropertyAccessMode.Field);
+        _ = modelBuilder.Entity<Workspace>().Navigation(e => e.Memberships).AutoInclude();
 
         _ = modelBuilder.Entity<Membership>().HasKey(e => e.Id);
         _ = modelBuilder.Entity<Membership>()
