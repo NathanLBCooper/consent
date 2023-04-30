@@ -13,7 +13,7 @@ internal static class UserModelMapper
     public static UserModel ToModel(this User entity, ConsentLinkGenerator linkGenerator)
     {
         return new UserModel(
-            Id: Guard.NotNull(entity.Id).Value.Value,
+            Id: Guard.NotNull(entity.Id).Value,
             Name: entity.Name,
             WorkspaceMemberships: entity.WorkspaceMemberships.Select(m => m.ToModel(linkGenerator)).ToArray()
             );

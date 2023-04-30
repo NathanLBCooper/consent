@@ -33,7 +33,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         _etagHelper = new EtagHelper();
     }
 
-    [HttpGet("", Name = "GetContract")]
+    [HttpGet("{id}", Name = "GetContract")]
     public async Task<ActionResult<ContractModel>> ContractGet(
         int id,
         [FromHeader] int userId,
@@ -94,9 +94,9 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         return Ok(entity.ToModel(Links));
     }
 
-    [HttpGet("version", Name = "GetContractVersion")]
+    [HttpGet("{contractId}/version/{id}", Name = "GetContractVersion")]
     public ActionResult<string> ContractVersionGet(
-    int id,
+    int contractId, int id,
     [FromHeader] int userId,
     [FromHeader(Name = HttpHeaderNames.IfNoneMatch)] string? ifNoneMatch)
     {

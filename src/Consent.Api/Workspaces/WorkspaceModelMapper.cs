@@ -10,7 +10,7 @@ internal static class WorkspaceModelMapper
 {
     public static WorkspaceModel ToModel(this Workspace entity)
     {
-        var id = Guard.NotNull(entity.Id).Value.Value;
+        var id = Guard.NotNull(entity.Id).Value;
         return new WorkspaceModel(id, entity.Name, entity.Memberships.Select(m => m.ToModel()).ToArray());
     }
 
