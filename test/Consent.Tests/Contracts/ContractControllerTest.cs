@@ -1,45 +1,31 @@
-﻿using System.Threading.Tasks;
-using Consent.Api.Controllers;
-using Consent.Api.Models.Users;
-using Consent.Api.Models.Workspaces;
-using Consent.Domain;
-using Consent.Storage.Contacts;
-using Consent.Storage.Users;
-using Consent.Storage.Workspaces;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Consent.Api.Client.Endpoints;
+using Consent.Api.Client.Models.Users;
+using Consent.Api.Client.Models.Workspaces;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Refit;
 using Shouldly;
 
 namespace Consent.Tests.Contracts;
 
 [Collection("DatabaseTest")]
-public class ContractControllerTest
+public class ContractControllerTest : IDisposable
 {
-    private readonly ContractController _sut;
-    private readonly UserControllerTestWrapper _userController;
-    private readonly WorkspaceController _workspaceController;
+    private readonly HttpClient _client;
+    private readonly IContractEndpoint _sut;
+    private readonly IUserEndpoint _userEndpoint;
+    private readonly IWorkspaceEndpoint _workspaceEndpoint;
 
     public ContractControllerTest(DatabaseFixture fixture)
     {
-        var userRepository = new UserRepository(fixture.UserDbContext);
-        var workspaceRepository = new WorkspaceRepository(fixture.WorkspaceDbContext);
-        var contractRepository = new ContractRepository(fixture.ContractDbContext);
-
-        _userController = new UserControllerTestWrapper(new UserController(new NullLogger<UserController>(), new FakeLinkGenerator(), userRepository)
-        {
-            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
-        });
-
-        _workspaceController = new WorkspaceController(
-            new NullLogger<WorkspaceController>(), workspaceRepository, userRepository
-        );
-
-        _sut = new ContractController(new NullLogger<ContractController>(), new FakeLinkGenerator(), contractRepository, userRepository)
-        {
-            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
-        };
+        var factory = new TestWebApplicationFactory(new InMemoryConfigurationBuilder() { SqlSettings = fixture.SqlSettings }.Build());
+        _client = factory.CreateClient();
+        _sut = RestService.For<IContractEndpoint>(_client);
+        _userEndpoint = RestService.For<IUserEndpoint>(_client);
+        _workspaceEndpoint = RestService.For<IWorkspaceEndpoint>(_client);
     }
 
     [Fact]
@@ -48,15 +34,14 @@ public class ContractControllerTest
         var (user, workspace) = await Setup();
         var request = new ContractCreateRequestModelBuilder(workspace.Id).Build();
 
-
-        var created = (await _sut.ContractCreate(request, user.Id)).GetValue();
+        var created = await _sut.ContractCreate(request, user.Id);
 
         _ = created.ShouldNotBeNull();
         created.Name.ShouldBe(request.Name);
         created.Workspace.Id.ShouldBe(workspace.Id);
 
 
-        var fetched = (await _sut.ContractGet(created.Id, user.Id, null)).GetValue();
+        var fetched = await _sut.ContractGet(created.Id, user.Id);
 
         _ = fetched.ShouldNotBeNull();
         fetched.Name.ShouldBe(request.Name);
@@ -72,15 +57,19 @@ public class ContractControllerTest
 
     private async Task<(UserModel user, WorkspaceModel workspace)> Setup()
     {
-        var user = Guard.NotNull((await _userController.UserCreate(
-                new UserCreateRequestModelBuilder().Build()
-                )).GetValue());
+        var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
 
-        var workspace = Guard.NotNull((await _workspaceController.WorkspaceCreate(
+        var workspace = await _workspaceEndpoint.WorkspaceCreate(
             request: new WorkspaceCreateRequestModelBuilder().Build(),
             userId: user.Id
-            )).GetValue());
+            );
 
         return (user, workspace);
+    }
+
+
+    public void Dispose()
+    {
+        _client.Dispose();
     }
 }

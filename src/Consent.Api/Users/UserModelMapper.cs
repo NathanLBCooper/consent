@@ -1,27 +1,19 @@
 ﻿using System.Linq;
-using Consent.Api.Models.Workspaces;
+using Consent.Api.Client.Models;
+using Consent.Api.Client.Models.Users;
+using Consent.Api.Users;
+using Consent.Api.Workspaces;
 using Consent.Domain;
 using Consent.Domain.Users;
 
-namespace Consent.Api.Models.Users;
-
-public record UserModel(
-    int Id,
-    string? Name,
-    UserWorkspaceMembershipModel[]? WorkspaceMemberships
-    );
-
-public record UserWorkspaceMembershipModel(
-    ResourceLink Workspace,
-    WorkspacePermissionModel[] Permissions
-    );
+namespace Consent.Api.Users;
 
 internal static class UserModelMapper
 {
     public static UserModel ToModel(this User entity, ConsentLinkGenerator linkGenerator)
     {
         return new UserModel(
-            Id: Guard.NotNull(entity.Id).Value.Value,
+            Id: Guard.NotNull(entity.Id).Value,
             Name: entity.Name,
             WorkspaceMemberships: entity.WorkspaceMemberships.Select(m => m.ToModel(linkGenerator)).ToArray()
             );

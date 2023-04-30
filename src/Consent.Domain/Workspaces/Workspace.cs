@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Consent.Domain.Users;
@@ -31,32 +30,29 @@ public class Workspace
         }
     }
 
-    private IImmutableList<Membership> _memberships;
-    public IImmutableList<Membership> Memberships
+    private List<Membership> _memberships;
+    public IReadOnlyList<Membership> Memberships => _memberships.AsReadOnly();
+    [MemberNotNull(nameof(_memberships))]
+    private void SetMemberships(List<Membership> value)
     {
-        get => _memberships;
-        [MemberNotNull(nameof(_memberships))]
-        private set
+        var users = value.Select(m => m.UserId);
+        if (users.Count() != users.Distinct().Count())
         {
-            var users = value.Select(m => m.UserId);
-            if (users.Count() != users.Distinct().Count())
-            {
-                throw new ArgumentException("Cannot have more than one membership for a user", nameof(Memberships));
-            }
-
-            if (!value.Any(m => m.IsSuperUser))
-            {
-                throw new ArgumentException("Workspace must have at least one superuser", nameof(Memberships));
-            }
-
-            _memberships = value;
+            throw new ArgumentException("Cannot have more than one membership for a user", nameof(Memberships));
         }
+
+        if (!value.Any(m => m.IsSuperUser))
+        {
+            throw new ArgumentException("Workspace must have at least one superuser", nameof(Memberships));
+        }
+
+        _memberships = value.ToList();
     }
 
     public Workspace(string name, IEnumerable<Membership> memberships)
     {
         Name = name;
-        Memberships = memberships.ToImmutableList();
+        SetMemberships(memberships.ToList());
     }
 
     public Workspace(string name, UserId creator) :
@@ -64,8 +60,10 @@ public class Workspace
     {
     }
 
-    private Workspace(string name) : this(name, Array.Empty<Membership>())
+    private Workspace(string name)
     {
+        Name = name;
+        _memberships = new List<Membership>();
     }
 
     public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)

@@ -1,10 +1,7 @@
-﻿using FluentValidation;
+﻿using Consent.Api.Client.Models.Users;
+using FluentValidation;
 
-namespace Consent.Api.Models.Users;
-
-public record UserCreateRequestModel(
-    string? Name
-    );
+namespace Consent.Api.Users;
 
 public class UserCreateRequestModelValidator : AbstractValidator<UserCreateRequestModel>
 {

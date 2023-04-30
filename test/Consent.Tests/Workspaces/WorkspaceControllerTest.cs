@@ -1,48 +1,46 @@
+using System;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Consent.Api.Controllers;
-using Consent.Api.Models.Workspaces;
+using Consent.Api.Client.Endpoints;
+using Consent.Api.Client.Models.Workspaces;
 using Consent.Domain;
-using Consent.Storage.Users;
-using Consent.Storage.Workspaces;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Refit;
 using Shouldly;
 
 namespace Consent.Tests.Workspaces;
 
 [Collection("DatabaseTest")]
-public class WorkspaceControllerTest
+public class WorkspaceControllerTest : IDisposable
 {
-    private readonly WorkspaceController _sut;
-    private readonly UserControllerTestWrapper _userController;
+    private readonly HttpClient _client;
+    private readonly IWorkspaceEndpoint _sut;
+    private readonly IUserEndpoint _userEndpoint;
 
     public WorkspaceControllerTest(DatabaseFixture fixture)
     {
-        var workspaceRepository = new WorkspaceRepository(fixture.WorkspaceDbContext);
-        var userRepository = new UserRepository(fixture.UserDbContext);
-        _sut = new WorkspaceController(new NullLogger<WorkspaceController>(), workspaceRepository, userRepository);
-        _userController = new UserControllerTestWrapper(new UserController(new NullLogger<UserController>(), new FakeLinkGenerator(), userRepository)
-        {
-            ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() },
-        });
+        var factory = new TestWebApplicationFactory(new InMemoryConfigurationBuilder() { SqlSettings = fixture.SqlSettings }.Build());
+        _client = factory.CreateClient();
+        _sut = RestService.For<IWorkspaceEndpoint>(_client);
+        _userEndpoint = RestService.For<IUserEndpoint>(_client);
     }
 
     [Fact]
     public async Task Can_create_and_get_a_workspace()
     {
-        var user = Guard.NotNull((await _userController.UserCreate(new UserCreateRequestModelBuilder().Build())).GetValue());
+        var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
         var request = new WorkspaceCreateRequestModelBuilder().Build();
 
-        var created = (await _sut.WorkspaceCreate(request, user.Id)).GetValue();
+        var created = await _sut.WorkspaceCreate(request, user.Id);
 
         _ = created.ShouldNotBeNull();
         created.Name.ShouldBe(request.Name);
         created.Memberships.ShouldNotBeEmpty();
 
-        var fetched = (await _sut.WorkspaceGet(created.Id, user.Id)).GetValue<WorkspaceModel>();
+        var fetched = await _sut.WorkspaceGet(created.Id, user.Id);
 
         _ = fetched.ShouldNotBeNull();
         fetched.Id.ShouldBe(created.Id);
@@ -51,38 +49,46 @@ public class WorkspaceControllerTest
     }
 
     [Fact]
-    public async Task Cannot_create_workspace_with_nonexistant_user()
+    public async Task Cannot_create_workspace_with_nonexistant_userAsync()
     {
         var request = new WorkspaceCreateRequestModelBuilder().Build();
-        var response = await _sut.WorkspaceCreate(request, -1);
 
-        _ = response.Result.ShouldBeOfType<NotFoundResult>();
+        var createWorkspace = async () => await _sut.WorkspaceCreate(request, -1);
+
+        var ex = await createWorkspace.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(ex.Content).Status.ShouldBe((int)HttpStatusCode.Unauthorized);
     }
 
     [Fact]
     public async Task Cannot_get_workspace_with_user_with_no_permissions()
     {
         var userBuilder = new UserCreateRequestModelBuilder();
-        var user = Guard.NotNull((await _userController.UserCreate(userBuilder.Build())).GetValue());
-        var otherUser = Guard.NotNull((await _userController.UserCreate(userBuilder.Build())).GetValue());
-        var created = Guard.NotNull((await _sut.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), user.Id)).GetValue());
+        var userOne = await _userEndpoint.UserCreate(userBuilder.Build());
+        var userTwo = await _userEndpoint.UserCreate(userBuilder.Build());
+        var userOnesWorkspace = await _sut.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), userOne.Id);
 
-        var response = await _sut.WorkspaceGet(created.Id, otherUser.Id);
+        var fetchAnotherUsersWorkspace = async () => await _sut.WorkspaceGet(userOnesWorkspace.Id, userTwo.Id);
 
-        _ = response.Result.ShouldBeOfType<NotFoundResult>();
+        var ex = await fetchAnotherUsersWorkspace.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(ex.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task Workspace_creater_gets_all_permissions()
     {
-        var user = Guard.NotNull((await _userController.UserCreate(new UserCreateRequestModelBuilder().Build())).GetValue());
+        var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
         var request = new WorkspaceCreateRequestModelBuilder().Build();
 
-        var created = Guard.NotNull((await _sut.WorkspaceCreate(request, user.Id)).GetValue<WorkspaceModel>());
+        var created = await _sut.WorkspaceCreate(request, user.Id);
         var userPermissions = created.Memberships.Single(m => m.UserId == user.Id).Permissions;
 
         userPermissions.ShouldBeEquivalentTo(
             new[] { WorkspacePermissionModel.View, WorkspacePermissionModel.Edit, WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
             );
+    }
+
+    public void Dispose()
+    {
+        _client.Dispose();
     }
 }

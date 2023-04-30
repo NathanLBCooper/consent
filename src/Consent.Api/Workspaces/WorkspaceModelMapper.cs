@@ -1,34 +1,16 @@
 ﻿using System;
 using System.Linq;
+using Consent.Api.Client.Models.Workspaces;
 using Consent.Domain;
 using Consent.Domain.Workspaces;
 
-namespace Consent.Api.Models.Workspaces;
-
-public record WorkspaceModel(
-    int Id,
-    string Name,
-    MembershipModel[] Memberships
-    );
-
-public record MembershipModel(
-    int UserId,
-    WorkspacePermissionModel[] Permissions
-    );
-
-public enum WorkspacePermissionModel
-{
-    View,
-    Edit,
-    Admin,
-    Buyer
-}
+namespace Consent.Api.Workspaces;
 
 internal static class WorkspaceModelMapper
 {
     public static WorkspaceModel ToModel(this Workspace entity)
     {
-        var id = Guard.NotNull(entity.Id).Value.Value;
+        var id = Guard.NotNull(entity.Id).Value;
         return new WorkspaceModel(id, entity.Name, entity.Memberships.Select(m => m.ToModel()).ToArray());
     }
 

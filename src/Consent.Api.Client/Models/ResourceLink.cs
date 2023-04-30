@@ -1,4 +1,4 @@
-﻿namespace Consent.Api.Models;
+﻿namespace Consent.Api.Client.Models;
 
 public record ResourceLink(
     int Id,

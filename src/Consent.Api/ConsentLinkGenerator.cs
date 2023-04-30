@@ -1,4 +1,5 @@
-﻿using Consent.Api.Controllers;
+﻿using Consent.Api.Contracts;
+using Consent.Api.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Http;
@@ -26,12 +27,12 @@ internal class ConsentLinkGenerator
             );
     }
 
-    public string? GetContractVersion(ContractVersionId contractVersionId)
+    public string? GetContractVersion(ContractId contractId, ContractVersionId contractVersionId)
     {
         return _linkGenerator.GetPathByAction(_httpContext,
             action: nameof(ContractController.ContractVersionGet),
             controller: "contract",
-            values: new { Id = contractVersionId.Value }
+            values: new { ContractId = contractId, Id = contractVersionId.Value }
             );
     }
 }

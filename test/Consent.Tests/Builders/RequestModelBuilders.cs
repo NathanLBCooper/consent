@@ -1,6 +1,6 @@
-﻿using Consent.Api.Models.Contracts;
-using Consent.Api.Models.Users;
-using Consent.Api.Models.Workspaces;
+﻿using Consent.Api.Client.Models.Contracts;
+using Consent.Api.Client.Models.Users;
+using Consent.Api.Client.Models.Workspaces;
 
 namespace Consent.Tests.Builders;
 public record UserCreateRequestModelBuilder(string Name = "user")

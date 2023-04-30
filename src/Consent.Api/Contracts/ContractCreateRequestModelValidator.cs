@@ -1,10 +1,7 @@
-﻿using FluentValidation;
+﻿using Consent.Api.Client.Models.Contracts;
+using FluentValidation;
 
-namespace Consent.Api.Models.Contracts;
-
-public record ContractCreateRequestModel(
-    string? Name, int WorkspaceId
-    );
+namespace Consent.Api.Contracts;
 
 public class ContractCreateRequestModelValidator : AbstractValidator<ContractCreateRequestModel>
 {
