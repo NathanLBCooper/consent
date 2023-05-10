@@ -2,7 +2,7 @@
 using Consent.Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
 
-namespace Consent.Storage.Contacts;
+namespace Consent.Storage.Contracts;
 
 public class ContractRepository : IContractRepository
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using Consent.Storage;
-using Consent.Storage.Contacts;
+using Consent.Storage.Contracts;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Microsoft.EntityFrameworkCore;

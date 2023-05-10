@@ -5,7 +5,7 @@ using Consent.Domain.Permissions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Consent.Storage.Contacts;
+namespace Consent.Storage.Contracts;
 
 public class ContractDbContext : DbContext
 {
