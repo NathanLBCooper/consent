@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Consent.Domain.Contracts;
 
@@ -69,14 +69,15 @@ public class ContractVersion
         }
     }
 
-    public ImmutableList<Provision> Provisions { get; private set; }
+    private readonly List<Provision> _provisions;
+    public IReadOnlyList<Provision> Provisions => _provisions.AsReadOnly();
 
     public ContractVersion(string name, string text, IEnumerable<Provision> provisions)
     {
         Name = name;
         Text = text;
 
-        Provisions = provisions.ToImmutableList();
+        _provisions = provisions.ToList();
         foreach (var p in provisions)
         {
             p.OnAddedToVersion(this);
@@ -90,7 +91,7 @@ public class ContractVersion
 
     public void AddProvisions(params Provision[] provisions)
     {
-        Provisions = Provisions.AddRange(provisions);
+        _provisions.AddRange(provisions);
         foreach (var p in provisions)
         {
             p.OnAddedToVersion(this);

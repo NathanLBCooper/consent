@@ -5,6 +5,7 @@ using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Consent.Storage.Users;
 
@@ -26,26 +27,24 @@ public class UserDbContext : DbContext
     {
         _ = modelBuilder.HasDefaultSchema("users");
 
-        _ = modelBuilder.Entity<User>(eb =>
-        {
-            _ = eb.HasKey(e => e.Id);
-            _ = eb.Property(e => e.Id).ValueGeneratedOnAdd();
+        ConfigureUsers(modelBuilder.Entity<User>());
+    }
 
-            eb.Metadata.FindNavigation(nameof(User.WorkspaceMemberships))!.SetPropertyAccessMode(PropertyAccessMode.Field);
-            _ = eb.HasMany(e => e.WorkspaceMemberships).WithOne();
-            _ = eb.Navigation(e => e.WorkspaceMemberships).AutoInclude();
-        });
+    private void ConfigureUsers(EntityTypeBuilder<User> builder)
+    {
+        _ = builder.HasKey(e => e.Id);
+        _ = builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
-        _ = modelBuilder.Entity<WorkspaceMembership>(eb =>
-        {
-            _ = eb.ToView("WorkspaceMembership");
-            _ = eb.HasOne<User>().WithMany(e => e.WorkspaceMemberships);
-        });
+        _ = builder.OwnsMany(e => e.WorkspaceMemberships, ConfigureWorkspaceMemeberships);
+    }
+
+    private void ConfigureWorkspaceMemeberships(OwnedNavigationBuilder<User, WorkspaceMembership> builder)
+    {
+        _ = builder.UsePropertyAccessMode(PropertyAccessMode.Field);
+        _ = builder.ToView("WorkspaceMembership");
 
         var enumToStr = new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } };
-
-        _ = modelBuilder.Entity<WorkspaceMembership>()
-            .Property(e => e.Permissions)
+        _ = builder.Property(e => e.Permissions)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, enumToStr),
                 v => JsonSerializer.Deserialize<ImmutableList<WorkspacePermission>>(v, enumToStr)!

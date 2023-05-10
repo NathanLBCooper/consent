@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Consent.Domain.Workspaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Consent.Storage.Workspaces;
 
@@ -25,24 +26,25 @@ public class WorkspaceDbContext : DbContext
     {
         _ = modelBuilder.HasDefaultSchema("workspaces");
 
-        _ = modelBuilder.Entity<Workspace>().HasKey(e => e.Id);
-        _ = modelBuilder.Entity<Workspace>()
-            .Property(e => e.Id)
-            .ValueGeneratedOnAdd();
+        ConfigureWorkspaces(modelBuilder.Entity<Workspace>());
+    }
 
-        modelBuilder.Entity<Workspace>().Metadata.FindNavigation(nameof(Workspace.Memberships))
-            !.SetPropertyAccessMode(PropertyAccessMode.Field);
-        _ = modelBuilder.Entity<Workspace>().Navigation(e => e.Memberships).AutoInclude();
+    private void ConfigureWorkspaces(EntityTypeBuilder<Workspace> builder)
+    {
+        _ = builder.HasKey(e => e.Id);
+        _ = builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
-        _ = modelBuilder.Entity<Membership>().HasKey(e => e.Id);
-        _ = modelBuilder.Entity<Membership>()
-            .Property(e => e.Id)
-            .ValueGeneratedOnAdd();
+        _ = builder.OwnsMany(e => e.Memberships, ConfigureWorkspaceMemberships);
+    }
+
+    private void ConfigureWorkspaceMemberships(OwnedNavigationBuilder<Workspace, Membership> builder)
+    {
+        _ = builder.UsePropertyAccessMode(PropertyAccessMode.Field);
+        _ = builder.HasKey(e => e.Id);
+        _ = builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         var enumToStr = new JsonSerializerOptions() { Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) } };
-
-        _ = modelBuilder.Entity<Membership>()
-            .Property(e => e.Permissions)
+        _ = builder.Property(e => e.Permissions)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, enumToStr),
                 v => JsonSerializer.Deserialize<ImmutableList<WorkspacePermission>>(v, enumToStr)!

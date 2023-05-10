@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Consent.Domain.Workspaces;
 
 namespace Consent.Domain.Contracts;
@@ -32,13 +32,14 @@ public class Contract
         }
     }
 
-    public ImmutableList<ContractVersion> Versions { get; private set; }
+    private readonly List<ContractVersion> _versions;
+    public IReadOnlyList<ContractVersion> Versions => _versions.AsReadOnly();
 
     public Contract(string name, WorkspaceId workspaceId, IEnumerable<ContractVersion> versions)
     {
         Name = name;
         WorkspaceId = workspaceId;
-        Versions = versions.ToImmutableList();
+        _versions = versions.ToList();
     }
 
     public Contract(string name, WorkspaceId workspaceId) : this(name, workspaceId, Array.Empty<ContractVersion>())
@@ -47,7 +48,7 @@ public class Contract
 
     public void AddContractVersions(params ContractVersion[] versions)
     {
-        Versions = Versions.AddRange(versions);
+        _versions.AddRange(versions);
     }
 }
 
