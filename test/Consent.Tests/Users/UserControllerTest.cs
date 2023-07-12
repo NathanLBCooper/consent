@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Workspaces;
-using Consent.Domain;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
 using Refit;
@@ -56,36 +54,6 @@ public class UserControllerTest : IDisposable
         membership.Permissions.ShouldBeEquivalentTo(
             new[] { WorkspacePermissionModel.View, WorkspacePermissionModel.Edit, WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
             );
-    }
-
-    [Fact]
-    public async Task Etags_work()
-    {
-        var request = new UserCreateRequestModelBuilder().Build();
-
-        var created = await _sut.UserCreateReq(request);
-        var etag = created.Headers.ETag?.ToString();
-        _ = etag.ShouldNotBeNull();
-        var user = Guard.NotNull(created.Content);
-
-        var getWithEtag = await _sut.UserGetReq(user.Id, etag);
-        getWithEtag.StatusCode.ShouldBe(HttpStatusCode.NotModified);
-        getWithEtag.Content.ShouldBeNull();
-
-        var getWithoutEtag = await _sut.UserGetReq(user.Id, null);
-        getWithoutEtag.StatusCode.ShouldBe(HttpStatusCode.OK);
-        _ = getWithoutEtag.Content.ShouldNotBeNull();
-
-        var getWithWrongEtag = await _sut.UserGetReq(user.Id, "wrong etag");
-        getWithWrongEtag.StatusCode.ShouldBe(HttpStatusCode.OK);
-        _ = getWithWrongEtag.Content.ShouldNotBeNull();
-
-        var otherUser = await _sut.UserCreate(request);
-        var getWithOtherUser = await _sut.UserGetReq(otherUser.Id, etag);
-        getWithOtherUser.StatusCode.ShouldBe(HttpStatusCode.OK);
-        _ = getWithOtherUser.Content.ShouldNotBeNull();
-
-        // todo test that update invalidates etag
     }
 
     public void Dispose()

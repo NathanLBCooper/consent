@@ -16,7 +16,6 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
     private readonly LinkGenerator _linkGenerator;
     private readonly IUserRepository _userRepository;
     private readonly UserCreateRequestModelValidator _validator = new();
-    private readonly EtagHelper _etagHelper;
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
@@ -25,12 +24,10 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         _logger = logger;
         _linkGenerator = linkGenerator;
         _userRepository = userRepository;
-        _etagHelper = new EtagHelper();
     }
 
     [HttpGet("", Name = "GetUser")]
-    public async Task<ActionResult<UserModel>> UserGet(
-        [FromHeader] int userId, [FromHeader(Name = HttpHeaderNames.IfNoneMatch)] string? ifNoneMatch)
+    public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId)
     {
         var user = await _userRepository.Get(new UserId(userId));
         if (user == null)
@@ -39,14 +36,6 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         }
 
         var model = user.ToModel(Links);
-        var etag = _etagHelper.Get("user", model);
-
-        Response.Headers.Add(HttpHeaderNames.ETag, etag);
-        if (ifNoneMatch != null && etag == ifNoneMatch)
-        {
-            return StatusCode(304);
-        }
-
         return Ok(model);
     }
 
@@ -62,9 +51,6 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         var created = await _userRepository.Create(new User(Guard.NotNull(request.Name)));
 
         var model = created.ToModel(Links);
-        var etag = _etagHelper.Get("user", model);
-
-        Response.Headers.Add(HttpHeaderNames.ETag, etag);
         return Ok(model);
     }
 }

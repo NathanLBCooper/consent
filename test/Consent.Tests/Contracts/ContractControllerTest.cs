@@ -48,13 +48,6 @@ public class ContractControllerTest : IDisposable
         fetched.Workspace.Id.ShouldBe(workspace.Id);
     }
 
-    [Fact]
-    public async Task Etags_work()
-    {
-        await Task.CompletedTask;
-        // todo
-    }
-
     private async Task<(UserModel user, WorkspaceModel workspace)> Setup()
     {
         var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());

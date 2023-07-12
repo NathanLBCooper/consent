@@ -19,7 +19,6 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private readonly LinkGenerator _linkGenerator;
     private readonly IContractRepository _contractRepository;
     private readonly IUserRepository _userRepository;
-    private readonly EtagHelper _etagHelper;
     private readonly ContractCreateRequestModelValidator _validator = new();
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
@@ -30,14 +29,12 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         _linkGenerator = linkGenerator;
         _contractRepository = contractRepository;
         _userRepository = userRepository;
-        _etagHelper = new EtagHelper();
     }
 
     [HttpGet("{id}", Name = "GetContract")]
     public async Task<ActionResult<ContractModel>> ContractGet(
         int id,
-        [FromHeader] int userId,
-        [FromHeader(Name = HttpHeaderNames.IfNoneMatch)] string? ifNoneMatch)
+        [FromHeader] int userId)
     {
         var user = await _userRepository.Get(new UserId(userId));
         if (user == null)
@@ -57,14 +54,6 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         }
 
         var model = contract.ToModel(Links);
-        var etag = _etagHelper.Get("contract", model);
-
-        Response.Headers.Add(HttpHeaderNames.ETag, etag);
-        if (ifNoneMatch != null && etag == ifNoneMatch)
-        {
-            return StatusCode(304);
-        }
-
         return Ok(model);
     }
 
@@ -95,10 +84,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     }
 
     [HttpGet("{contractId}/version/{id}", Name = "GetContractVersion")]
-    public ActionResult<string> ContractVersionGet(
-    int contractId, int id,
-    [FromHeader] int userId,
-    [FromHeader(Name = HttpHeaderNames.IfNoneMatch)] string? ifNoneMatch)
+    public ActionResult<string> ContractVersionGet(int contractId, int id, [FromHeader] int userId)
     {
         return Problem();
     }
