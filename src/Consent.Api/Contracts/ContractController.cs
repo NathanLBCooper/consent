@@ -5,6 +5,8 @@ using Consent.Domain;
 using Consent.Domain.Contracts;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
+using Consent.Storage.Contracts;
+using Consent.Storage.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;

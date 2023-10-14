@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Consent.Domain.Users;
 
-namespace Consent.Domain.Users;
+namespace Consent.Storage.Users;
 
 public interface IUserRepository
 {

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Consent.Api.Client.Models.Users;
 using Consent.Domain;
 using Consent.Domain.Users;
+using Consent.Storage.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;

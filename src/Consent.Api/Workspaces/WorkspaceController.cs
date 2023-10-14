@@ -4,6 +4,8 @@ using Consent.Api.Client.Models.Workspaces;
 using Consent.Domain;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
+using Consent.Storage.Users;
+using Consent.Storage.Workspaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

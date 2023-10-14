@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Consent.Domain.Workspaces;
 
-namespace Consent.Domain.Workspaces;
+namespace Consent.Storage.Workspaces;
 
 public interface IWorkspaceRepository
 {

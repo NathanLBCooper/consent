@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Consent.Domain.Contracts;
 
-namespace Consent.Domain.Contracts;
+namespace Consent.Storage.Contracts;
 
 public interface IContractRepository
 {
