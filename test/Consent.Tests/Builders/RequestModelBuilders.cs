@@ -26,3 +26,11 @@ public record ContractCreateRequestModelBuilder(int WorkspaceId, string Name = "
         return new(Name, WorkspaceId);
     }
 }
+
+public record ContractVersionCreateRequestModelBuilder()
+{
+    public ContractVersionCreateRequestModel Build()
+    {
+        return new();
+    }
+}

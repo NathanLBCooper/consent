@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
+using Consent.Api.Client.Models.Contracts;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 using Consent.Tests.Builders;
@@ -31,7 +32,7 @@ public class ContractControllerTest : IDisposable
     [Fact]
     public async Task Can_create_and_get_a_contract()
     {
-        var (user, workspace) = await Setup();
+        var (user, workspace) = await CreateUserAndWorkspace();
         var request = new ContractCreateRequestModelBuilder(workspace.Id).Build();
 
         var created = await _sut.ContractCreate(request, user.Id);
@@ -48,7 +49,25 @@ public class ContractControllerTest : IDisposable
         fetched.Workspace.Id.ShouldBe(workspace.Id);
     }
 
-    private async Task<(UserModel user, WorkspaceModel workspace)> Setup()
+    [Fact(Skip = "unimplemented")]
+    public async Task Can_create_and_get_a_contract_version()
+    {
+        var (user, workspace) = await CreateUserAndWorkspace();
+        var contract = CreateContract(user, workspace);
+
+        var request = new ContractVersionCreateRequestModelBuilder().Build();
+
+        var created = await _sut.ContractVersionCreate(contract.Id, request, user.Id);
+
+        _ = created.ShouldNotBeNull();
+        created.Contract.Id.ShouldBe(contract.Id);
+
+        var fetched = await _sut.ContractVersionGet(contract.Id, created.Id, user.Id);
+        _ = fetched.ShouldNotBeNull();
+        fetched.Contract.Id.ShouldBe(contract.Id);
+    }
+
+    private async Task<(UserModel user, WorkspaceModel workspace)> CreateUserAndWorkspace()
     {
         var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
 
@@ -60,6 +79,10 @@ public class ContractControllerTest : IDisposable
         return (user, workspace);
     }
 
+    private async Task<ContractModel> CreateContract(UserModel user, WorkspaceModel workspace)
+    {
+        return await _sut.ContractCreate(new ContractCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
+    }
 
     public void Dispose()
     {

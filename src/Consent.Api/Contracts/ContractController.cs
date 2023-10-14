@@ -94,6 +94,16 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         return Problem();
     }
 
+    [HttpPost("{contractId}/version", Name = "CreateContractVersion")]
+    public ActionResult<string> ContractVersionCreate(
+        [FromQuery] int contactId, ContractVersionCreateRequestModel request, [FromHeader] int userId)
+    {
+        _ = contactId;
+        _ = request;
+        _ = userId;
+        return Problem();
+    }
+
     private bool UserHasPermissions(User user, WorkspaceId workspaceId, WorkspacePermission requiredPermission)
     {
         var membership = user.WorkspaceMemberships.SingleOrDefault(m => m.WorkspaceId == workspaceId);
