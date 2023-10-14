@@ -18,6 +18,10 @@ csharp_style_var_when_type_is_apparent = true:warning
 csharp_style_var_elsewhere = true:warning
 # use file_scoped namespaces
 csharp_style_namespace_declarations = file_scoped:warning
+# match namespaces to folder structure
+#   this fails in a somewhat cryptic manner: "NotSupportedException: Changing document properties is not supported" on dotnet format
+dotnet_style_namespace_match_folder = true:warning
+dotnet_diagnostic.IDE0130.severity = warning
 # Organize usings 
 dotnet_sort_system_directives_first = true:warning
 # Expression-level preferences
