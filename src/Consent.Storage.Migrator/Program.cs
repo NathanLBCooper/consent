@@ -10,7 +10,7 @@ namespace Consent.Storage.Migrator;
 
 public class Program
 {
-    internal static int Main(string[] args)
+    internal static int Main()
     {
         var configuration = new ConfigurationBuilder()
            .AddJsonFile("appsettings.json")
