@@ -10,6 +10,10 @@
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
+  <Target Name="FormatCode" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet format --severity warn --verbosity normal" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.9" />

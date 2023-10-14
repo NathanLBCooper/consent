@@ -7,6 +7,10 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <Target Name="FormatCode" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet format --severity warn --verbosity normal" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Refit" Version="6.3.2" />
   </ItemGroup>

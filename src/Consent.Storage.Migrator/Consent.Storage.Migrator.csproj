@@ -10,6 +10,10 @@
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
+  <Target Name="FormatCode" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet format --severity warn --verbosity normal" />
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />

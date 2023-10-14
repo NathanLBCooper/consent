@@ -11,7 +11,7 @@ end_of_line = crlf
 indent_size = 2
 
 [*.cs]
-end_of_line = crlf
+end_of_line = crlf:warning
 # use var everywhere
 csharp_style_var_for_built_in_types = true:warning
 csharp_style_var_when_type_is_apparent = true:warning
@@ -25,9 +25,13 @@ dotnet_style_prefer_conditional_expression_over_return = false
 # Don't force `var (a, b) = Foo();` over `var aandbTuple = Foo();`
 csharp_style_deconstructed_variable_declaration = false
 # private member underscores
-dotnet_naming_rule.instance_fields_should_be_camel_case.severity = suggestion
-dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields
-dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style
-dotnet_naming_symbols.instance_fields.applicable_kinds = field
-dotnet_naming_style.instance_field_style.capitalization = camel_case
-dotnet_naming_style.instance_field_style.required_prefix = _
+dotnet_naming_rule.instance_fields_should_be_camel_case.severity = suggestion:warning
+dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields:warning
+dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style:warning
+dotnet_naming_symbols.instance_fields.applicable_kinds = field:warning
+dotnet_naming_style.instance_field_style.capitalization = camel_case:warning
+dotnet_naming_style.instance_field_style.required_prefix = _:warning
+# prevent discarded variables
+csharp_style_unused_value_expression_statement_preference = discard_variable:warning
+csharp_style_unused_value_assignment_preference = discard_variable:warning
+dotnet_code_quality_unused_parameters = all:warning
