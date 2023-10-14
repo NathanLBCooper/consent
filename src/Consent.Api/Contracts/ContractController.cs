@@ -88,13 +88,16 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     [HttpGet("{contractId}/version/{id}", Name = "GetContractVersion")]
     public ActionResult<string> ContractVersionGet(int contractId, int id, [FromHeader] int userId)
     {
+        _ = contractId;
+        _ = id;
+        _ = userId;
         return Problem();
     }
 
     private bool UserHasPermissions(User user, WorkspaceId workspaceId, WorkspacePermission requiredPermission)
     {
         var membership = user.WorkspaceMemberships.SingleOrDefault(m => m.WorkspaceId == workspaceId);
-        if (membership == null || !membership.Permissions.Contains(WorkspacePermission.Edit))
+        if (membership == null || !membership.Permissions.Contains(requiredPermission))
         {
             return false;
         }
