@@ -8,11 +8,7 @@ public interface IUserEndpoint
 {
     [Get("/user")]
     Task<UserModel> UserGet([Header("userId")] int userId);
-    [Get("/user")]
-    Task<ApiResponse<UserModel>> UserGetReq([Header("userId")] int userId);
 
     [Post("/user")]
     Task<UserModel> UserCreate([Body] UserCreateRequestModel request);
-    [Post("/user")]
-    Task<ApiResponse<UserModel>> UserCreateReq([Body] UserCreateRequestModel request);
 }
