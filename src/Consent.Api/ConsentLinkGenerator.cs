@@ -27,6 +27,15 @@ internal class ConsentLinkGenerator
             );
     }
 
+    public string? GetContract(ContractId contractId)
+    {
+        return _linkGenerator.GetPathByAction(_httpContext,
+                    action: nameof(ContractController.ContractGet),
+                    controller: "contract",
+                    values: new { Id = contractId }
+                    );
+    }
+
     public string? GetContractVersion(ContractId contractId, ContractVersionId contractVersionId)
     {
         return _linkGenerator.GetPathByAction(_httpContext,

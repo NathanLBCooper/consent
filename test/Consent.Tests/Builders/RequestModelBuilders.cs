@@ -3,7 +3,7 @@ using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 
 namespace Consent.Tests.Builders;
-public record UserCreateRequestModelBuilder(string Name = "user")
+public record UserCreateRequestModelBuilder(string Name = "username")
 {
     public UserCreateRequestModel Build()
     {
@@ -11,7 +11,7 @@ public record UserCreateRequestModelBuilder(string Name = "user")
     }
 }
 
-public record WorkspaceCreateRequestModelBuilder(string Name = "workspace")
+public record WorkspaceCreateRequestModelBuilder(string Name = "workspacename")
 {
     public WorkspaceCreateRequestModel Build()
     {
@@ -19,7 +19,7 @@ public record WorkspaceCreateRequestModelBuilder(string Name = "workspace")
     }
 }
 
-public record ContractCreateRequestModelBuilder(int WorkspaceId, string Name = "contract")
+public record ContractCreateRequestModelBuilder(int WorkspaceId, string Name = "contractname")
 {
     public ContractCreateRequestModel Build()
     {
@@ -27,10 +27,10 @@ public record ContractCreateRequestModelBuilder(int WorkspaceId, string Name = "
     }
 }
 
-public record ContractVersionCreateRequestModelBuilder()
+public record ContractVersionCreateRequestModelBuilder(string Name = "contractversionname", string Text = "contractversiontext")
 {
     public ContractVersionCreateRequestModel Build()
     {
-        return new();
+        return new(Name, Text);
     }
 }

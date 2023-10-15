@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Consent.Api.Client.Models;
 using Consent.Api.Client.Models.Contracts;
 using Consent.Domain;
@@ -12,7 +13,7 @@ internal static class ContractModelMapper
     {
         var workspace = new ResourceLink(entity.WorkspaceId.Value, linkGenerator.GetWorkspace(entity.WorkspaceId));
         var contractId = Guard.NotNull(entity.Id);
-        var versions = entity.Versions.Select(
+        var versionLinks = entity.Versions.Select(
             v =>
             {
                 var id = Guard.NotNull(v.Id);
@@ -23,7 +24,30 @@ internal static class ContractModelMapper
             Id: entity.Id!.Value.Value,
             Name: entity.Name,
             Workspace: workspace,
-            Versions: versions
+            Versions: versionLinks
             );
+    }
+
+    public static ContractVersionModel ToModel(
+        this ContractVersion entity, Contract contract, ConsentLinkGenerator linkGenerator)
+    {
+        var versionId = Guard.NotNull(entity.Id);
+        var contractId = Guard.NotNull(contract.Id);
+        var contractLink = new ResourceLink(contractId.Value, linkGenerator.GetContract(contractId));
+
+        return new ContractVersionModel(versionId.Value, entity.Name, entity.Text, entity.Status.ToModel(), contractLink);
+    }
+
+    private static ContractVersionStatusModel ToModel(this ContractVersionStatus value)
+    {
+        return value switch
+        {
+            ContractVersionStatus.Draft => ContractVersionStatusModel.Draft,
+            ContractVersionStatus.Active => ContractVersionStatusModel.Active,
+            ContractVersionStatus.Legacy => ContractVersionStatusModel.Legacy,
+            ContractVersionStatus.Deprecated => ContractVersionStatusModel.Deprecated,
+            ContractVersionStatus.Obsolete => ContractVersionStatusModel.Obsolete,
+            _ => throw new ArgumentOutOfRangeException(nameof(value))
+        };
     }
 }

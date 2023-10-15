@@ -39,3 +39,5 @@ dotnet_naming_style.instance_field_style.required_prefix = _:warning
 csharp_style_unused_value_expression_statement_preference = discard_variable:warning
 csharp_style_unused_value_assignment_preference = discard_variable:warning
 dotnet_code_quality_unused_parameters = all:warning
+# force brackets (eg on if statements)
+csharp_prefer_braces = true:warning

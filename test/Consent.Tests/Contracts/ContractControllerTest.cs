@@ -49,11 +49,10 @@ public class ContractControllerTest : IDisposable
         fetched.Workspace.Id.ShouldBe(workspace.Id);
     }
 
-    [Fact(Skip = "unimplemented")]
+    [Fact]
     public async Task Can_create_and_get_a_contract_version()
     {
-        var (user, workspace) = await CreateUserAndWorkspace();
-        var contract = CreateContract(user, workspace);
+        var (user, _, contract) = await CreateUserWorkspaceAndContract();
 
         var request = new ContractVersionCreateRequestModelBuilder().Build();
 
@@ -61,10 +60,16 @@ public class ContractControllerTest : IDisposable
 
         _ = created.ShouldNotBeNull();
         created.Contract.Id.ShouldBe(contract.Id);
+        created.Name.ShouldBe(request.Name);
+        created.Text.ShouldBe(request.Text);
+        created.Status.ShouldBe(ContractVersionStatusModel.Draft);
 
         var fetched = await _sut.ContractVersionGet(contract.Id, created.Id, user.Id);
         _ = fetched.ShouldNotBeNull();
         fetched.Contract.Id.ShouldBe(contract.Id);
+        fetched.Name.ShouldBe(request.Name);
+        fetched.Text.ShouldBe(request.Text);
+        fetched.Status.ShouldBe(ContractVersionStatusModel.Draft);
     }
 
     private async Task<(UserModel user, WorkspaceModel workspace)> CreateUserAndWorkspace()
@@ -79,9 +84,12 @@ public class ContractControllerTest : IDisposable
         return (user, workspace);
     }
 
-    private async Task<ContractModel> CreateContract(UserModel user, WorkspaceModel workspace)
+    private async Task<(UserModel user, WorkspaceModel workspace, ContractModel contract)> CreateUserWorkspaceAndContract()
     {
-        return await _sut.ContractCreate(new ContractCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
+        var (user, workspace) = await CreateUserAndWorkspace();
+        var contract = await _sut.ContractCreate(new ContractCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
+
+        return (user, workspace, contract);
     }
 
     public void Dispose()

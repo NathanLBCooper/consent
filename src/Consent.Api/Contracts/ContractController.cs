@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Contracts;
 using Consent.Domain;
@@ -21,11 +22,14 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private readonly LinkGenerator _linkGenerator;
     private readonly IContractRepository _contractRepository;
     private readonly IUserRepository _userRepository;
-    private readonly ContractCreateRequestModelValidator _validator = new();
+    private readonly ContractCreateRequestModelValidator _contractValidator = new();
+    private readonly ContractVersionCreateRequestModelValidator _contractVersionValidator = new();
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
-    public ContractController(ILogger<ContractController> logger, LinkGenerator linkGenerator, IContractRepository contractRepository, IUserRepository userRepository)
+    public ContractController(
+        ILogger<ContractController> logger, LinkGenerator linkGenerator,
+        IContractRepository contractRepository, IUserRepository userRepository)
     {
         _logger = logger;
         _linkGenerator = linkGenerator;
@@ -62,7 +66,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     [HttpPost("", Name = "CreateContract")]
     public async Task<ActionResult<ContractModel>> ContractCreate(ContractCreateRequestModel request, [FromHeader] int userId)
     {
-        var validationResult = _validator.Validate(request);
+        var validationResult = _contractValidator.Validate(request);
         if (!validationResult.IsValid)
         {
             return UnprocessableEntity(validationResult.ToString());
@@ -86,22 +90,72 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     }
 
     [HttpGet("{contractId}/version/{id}", Name = "GetContractVersion")]
-    public ActionResult<string> ContractVersionGet(int contractId, int id, [FromHeader] int userId)
+    public async Task<ActionResult<ContractVersionModel>> ContractVersionGet(int contractId, int id, [FromHeader] int userId)
     {
-        _ = contractId;
-        _ = id;
-        _ = userId;
-        return Problem();
+        var user = await _userRepository.Get(new UserId(userId));
+        if (user == null)
+        {
+            return Forbid();
+        }
+
+        var contract = await _contractRepository.Get(new ContractId(contractId));
+        if (contract == null)
+        {
+            return NotFound();
+        }
+
+        if (!UserHasPermissions(user, contract.WorkspaceId, WorkspacePermission.View))
+        {
+            return NotFound();
+        }
+
+        var versionId = new ContractVersionId(id);
+        var version = contract.Versions.SingleOrDefault(v => v.Id == versionId);
+
+        if (version == null)
+        {
+            return NotFound();
+        }
+
+        var model = version.ToModel(contract, Links);
+        return Ok(model);
     }
 
     [HttpPost("{contractId}/version", Name = "CreateContractVersion")]
-    public ActionResult<string> ContractVersionCreate(
-        [FromQuery] int contactId, ContractVersionCreateRequestModel request, [FromHeader] int userId)
+    public async Task<ActionResult<ContractVersionModel>> ContractVersionCreate(
+        [FromRoute] int contractId, ContractVersionCreateRequestModel request, [FromHeader] int userId)
     {
-        _ = contactId;
-        _ = request;
-        _ = userId;
-        return Problem();
+        var validationResult = _contractVersionValidator.Validate(request);
+        if (!validationResult.IsValid)
+        {
+            return UnprocessableEntity(validationResult.ToString());
+        }
+
+        var user = await _userRepository.Get(new UserId(userId));
+        if (user == null)
+        {
+            return Forbid();
+        }
+
+        var contract = await _contractRepository.Get(new ContractId(contractId));
+        if (contract == null)
+        {
+            return Forbid();
+        }
+
+        if (!UserHasPermissions(user, contract.WorkspaceId, WorkspacePermission.View))
+        {
+            return Forbid();
+        }
+
+        var created = new ContractVersion(
+            Guard.NotNull(request.Name), Guard.NotNull(request.Text), Array.Empty<Provision>()
+            );
+        contract.AddContractVersions(created);
+
+        await _contractRepository.Update(contract);
+
+        return Ok(created.ToModel(contract, Links));
     }
 
     private bool UserHasPermissions(User user, WorkspaceId workspaceId, WorkspacePermission requiredPermission)
