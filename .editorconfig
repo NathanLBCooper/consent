@@ -41,3 +41,5 @@ csharp_style_unused_value_assignment_preference = discard_variable:warning
 dotnet_code_quality_unused_parameters = all:warning
 # force brackets (eg on if statements)
 csharp_prefer_braces = true:warning
+# remove unnecessary using directives
+dotnet_diagnostic.IDE0005.severity = warning
