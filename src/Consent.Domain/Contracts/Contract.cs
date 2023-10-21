@@ -10,7 +10,7 @@ namespace Consent.Domain.Contracts;
  * A document that that is presented to a participant for their full or partial agreement
  */
 
-public class Contract
+public class Contract : IEntity<ContractId>
 {
     public ContractId? Id { get; init; }
 

@@ -1,10 +1,7 @@
-﻿using System.Threading.Tasks;
-using Consent.Domain.Users;
+﻿using Consent.Domain.Users;
 
 namespace Consent.Storage.Users;
 
-public interface IUserRepository
+public interface IUserRepository : IRepository<User, UserId>
 {
-    Task<User?> Get(UserId id);
-    Task<User> Create(User user);
 }

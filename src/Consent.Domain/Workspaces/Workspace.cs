@@ -10,7 +10,7 @@ namespace Consent.Domain.Workspaces;
  *  A container for collaborating on contracts, permissions etc
  */
 
-public class Workspace
+public class Workspace : IEntity<WorkspaceId>
 {
     public WorkspaceId? Id { get; init; }
 

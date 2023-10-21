@@ -1,11 +1,7 @@
-﻿using System.Threading.Tasks;
-using Consent.Domain.Contracts;
+﻿using Consent.Domain.Contracts;
 
 namespace Consent.Storage.Contracts;
 
-public interface IContractRepository
+public interface IContractRepository : IRepository<Contract, ContractId>
 {
-    Task<Contract?> Get(ContractId id);
-    Task<Contract> Create(Contract contract);
-    Task Update(Contract contract);
 }

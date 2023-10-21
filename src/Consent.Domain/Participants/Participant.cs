@@ -6,7 +6,7 @@ namespace Consent.Domain.Participants;
  *  A person who agrees to things
  */
 
-public class Participant
+public class Participant : IEntity<ParticipantId>
 {
     public ParticipantId? Id { get; init; }
 

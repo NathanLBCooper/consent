@@ -9,7 +9,7 @@ namespace Consent.Domain.Users;
  *  A user of the system who manages and sets up things
  */
 
-public class User
+public class User : IEntity<UserId>
 {
     public UserId? Id { get; init; }
 

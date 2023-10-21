@@ -1,39 +1,10 @@
-﻿using System.Threading.Tasks;
-using Consent.Domain.Contracts;
-using Microsoft.EntityFrameworkCore;
+﻿using Consent.Domain.Contracts;
 
 namespace Consent.Storage.Contracts;
 
-public class ContractRepository : IContractRepository
+public class ContractRepository : Repository<Contract, ContractId>, IContractRepository
 {
-    private readonly ContractDbContext _dbContext;
-
-    public ContractRepository(ContractDbContext dbContext)
+    public ContractRepository(ContractDbContext dbContext) : base(dbContext)
     {
-        _dbContext = dbContext;
-    }
-
-    public async Task<Contract> Create(Contract contract)
-    {
-        _ = await _dbContext.AddAsync(contract);
-        _ = await _dbContext.SaveChangesAsync();
-
-        return contract;
-    }
-
-    public async Task<Contract?> Get(ContractId id)
-    {
-        if (await _dbContext.Contracts.FindAsync(id) is Contract contract)
-        {
-            return contract;
-        }
-
-        return null;
-    }
-
-    public async Task Update(Contract contract)
-    {
-        _dbContext.Attach(contract).State = EntityState.Modified;
-        _ = await _dbContext.SaveChangesAsync();
     }
 }

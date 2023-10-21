@@ -7,7 +7,7 @@ namespace Consent.Domain.Permissions;
  *  A specific idea that can be agreed to
  */
 
-public class Permission
+public class Permission : IEntity<PermissionId>
 {
     public PermissionId? Id { get; init; }
     public WorkspaceId WorkspaceId { get; private init; }

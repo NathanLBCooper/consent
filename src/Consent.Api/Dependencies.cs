@@ -32,7 +32,7 @@ public static class Dependencies
         var contractDbContextOptions = Options<ContractDbContext>(sqlSettings);
         container.Register<ContractDbContext>(() => new ContractDbContext(contractDbContextOptions), Lifestyle.Scoped);
 
-        RegisterByConvention(typeof(UserRepository).Assembly, container, t => t.Name.EndsWith("Repository"));
+        RegisterByConvention(typeof(UserRepository).Assembly, container, t => t.Name.EndsWith("Repository"), true);
     }
 
     private static DbContextOptions<TDbContext> Options<TDbContext>(SqlSettings sqlSettings) where TDbContext : DbContext
@@ -42,13 +42,20 @@ public static class Dependencies
             .Options;
     }
 
-    private static void RegisterByConvention(Assembly assembly, Container container, Func<Type, bool> condition)
+    private static void RegisterByConvention(Assembly assembly, Container container,
+        Func<Type, bool> condition, bool onlyMatchingNames)
     {
-        var registrations =
-            from type in assembly.GetExportedTypes()
-            where condition(type)
-            from service in type.GetInterfaces()
-            select new { service, implementation = type };
+        var registrations = assembly
+                            .GetExportedTypes()
+                            .Where(t => !t.IsInterface)
+                            .Where(condition)
+                            .SelectMany(t => t.GetInterfaces(), (implementation, service) => new { service, implementation });
+
+        if (onlyMatchingNames)
+        {
+            // "IFoo" and "Foo" are examples of matching names
+            registrations = registrations.Where(p => p.implementation.Name == p.service.Name[1..]);
+        }
 
         foreach (var reg in registrations)
         {
