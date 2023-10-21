@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
+using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
@@ -19,7 +20,8 @@ public class UserControllerTest : IDisposable
 
     public UserControllerTest(DatabaseFixture fixture)
     {
-        var factory = new TestWebApplicationFactory(new InMemoryConfigurationBuilder() { SqlSettings = fixture.SqlSettings }.Build());
+        var factory = new TestWebApplicationFactory(
+            new InMemoryConfigurationBuilder() { SqlSettings = fixture.SqlSettings }.Build());
         _client = factory.CreateClient();
         _sut = RestService.For<IUserEndpoint>(_client);
         _workspaceEndpoint = RestService.For<IWorkspaceEndpoint>(_client);
@@ -30,14 +32,18 @@ public class UserControllerTest : IDisposable
     {
         var request = new UserCreateRequestModelBuilder().Build();
 
+        void Verify(UserModel model)
+        {
+            model.Name.ShouldBe(request.Name);
+            model.WorkspaceMemberships.ShouldBeEmpty();
+        }
+
         var created = await _sut.UserCreate(request);
-        created.Name.ShouldBe(request.Name);
+        Verify(created);
 
         var fetched = await _sut.UserGet(created.Id);
-        _ = fetched.ShouldNotBeNull();
-
         fetched.Id.ShouldBe(created.Id);
-        fetched.Name.ShouldBe(created.Name);
+        Verify(fetched);
     }
 
     [Fact]
@@ -52,7 +58,9 @@ public class UserControllerTest : IDisposable
         membership.Workspace.Id.ShouldBe(workspace.Id);
         membership.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
         membership.Permissions.ShouldBeEquivalentTo(
-            new[] { WorkspacePermissionModel.View, WorkspacePermissionModel.Edit, WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
+            new[] {
+                WorkspacePermissionModel.View, WorkspacePermissionModel.Edit,
+                WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
             );
     }
 
