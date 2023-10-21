@@ -32,7 +32,7 @@ internal class ConsentLinkGenerator
         return _linkGenerator.GetPathByAction(_httpContext,
                     action: nameof(ContractController.ContractGet),
                     controller: "contract",
-                    values: new { Id = contractId }
+                    values: new { Id = contractId.Value }
                     );
     }
 
@@ -41,7 +41,7 @@ internal class ConsentLinkGenerator
         return _linkGenerator.GetPathByAction(_httpContext,
             action: nameof(ContractController.ContractVersionGet),
             controller: "contract",
-            values: new { ContractId = contractId, Id = contractVersionId.Value }
+            values: new { ContractId = contractId.Value, Id = contractVersionId.Value }
             );
     }
 }

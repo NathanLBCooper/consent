@@ -35,41 +35,43 @@ public class ContractControllerTest : IDisposable
         var (user, workspace) = await CreateUserAndWorkspace();
         var request = new ContractCreateRequestModelBuilder(workspace.Id).Build();
 
+        void Verify(ContractModel model)
+        {
+            model.Name.ShouldBe(request.Name);
+            model.Workspace.Id.ShouldBe(workspace.Id);
+            model.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
+            model.Versions.ShouldBeEmpty();
+        }
+
         var created = await _sut.ContractCreate(request, user.Id);
-
-        _ = created.ShouldNotBeNull();
-        created.Name.ShouldBe(request.Name);
-        created.Workspace.Id.ShouldBe(workspace.Id);
-
+        Verify(created);
 
         var fetched = await _sut.ContractGet(created.Id, user.Id);
-
-        _ = fetched.ShouldNotBeNull();
-        fetched.Name.ShouldBe(request.Name);
-        fetched.Workspace.Id.ShouldBe(workspace.Id);
+        fetched.Id.ShouldBe(created.Id);
+        Verify(fetched);
     }
 
     [Fact]
     public async Task Can_create_and_get_a_contract_version()
     {
         var (user, _, contract) = await CreateUserWorkspaceAndContract();
-
         var request = new ContractVersionCreateRequestModelBuilder().Build();
 
-        var created = await _sut.ContractVersionCreate(contract.Id, request, user.Id);
+        void Verify(ContractVersionModel model)
+        {
+            model.Contract.Id.ShouldBe(contract.Id);
+            model.Contract.Href.ShouldBe($"/Contract/{contract.Id}");
+            model.Name.ShouldBe(model.Name);
+            model.Text.ShouldBe(model.Text);
+            model.Status.ShouldBe(ContractVersionStatusModel.Draft);
+        }
 
-        _ = created.ShouldNotBeNull();
-        created.Contract.Id.ShouldBe(contract.Id);
-        created.Name.ShouldBe(request.Name);
-        created.Text.ShouldBe(request.Text);
-        created.Status.ShouldBe(ContractVersionStatusModel.Draft);
+        var created = await _sut.ContractVersionCreate(contract.Id, request, user.Id);
+        Verify(created);
 
         var fetched = await _sut.ContractVersionGet(contract.Id, created.Id, user.Id);
-        _ = fetched.ShouldNotBeNull();
-        fetched.Contract.Id.ShouldBe(contract.Id);
-        fetched.Name.ShouldBe(request.Name);
-        fetched.Text.ShouldBe(request.Text);
-        fetched.Status.ShouldBe(ContractVersionStatusModel.Draft);
+        fetched.Id.ShouldBe(created.Id);
+        Verify(fetched);
     }
 
     private async Task<(UserModel user, WorkspaceModel workspace)> CreateUserAndWorkspace()
