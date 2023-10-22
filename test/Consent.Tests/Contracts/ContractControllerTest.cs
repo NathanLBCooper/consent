@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
@@ -32,7 +33,8 @@ public class ContractControllerTest : IDisposable
     [Fact]
     public async Task Can_create_and_get_a_contract()
     {
-        var (user, workspace) = await CreateUserAndWorkspace();
+        var user = await CreateUser();
+        var workspace = await CreateWorkspace(user);
         var request = new ContractCreateRequestModelBuilder(workspace.Id).Build();
 
         void Verify(ContractModel model)
@@ -54,7 +56,8 @@ public class ContractControllerTest : IDisposable
     [Fact]
     public async Task Can_create_and_get_a_contract_version()
     {
-        var (user, _, contract) = await CreateUserWorkspaceAndContract();
+        var user = await CreateUser();
+        var contract = await CreateContact(await CreateWorkspace(user), user);
         var request = new ContractVersionCreateRequestModelBuilder().Build();
 
         void Verify(ContractVersionModel model)
@@ -64,6 +67,7 @@ public class ContractControllerTest : IDisposable
             model.Name.ShouldBe(model.Name);
             model.Text.ShouldBe(model.Text);
             model.Status.ShouldBe(ContractVersionStatusModel.Draft);
+            model.Provisions.ShouldBeEmpty();
         }
 
         var created = await _sut.ContractVersionCreate(contract.Id, request, user.Id);
@@ -74,24 +78,52 @@ public class ContractControllerTest : IDisposable
         Verify(fetched);
     }
 
-    private async Task<(UserModel user, WorkspaceModel workspace)> CreateUserAndWorkspace()
+    [Fact]
+    public async Task Can_create_a_provision()
     {
-        var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
+        var user = await CreateUser();
+        var contract = await CreateContact(await CreateWorkspace(user), user);
+        var version = await CreateVersion(contract, user);
+        var request = new ProvisionCreateRequestModelBuilder().Build();
 
-        var workspace = await _workspaceEndpoint.WorkspaceCreate(
+        void Verify(ProvisionModel model)
+        {
+            model.Text.ShouldBe(request.Text);
+            model.Permissions.ShouldBeEmpty();
+            model.Version.Id.ShouldBe(version.Id);
+            model.Version.Href.ShouldBe($"/Contract/{contract.Id}/version/{version.Id}");
+        }
+
+        var created = await _sut.ProvisionCreate(contract.Id, version.Id, request, user.Id);
+        Verify(created);
+
+        var fetchedVersion = await _sut.ContractVersionGet(contract.Id, created.Id, user.Id);
+        var fetched = fetchedVersion.Provisions.Single(p => p.Id == created.Id);
+        Verify(fetched);
+    }
+
+    private async Task<UserModel> CreateUser()
+    {
+        return await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
+    }
+
+    private async Task<WorkspaceModel> CreateWorkspace(UserModel user)
+    {
+        return await _workspaceEndpoint.WorkspaceCreate(
             request: new WorkspaceCreateRequestModelBuilder().Build(),
             userId: user.Id
             );
-
-        return (user, workspace);
     }
 
-    private async Task<(UserModel user, WorkspaceModel workspace, ContractModel contract)> CreateUserWorkspaceAndContract()
+    private async Task<ContractModel> CreateContact(WorkspaceModel workspace, UserModel user)
     {
-        var (user, workspace) = await CreateUserAndWorkspace();
-        var contract = await _sut.ContractCreate(new ContractCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
+        return await _sut.ContractCreate(new ContractCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
+    }
 
-        return (user, workspace, contract);
+    private async Task<ContractVersionModel> CreateVersion(ContractModel contract, UserModel user)
+    {
+        return await _sut.ContractVersionCreate(
+            contract.Id, new ContractVersionCreateRequestModelBuilder().Build(), user.Id);
     }
 
     public void Dispose()

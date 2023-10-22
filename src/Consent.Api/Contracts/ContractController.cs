@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Consent.Api.Client.Models.Contracts;
 using Consent.Domain;
 using Consent.Domain.Contracts;
+using Consent.Domain.Permissions;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Consent.Storage.Contracts;
@@ -24,6 +25,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private readonly IUserRepository _userRepository;
     private readonly ContractCreateRequestModelValidator _contractValidator = new();
     private readonly ContractVersionCreateRequestModelValidator _contractVersionValidator = new();
+    private readonly ProvisionCreateRequestModelValidator _provisionValidator = new();
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
@@ -158,6 +160,48 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         return Ok(created.ToModel(contract, Links));
     }
 
+    [HttpPost("{contractId}/version/{versionId}/provision", Name = "CreateProvision")]
+    public async Task<ActionResult<ProvisionModel>> ProvisionCreate(
+        [FromRoute] int contractId, [FromRoute] int versionId, ProvisionCreateRequestModel request, [FromHeader] int userId)
+    {
+        var validationResult = _provisionValidator.Validate(request);
+        if (!validationResult.IsValid)
+        {
+            return UnprocessableEntity(validationResult.ToString());
+        }
+
+        var user = await _userRepository.Get(new UserId(userId));
+        if (user == null)
+        {
+            return Forbid();
+        }
+
+        var contract = await _contractRepository.Get(new ContractId(contractId));
+        if (contract == null)
+        {
+            return NotFound();
+        }
+
+        if (!UserHasPermissions(user, contract.WorkspaceId, WorkspacePermission.View))
+        {
+            return NotFound();
+        }
+
+        var versionIdent = new ContractVersionId(versionId);
+        var version = contract.Versions.SingleOrDefault(v => v.Id == versionIdent);
+        if (version == null)
+        {
+            return NotFound();
+        }
+
+        var created = new Provision(Guard.NotNull(request.Text), Array.Empty<PermissionId>());
+        version.AddProvisions(created);
+
+        await _contractRepository.Update(contract);
+
+        return Ok(created.ToModel(version, contract, Links));
+    }
+
     private bool UserHasPermissions(User user, WorkspaceId workspaceId, WorkspacePermission requiredPermission)
     {
         var membership = user.WorkspaceMemberships.SingleOrDefault(m => m.WorkspaceId == workspaceId);
@@ -169,4 +213,3 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         return true;
     }
 }
-

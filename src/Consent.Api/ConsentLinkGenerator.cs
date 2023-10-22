@@ -1,6 +1,7 @@
 ﻿using Consent.Api.Contracts;
 using Consent.Api.Workspaces;
 using Consent.Domain.Contracts;
+using Consent.Domain.Permissions;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -43,5 +44,11 @@ internal class ConsentLinkGenerator
             controller: "contract",
             values: new { ContractId = contractId.Value, Id = contractVersionId.Value }
             );
+    }
+
+    public string? GetPermission(PermissionId permissionId)
+    {
+        _ = permissionId;
+        return null;
     }
 }

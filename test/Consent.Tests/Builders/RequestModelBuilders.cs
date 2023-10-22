@@ -34,3 +34,11 @@ public record ContractVersionCreateRequestModelBuilder(string Name = "contractve
         return new(Name, Text);
     }
 }
+
+public record ProvisionCreateRequestModelBuilder(string Text = "provisiontext")
+{
+    public ProvisionCreateRequestModel Build()
+    {
+        return new(Text);
+    }
+}
