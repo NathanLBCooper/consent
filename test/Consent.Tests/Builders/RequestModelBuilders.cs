@@ -1,4 +1,5 @@
-﻿using Consent.Api.Client.Models.Contracts;
+﻿using System;
+using Consent.Api.Client.Models.Contracts;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 
@@ -35,10 +36,10 @@ public record ContractVersionCreateRequestModelBuilder(string Name = "contractve
     }
 }
 
-public record ProvisionCreateRequestModelBuilder(string Text = "provisiontext")
+public record ProvisionCreateRequestModelBuilder(int[] Permissions, string Text = "provisiontext")
 {
     public ProvisionCreateRequestModel Build()
     {
-        return new(Text);
+        return new(Text, Permissions ?? Array.Empty<int>());
     }
 }

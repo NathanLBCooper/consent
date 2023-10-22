@@ -84,12 +84,15 @@ public class ContractControllerTest : IDisposable
         var user = await CreateUser();
         var contract = await CreateContact(await CreateWorkspace(user), user);
         var version = await CreateVersion(contract, user);
-        var request = new ProvisionCreateRequestModelBuilder().Build();
+        var permissionId = 1; // todo, doesn't validate existance
+        var request = new ProvisionCreateRequestModelBuilder(new[] { permissionId }).Build();
 
         void Verify(ProvisionModel model)
         {
             model.Text.ShouldBe(request.Text);
-            model.Permissions.ShouldBeEmpty();
+            var permission = model.Permissions.ShouldHaveSingleItem();
+            permission.Id.ShouldBe(permissionId);
+            permission.Href.ShouldBe(null); // todo, no controller
             model.Version.Id.ShouldBe(version.Id);
             model.Version.Href.ShouldBe($"/Contract/{contract.Id}/version/{version.Id}");
         }

@@ -9,5 +9,6 @@ public class ProvisionCreateRequestModelValidator : AbstractValidator<ProvisionC
     {
         _ = RuleFor(q => q).NotEmpty();
         _ = RuleFor(q => q.Text).NotNull().NotEmpty();
+        _ = RuleFor(q => q.PermissionIds).NotNull();
     }
 }

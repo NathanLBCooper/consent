@@ -194,7 +194,9 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
             return NotFound();
         }
 
-        var created = new Provision(Guard.NotNull(request.Text), Array.Empty<PermissionId>());
+        var permissionIds = Guard.NotNull(request.PermissionIds).Select(pid => new PermissionId(pid));
+        // todo validate permissions actually exist
+        var created = new Provision(Guard.NotNull(request.Text), permissionIds);
         version.AddProvisions(created);
 
         await _contractRepository.Update(contract);
