@@ -32,7 +32,12 @@ internal record ContractVersionBuilder
 internal record ProvisionBuilder
 {
     public string Text { get; init; } = "my provision";
-    public PermissionId[] PermissionIds = Array.Empty<PermissionId>();
+    public PermissionId[] PermissionIds;
+
+    public ProvisionBuilder(params PermissionId[] permissionIds)
+    {
+        PermissionIds = permissionIds;
+    }
 
     public Provision Build()
     {

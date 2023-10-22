@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
@@ -103,6 +104,20 @@ public class ContractControllerTest : IDisposable
         var fetchedVersion = await _sut.ContractVersionGet(contract.Id, created.Id, user.Id);
         var fetched = fetchedVersion.Provisions.Single(p => p.Id == created.Id);
         Verify(fetched);
+    }
+
+    [Fact]
+    public async Task Cannot_create_a_provision_without_any_permissions()
+    {
+        var user = await CreateUser();
+        var contract = await CreateContact(await CreateWorkspace(user), user);
+        var version = await CreateVersion(contract, user);
+        var request = new ProvisionCreateRequestModelBuilder(Array.Empty<int>()).Build();
+
+        var createProvision = async () => await _sut.ProvisionCreate(contract.Id, version.Id, request, user.Id);
+
+        var error = await createProvision.ShouldThrowAsync<ApiException>();
+        ((int)error.StatusCode).ShouldBe((int)HttpStatusCode.UnprocessableEntity);
     }
 
     private async Task<UserModel> CreateUser()

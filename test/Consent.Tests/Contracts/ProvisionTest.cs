@@ -15,7 +15,7 @@ public class ProvisionTest
     [InlineData("  ")]
     public void Cannot_create_provision_with_empty_name(string text)
     {
-        var ctor = () => new Provision(text, Array.Empty<PermissionId>());
+        var ctor = () => new Provision(text, new[] { new PermissionId(1001) });
         _ = ctor.ShouldThrow<ArgumentException>();
     }
 
@@ -45,10 +45,10 @@ public class ProvisionTest
     }
 
     [Fact]
-    public void Foo()
+    public void Provision_can_only_be_attached_to_one_version_once()
     {
         var version = new ContractVersionBuilder().Build();
-        var provison = new Provision("text", Array.Empty<PermissionId>());
+        var provison = new Provision("text", new[] { new PermissionId(1002) });
 
         // Calling this not from the version is wrong and doesn't actually add to contract. Use domain event or something?
         provison.OnAddedToVersion(version);
@@ -59,5 +59,12 @@ public class ProvisionTest
         var changeAttached = () => provison.OnAddedToVersion(new ContractVersionBuilder().Build());
         _ = changeAttached.ShouldThrow<InvalidOperationException>();
 
+    }
+
+    [Fact]
+    public void Permissions_must_not_be_empty()
+    {
+        var ctor = () => new Provision("text", Array.Empty<PermissionId>());
+        _ = ctor.ShouldThrow<ArgumentException>();
     }
 }

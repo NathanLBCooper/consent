@@ -33,7 +33,21 @@ public class Provision
         }
     }
 
-    public ImmutableList<PermissionId> PermissionIds { get; private set; }
+    private ImmutableList<PermissionId> _permissionIds;
+    public ImmutableList<PermissionId> PermissionIds
+    {
+        get => _permissionIds;
+        [MemberNotNull(nameof(_permissionIds))]
+        private set
+        {
+            if (value.IsEmpty)
+            {
+                throw new ArgumentException("Cannot be empty", nameof(PermissionIds));
+            }
+
+            _permissionIds = value;
+        }
+    }
 
     public Provision(string text, IEnumerable<PermissionId> permissionIds)
     {
@@ -41,8 +55,10 @@ public class Provision
         PermissionIds = permissionIds.ToImmutableList();
     }
 
-    private Provision(string text) : this(text, Array.Empty<PermissionId>())
+    private Provision(string text)
     {
+        Text = text;
+        _permissionIds = ImmutableList.Create<PermissionId>();
     }
 
     public void OnAddedToVersion(ContractVersion version)

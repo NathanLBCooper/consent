@@ -13,10 +13,7 @@ public class ContractsTest
     public void Can_create_and_edit_contract()
     {
         var permissions = new[] { new PermissionId(1) };
-        var provision = new ProvisionBuilder()
-        {
-            PermissionIds = permissions
-        }.Build();
+        var provision = new ProvisionBuilder(permissions).Build();
         var version = new ContractVersionBuilder()
         {
             Provisions = new[] { provision },
@@ -43,10 +40,7 @@ public class ContractsTest
     public void Can_create_contract_and_set_version_to_active()
     {
         var permissions = new[] { new PermissionId(1) };
-        var provision = new ProvisionBuilder()
-        {
-            PermissionIds = permissions
-        }.Build();
+        var provision = new ProvisionBuilder(permissions).Build();
         var version = new ContractVersionBuilder()
         {
             Provisions = new[] { provision },
