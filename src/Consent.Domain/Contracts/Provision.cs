@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using Consent.Domain.Core;
 using Consent.Domain.Permissions;
 
 namespace Consent.Domain.Contracts;

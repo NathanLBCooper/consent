@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Consent.Api.Client.Models.Workspaces;
-using Consent.Domain;
+using Consent.Domain.Core;
 using Consent.Domain.Workspaces;
 
 namespace Consent.Api.Workspaces;

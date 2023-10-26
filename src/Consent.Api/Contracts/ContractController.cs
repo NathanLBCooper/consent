@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Contracts;
-using Consent.Domain;
 using Consent.Domain.Contracts;
+using Consent.Domain.Core;
 using Consent.Domain.Permissions;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;

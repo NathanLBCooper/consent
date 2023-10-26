@@ -1,4 +1,5 @@
 ﻿using System;
+using Consent.Domain.Core;
 using Consent.Domain.Workspaces;
 
 namespace Consent.Domain.Permissions;

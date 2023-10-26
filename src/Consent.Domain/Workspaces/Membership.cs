@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Consent.Domain.Core;
 using Consent.Domain.Users;
 
 namespace Consent.Domain.Workspaces;

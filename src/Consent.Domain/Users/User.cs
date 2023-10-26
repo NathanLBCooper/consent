@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Consent.Domain.Core;
 
 namespace Consent.Domain.Users;
 

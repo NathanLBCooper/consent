@@ -3,7 +3,7 @@ using Consent.Api.Client.Models;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Users;
 using Consent.Api.Workspaces;
-using Consent.Domain;
+using Consent.Domain.Core;
 using Consent.Domain.Users;
 
 namespace Consent.Api.Users;

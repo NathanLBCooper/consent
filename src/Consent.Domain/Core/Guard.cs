@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace Consent.Domain;
+namespace Consent.Domain.Core;
 
 public static class Guard
 {

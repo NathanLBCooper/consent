@@ -7,6 +7,10 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Core\" />
+  </ItemGroup>
+
   <Target Name="FormatCode" BeforeTargets="PreBuildEvent">
     <Exec Command="dotnet format --severity warn --verbosity normal" />
   </Target>

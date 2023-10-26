@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Consent.Domain;
+using Consent.Domain.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace Consent.Storage;

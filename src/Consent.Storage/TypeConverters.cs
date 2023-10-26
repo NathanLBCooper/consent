@@ -1,5 +1,5 @@
-﻿using Consent.Domain;
-using Consent.Domain.Contracts;
+﻿using Consent.Domain.Contracts;
+using Consent.Domain.Core;
 using Consent.Domain.Participants;
 using Consent.Domain.Permissions;
 using Consent.Domain.Users;

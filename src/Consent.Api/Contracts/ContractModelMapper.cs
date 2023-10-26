@@ -2,8 +2,8 @@
 using System.Linq;
 using Consent.Api.Client.Models;
 using Consent.Api.Client.Models.Contracts;
-using Consent.Domain;
 using Consent.Domain.Contracts;
+using Consent.Domain.Core;
 
 namespace Consent.Api.Contracts;
 

@@ -1,4 +1,4 @@
-﻿namespace Consent.Domain;
+﻿namespace Consent.Domain.Core;
 
 public interface IIdentifier
 {

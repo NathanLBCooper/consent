@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Workspaces;
-using Consent.Domain;
+using Consent.Domain.Core;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Consent.Storage.Users;
