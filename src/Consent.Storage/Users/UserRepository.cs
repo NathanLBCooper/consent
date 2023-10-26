@@ -1,4 +1,5 @@
-﻿using Consent.Domain.Users;
+﻿using Consent.Application.Users;
+using Consent.Domain.Users;
 
 namespace Consent.Storage.Users;
 

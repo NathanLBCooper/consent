@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Consent.Application.Users;
 using Consent.Storage;
 using Consent.Storage.Contracts;
 using Consent.Storage.Users;
@@ -33,6 +34,8 @@ public static class Dependencies
         container.Register<ContractDbContext>(() => new ContractDbContext(contractDbContextOptions), Lifestyle.Scoped);
 
         RegisterByConvention(typeof(UserRepository).Assembly, container, t => t.Name.EndsWith("Repository"), true);
+        RegisterByConvention(typeof(UserGetQueryHandler).Assembly, container, t => t.Name.EndsWith("QueryHandler"), true);
+        RegisterByConvention(typeof(UserCreateCommandHandler).Assembly, container, t => t.Name.EndsWith("CommandHandler"), true);
     }
 
     private static DbContextOptions<TDbContext> Options<TDbContext>(SqlSettings sqlSettings) where TDbContext : DbContext

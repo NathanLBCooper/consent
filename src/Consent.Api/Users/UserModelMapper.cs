@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Consent.Api.Client.Models;
 using Consent.Api.Client.Models.Users;
-using Consent.Api.Users;
 using Consent.Api.Workspaces;
 using Consent.Domain.Core;
 using Consent.Domain.Users;

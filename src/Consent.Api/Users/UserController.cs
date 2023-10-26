@@ -1,11 +1,11 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Users;
+using Consent.Application.Users;
 using Consent.Domain.Core;
 using Consent.Domain.Users;
-using Consent.Storage.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 
 namespace Consent.Api.Users;
 
@@ -13,45 +13,44 @@ namespace Consent.Api.Users;
 [Route("[controller]")]
 public class UserController : ControllerBase // [FromHeader] int userId is honestly based auth
 {
-    private readonly ILogger<UserController> _logger;
     private readonly LinkGenerator _linkGenerator;
-    private readonly IUserRepository _userRepository;
-    private readonly UserCreateRequestModelValidator _validator = new();
+    private readonly IUserGetQueryHandler _get;
+    private readonly IUserCreateCommandHandler _create;
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
-    public UserController(ILogger<UserController> logger, LinkGenerator linkGenerator, IUserRepository userRepository)
+    public UserController(LinkGenerator linkGenerator, IUserGetQueryHandler get, IUserCreateCommandHandler create)
     {
-        _logger = logger;
         _linkGenerator = linkGenerator;
-        _userRepository = userRepository;
+        _get = get;
+        _create = create;
     }
 
     [HttpGet("", Name = "GetUser")]
-    public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId)
+    public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.Get(new UserId(userId));
-        if (user == null)
-        {
-            return NotFound();
-        }
+        var command = new UserGetQuery(new UserId(userId));
+        var maybe = await _get.Handle(command, cancellationToken);
 
-        var model = user.ToModel(Links);
-        return Ok(model);
+        var response = maybe.Match<User, ActionResult<UserModel>>(
+            user => Ok(user.ToModel(Links)),
+            () => NotFound()
+        );
+
+        return response;
     }
 
     [HttpPost("", Name = "CreateUser")]
-    public async Task<ActionResult<UserModel>> UserCreate(UserCreateRequestModel request)
+    public async Task<ActionResult<UserModel>> UserCreate(UserCreateRequestModel request, CancellationToken cancellationToken)
     {
-        var validationResult = _validator.Validate(request);
-        if (!validationResult.IsValid)
-        {
-            return UnprocessableEntity(validationResult.ToString());
-        }
+        var command = new UserCreateCommand(request.Name);
+        var result = await _create.Handle(command, cancellationToken);
 
-        var created = await _userRepository.Create(new User(Guard.NotNull(request.Name)));
+        var response = result.Match(
+            user => Ok(user.ToModel(Links)),
+            error => error.ToErrorResponse<UserModel>(this)
+            );
 
-        var model = created.ToModel(Links);
-        return Ok(model);
+        return response;
     }
 }

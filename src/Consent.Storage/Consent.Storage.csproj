@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Consent.Domain\Consent.Domain.csproj" />
+    <ProjectReference Include="..\Consent.Application\Consent.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Workspaces;
+using Consent.Application.Users;
 using Consent.Domain.Core;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
-using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

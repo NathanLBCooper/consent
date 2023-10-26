@@ -11,4 +11,12 @@
     <Exec Command="dotnet format --severity warn --verbosity normal" />
   </Target>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Consent.Domain\Consent.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

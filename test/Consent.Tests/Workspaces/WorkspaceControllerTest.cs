@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Workspaces;
-using Consent.Domain;
+using Consent.Domain.Core;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
 using Refit;

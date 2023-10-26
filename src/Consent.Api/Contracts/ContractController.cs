@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Contracts;
+using Consent.Application.Users;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Permissions;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Consent.Storage.Contracts;
-using Consent.Storage.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
