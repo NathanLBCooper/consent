@@ -67,6 +67,11 @@ public class Workspace : IEntity<WorkspaceId>
         _memberships = new List<Membership>();
     }
 
+    public bool UserCanView(UserId userId)
+    {
+        return Memberships.SingleOrDefault(m => m.UserId == userId)?.CanView ?? false;
+    }
+
     public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)
     {
         return Memberships.SingleOrDefault(m => m.UserId == userId)?.Permissions

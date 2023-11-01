@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Consent.Domain.Core;
@@ -25,8 +24,7 @@ public class WorkspaceGetQueryHandler : IWorkspaceGetQueryHandler
             return Maybe<Workspace>.None;
         }
 
-        var userHasPermission = workspace.GetUserPermissions(query.RequestedBy).Contains(WorkspacePermission.View);
-        if (!userHasPermission)
+        if (!workspace.UserCanView(query.RequestedBy))
         {
             return Maybe<Workspace>.None;
         }
