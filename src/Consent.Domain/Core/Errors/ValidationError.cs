@@ -1,6 +1,4 @@
-using Consent.Domain.Core;
-
-namespace Consent.Application;
+namespace Consent.Domain.Core.Errors;
 
 public record ValidationError : Error
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using Consent.Domain.Core.Errors;
 
 namespace Consent.Domain.Core;
 

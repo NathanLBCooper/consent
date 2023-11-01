@@ -1,13 +1,12 @@
-﻿using System.Linq;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Workspaces;
-using Consent.Application.Users;
+using Consent.Application.Workspaces;
 using Consent.Domain.Core;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
-using Consent.Storage.Workspaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Routing;
 
 namespace Consent.Api.Workspaces;
 
@@ -15,51 +14,34 @@ namespace Consent.Api.Workspaces;
 [Route("[controller]")]
 public class WorkspaceController : ControllerBase // [FromHeader] int userId is honestly based auth
 {
-    private readonly ILogger<WorkspaceController> _logger;
-    private readonly IWorkspaceRepository _workspaceRepository;
-    private readonly IUserRepository _userRepository;
-    private readonly WorkspaceCreateRequestModelValidator _workspaceCreateRequestModelValidator = new();
+    private readonly IWorkspaceGetQueryHandler _get;
+    private readonly IWorkspaceCreateCommandHandler _create;
 
-    public WorkspaceController(ILogger<WorkspaceController> logger,
-        IWorkspaceRepository workspaceRepository, IUserRepository userRepository)
+    public WorkspaceController(IWorkspaceGetQueryHandler get, IWorkspaceCreateCommandHandler create)
     {
-        _logger = logger;
-        _workspaceRepository = workspaceRepository;
-        _userRepository = userRepository;
+        _get = get;
+        _create = create;
     }
 
     [HttpGet("{id}", Name = "GetWorkspace")]
-    public async Task<ActionResult<WorkspaceModel>> WorkspaceGet(int id, [FromHeader] int userId)
+    public async Task<ActionResult<WorkspaceModel>> WorkspaceGet(int id, [FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var workspaceId = new WorkspaceId(id);
-        var userIdentity = new UserId(userId);
-
-        var workspace = await _workspaceRepository.Get(workspaceId);
-        if (workspace == null || !workspace.GetUserPermissions(userIdentity).Contains(WorkspacePermission.View))
-        {
-            return NotFound();
-        }
-
-        return Ok(workspace.ToModel());
+        var query = new WorkspaceGetQuery(new WorkspaceId(id), new UserId(userId));
+        var maybe = await _get.Handle(query, cancellationToken);
+        return maybe.Match<Workspace, ActionResult<WorkspaceModel>>(
+            workspace => Ok(workspace.ToModel()),
+            () => NotFound()
+            );
     }
 
     [HttpPost("", Name = "CreateWorkspace")]
-    public async Task<ActionResult<WorkspaceModel>> WorkspaceCreate(WorkspaceCreateRequestModel request, [FromHeader] int userId)
+    public async Task<ActionResult<WorkspaceModel>> WorkspaceCreate(WorkspaceCreateRequestModel request, [FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var validationResult = _workspaceCreateRequestModelValidator.Validate(request);
-        if (!validationResult.IsValid)
-        {
-            return UnprocessableEntity(validationResult.ToString());
-        }
-
-        var user = await _userRepository.Get(new UserId(userId));
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-
-        var entity = await _workspaceRepository.Create(new Workspace(Guard.NotNull(request.Name), user.Id!.Value));
-
-        return Ok(entity.ToModel());
+        var command = new WorkspaceCreateCommand(request.Name, new UserId(userId));
+        var result = await _create.Handle(command, cancellationToken);
+        return result.Match(
+            workspace => Ok(workspace.ToModel()),
+            error => error.ToErrorResponse<WorkspaceModel>(this)
+            );
     }
 }

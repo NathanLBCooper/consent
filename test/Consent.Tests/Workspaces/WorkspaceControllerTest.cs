@@ -66,7 +66,7 @@ public class WorkspaceControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_create_workspace_with_nonexistant_userAsync()
+    public async Task Cannot_create_workspace_with_nonexistant_user()
     {
         var request = new WorkspaceCreateRequestModelBuilder().Build();
 

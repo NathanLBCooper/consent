@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Consent.Domain.Core;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Users;
 
 namespace Consent.Application.Users;

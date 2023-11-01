@@ -1,4 +1,5 @@
 ﻿using System;
+using Consent.Domain.Core.Errors;
 
 namespace Consent.Domain.Core;
 

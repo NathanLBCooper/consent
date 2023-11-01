@@ -1,5 +1,4 @@
-﻿using Consent.Application;
-using Consent.Domain.Core;
+﻿using Consent.Domain.Core.Errors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Consent.Api;
@@ -10,8 +9,9 @@ internal static class ErrorResponseMapper
     {
         return error switch
         {
-            ValidationError => controller.UnprocessableEntity(error.ToString()),
-            _ => controller.BadRequest(error.ToString()),
+            ValidationError => error.Message != null ? controller.UnprocessableEntity(error.Message) : controller.UnprocessableEntity(),
+            UnauthorizedError => error.Message != null ? controller.Unauthorized(error.Message) : controller.Unauthorized(),
+            _ => error.Message != null ? controller.BadRequest(error.Message) : controller.BadRequest()
         };
     }
 }

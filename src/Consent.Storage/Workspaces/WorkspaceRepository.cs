@@ -1,4 +1,5 @@
-﻿using Consent.Domain.Workspaces;
+﻿using Consent.Application.Workspaces;
+using Consent.Domain.Workspaces;
 
 namespace Consent.Storage.Workspaces;
 
