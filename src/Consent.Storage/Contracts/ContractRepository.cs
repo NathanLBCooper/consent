@@ -1,4 +1,5 @@
-﻿using Consent.Domain.Contracts;
+﻿using Consent.Application.Contracts;
+using Consent.Domain.Contracts;
 
 namespace Consent.Storage.Contracts;
 

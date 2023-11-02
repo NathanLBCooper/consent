@@ -1,6 +1,6 @@
 ﻿using Consent.Domain.Contracts;
 
-namespace Consent.Storage.Contracts;
+namespace Consent.Application.Contracts;
 
 public interface IContractRepository : IRepository<Contract, ContractId>
 {

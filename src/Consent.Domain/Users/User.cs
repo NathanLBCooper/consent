@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Consent.Domain.Core;
+using Consent.Domain.Workspaces;
 
 namespace Consent.Domain.Users;
 
@@ -42,6 +43,11 @@ public class User : IEntity<UserId>
 
     public User(string name) : this(name, Array.Empty<WorkspaceMembership>())
     {
+    }
+
+    public bool CanViewWorkspace(WorkspaceId workspaceId)
+    {
+        return WorkspaceMemberships.SingleOrDefault(m => m.WorkspaceId == workspaceId)?.CanView ?? false;
     }
 }
 

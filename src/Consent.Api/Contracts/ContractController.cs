@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Contracts;
+using Consent.Application.Contracts;
 using Consent.Application.Users;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Permissions;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
-using Consent.Storage.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -26,43 +27,31 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private readonly ContractCreateRequestModelValidator _contractValidator = new();
     private readonly ContractVersionCreateRequestModelValidator _contractVersionValidator = new();
     private readonly ProvisionCreateRequestModelValidator _provisionValidator = new();
+    private readonly IContractGetQueryHandler _get;
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
     public ContractController(
         ILogger<ContractController> logger, LinkGenerator linkGenerator,
-        IContractRepository contractRepository, IUserRepository userRepository)
+        IContractRepository contractRepository, IUserRepository userRepository,
+        IContractGetQueryHandler get)
     {
         _logger = logger;
         _linkGenerator = linkGenerator;
         _contractRepository = contractRepository;
         _userRepository = userRepository;
+        _get = get;
     }
 
     [HttpGet("{id}", Name = "GetContract")]
-    public async Task<ActionResult<ContractModel>> ContractGet(
-        int id,
-        [FromHeader] int userId)
+    public async Task<ActionResult<ContractModel>> ContractGet(int id, [FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.Get(new UserId(userId));
-        if (user == null)
-        {
-            return Forbid();
-        }
-
-        var contract = await _contractRepository.Get(new ContractId(id));
-        if (contract == null)
-        {
-            return NotFound();
-        }
-
-        if (!UserHasPermissions(user, contract.WorkspaceId, WorkspacePermission.View))
-        {
-            return NotFound();
-        }
-
-        var model = contract.ToModel(Links);
-        return Ok(model);
+        var query = new ContractGetQuery(new ContractId(id), new UserId(userId));
+        var maybe = await _get.Handle(query, cancellationToken);
+        return maybe.Match<Contract, ActionResult<ContractModel>>(
+            contract => Ok(contract.ToModel(Links)),
+            () => NotFound()
+            );
     }
 
     [HttpPost("", Name = "CreateContract")]
