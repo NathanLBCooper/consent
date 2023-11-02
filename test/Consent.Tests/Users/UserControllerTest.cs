@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
+using Consent.Domain.Core;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
 using Refit;
@@ -44,6 +46,10 @@ public class UserControllerTest : IDisposable
         var fetched = await _sut.UserGet(created.Id);
         fetched.Id.ShouldBe(created.Id);
         Verify(fetched);
+
+        fetched = await _sut.UserGet(created.Id, created.Id);
+        fetched.Id.ShouldBe(created.Id);
+        Verify(fetched);
     }
 
     [Fact]
@@ -52,16 +58,38 @@ public class UserControllerTest : IDisposable
         var created = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
         var workspace = await _workspaceEndpoint.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), created.Id);
 
-        var fetched = await _sut.UserGet(created.Id);
-
-        var membership = fetched.WorkspaceMemberships.ShouldHaveSingleItem();
-        membership.Workspace.Id.ShouldBe(workspace.Id);
-        membership.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
-        membership.Permissions.ShouldBeEquivalentTo(
-            new[] {
+        void Verify(UserModel model)
+        {
+            var membership = model.WorkspaceMemberships.ShouldHaveSingleItem();
+            membership.Workspace.Id.ShouldBe(workspace.Id);
+            membership.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
+            membership.Permissions.ShouldBeEquivalentTo(
+                new[] {
                 WorkspacePermissionModel.View, WorkspacePermissionModel.Edit,
                 WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
-            );
+                );
+        }
+
+        var fetched = await _sut.UserGet(created.Id);
+        Verify(fetched);
+
+        fetched = await _sut.UserGet(created.Id, created.Id);
+        Verify(fetched);
+    }
+
+    [Fact]
+    public async Task User_can_only_get_themselves() // ie pointless endpoint. But I would like user permissions or something soon
+    {
+        var bob = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+        var eve = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+
+        var bobFetchedByBob = await _sut.UserGet(bob.Id, bob.Id);
+        bobFetchedByBob.Id.ShouldBe(bob.Id);
+
+        var bobFetchedByEve = async () => await _sut.UserGet(bob.Id, eve.Id);
+
+        var error = await bobFetchedByEve.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
     }
 
     public void Dispose()

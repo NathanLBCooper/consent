@@ -26,10 +26,25 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         _create = create;
     }
 
-    [HttpGet("", Name = "GetUser")]
+    [HttpGet("", Name = "GetUserSelf")]
     public async Task<ActionResult<UserModel>> UserGet([FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var command = new UserGetQuery(new UserId(userId));
+        var id = new UserId(userId);
+        var command = new UserGetQuery(id, id);
+        var maybe = await _get.Handle(command, cancellationToken);
+
+        var response = maybe.Match<User, ActionResult<UserModel>>(
+            user => Ok(user.ToModel(Links)),
+            () => NotFound()
+        );
+
+        return response;
+    }
+
+    [HttpGet("{id}", Name = "GetUser")]
+    public async Task<ActionResult<UserModel>> UserGet(int id, [FromHeader] int userId, CancellationToken cancellationToken)
+    {
+        var command = new UserGetQuery(new UserId(id), new UserId(userId));
         var maybe = await _get.Handle(command, cancellationToken);
 
         var response = maybe.Match<User, ActionResult<UserModel>>(

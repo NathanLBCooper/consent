@@ -18,6 +18,11 @@ public class UserGetQueryHandler : IUserGetQueryHandler
 
     public async Task<Maybe<User>> Handle(UserGetQuery command, CancellationToken cancellationToken)
     {
+        if (command.UserId != command.RequestedBy)
+        {
+            return Maybe<User>.None;
+        }
+
         var user = await _userRepository.Get(command.UserId);
         if (user is null)
         {
