@@ -2,6 +2,16 @@
 
 ...
 
+# Tools
+
+## Lefthook
+
+Pre-commit hooks
+
+```sh
+winget install evilmartians.lefthook
+```
+
 # Setup
 
 ```sh
