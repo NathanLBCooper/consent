@@ -2,4 +2,4 @@ pre-commit:
   commands:
     dotnet-format:
       glob: "*.cs"
-      run: dotnet format ./Consent.sln --severity warn --verbosity normal --include {staged_files}
+      run: dotnet format ./Consent.sln --severity warn --verbosity normal --verify-no-changes --include {staged_files}
