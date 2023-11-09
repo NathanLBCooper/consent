@@ -12,6 +12,12 @@ Pre-commit hooks
 winget install evilmartians.lefthook
 ```
 
+then to sync githooks with *lefthook.yml*
+
+```sh
+lefthook install
+```
+
 # Setup
 
 ```sh
