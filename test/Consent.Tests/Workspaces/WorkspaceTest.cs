@@ -52,6 +52,22 @@ public class WorkspaceTest
     }
 
     [Fact]
+    public void Users_with_edit_permissions_can_edit()
+    {
+        var bob = new UserId(10);
+        var eve = new UserId(11);
+        var workspace = new Workspace("myworkspace", new List<Membership> {
+            new (bob, new[] { WorkspacePermission.Edit }),
+            new (eve, new[] { WorkspacePermission.Admin }),
+            new (new UserId(12), Membership.SuperUser)
+        });
+
+        workspace.UserCanEdit(bob).ShouldBeTrue();
+        workspace.UserCanEdit(eve).ShouldBeFalse();
+        workspace.UserCanEdit(new UserId(13)).ShouldBeFalse();
+    }
+
+    [Fact]
     public void Creating_a_workspace_with_user_gives_user_all_permissions()
     {
         var userId = new UserId(1);

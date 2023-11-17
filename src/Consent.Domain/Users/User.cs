@@ -49,6 +49,11 @@ public class User : IEntity<UserId>
     {
         return WorkspaceMemberships.SingleOrDefault(m => m.WorkspaceId == workspaceId)?.CanView ?? false;
     }
+
+    public bool CanEditWorkspace(WorkspaceId workspaceId)
+    {
+        return WorkspaceMemberships.SingleOrDefault(m => m.WorkspaceId == workspaceId)?.CanEdit ?? false;
+    }
 }
 
 public readonly record struct UserId(int Value) : IIdentifier;

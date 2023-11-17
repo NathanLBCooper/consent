@@ -11,4 +11,9 @@ public static class WorkspacePermissionsExtensions
     {
         return permissions.Contains(WorkspacePermission.View);
     }
+
+    public static bool CanEdit(this IEnumerable<WorkspacePermission> permissions)
+    {
+        return permissions.Contains(WorkspacePermission.Edit);
+    }
 }

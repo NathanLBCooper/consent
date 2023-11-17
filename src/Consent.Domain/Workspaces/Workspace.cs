@@ -72,6 +72,11 @@ public class Workspace : IEntity<WorkspaceId>
         return Memberships.SingleOrDefault(m => m.UserId == userId)?.CanView ?? false;
     }
 
+    public bool UserCanEdit(UserId userId)
+    {
+        return Memberships.SingleOrDefault(m => m.UserId == userId)?.CanEdit ?? false;
+    }
+
     public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)
     {
         return Memberships.SingleOrDefault(m => m.UserId == userId)?.Permissions

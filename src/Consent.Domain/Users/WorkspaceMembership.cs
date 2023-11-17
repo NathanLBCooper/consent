@@ -12,6 +12,7 @@ public class WorkspaceMembership
     public ImmutableList<WorkspacePermission> Permissions { get; private init; }
 
     public bool CanView => Permissions.CanView();
+    public bool CanEdit => Permissions.CanEdit();
 
     public WorkspaceMembership(MembershipId id, WorkspaceId workspaceId, IEnumerable<WorkspacePermission> permissions)
     {

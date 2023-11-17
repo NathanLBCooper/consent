@@ -22,6 +22,7 @@ public class Membership
 
     public bool IsSuperUser { get; }
     public bool CanView => Permissions.CanView();
+    public bool CanEdit => Permissions.CanEdit();
 
     public Membership(UserId userId, IEnumerable<WorkspacePermission> permissions)
     {
