@@ -9,7 +9,6 @@ using Consent.Domain.Users;
 namespace Consent.Application.Contracts;
 
 public record ContractVersionGetQuery(
-    ContractId ContractId,
     ContractVersionId ContractVersionId,
     UserId RequestedBy
     );
@@ -34,7 +33,7 @@ public class ContractVersionGetQueryHandler : IContractVersionGetQueryHandler
 
     public async Task<Maybe<ContractVersionGetQueryResult>> Handle(ContractVersionGetQuery query, CancellationToken cancellationToken)
     {
-        var contract = await _contractRepository.Get(query.ContractId);
+        var contract = await _contractRepository.FindByContractVersion(query.ContractVersionId);
         if (contract is null)
         {
             return Maybe<ContractVersionGetQueryResult>.None;

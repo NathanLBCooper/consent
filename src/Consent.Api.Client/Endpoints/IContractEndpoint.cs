@@ -12,8 +12,8 @@ public interface IContractEndpoint
     [Post("/contract")]
     Task<ContractModel> ContractCreate([Body] ContractCreateRequestModel request, [Header("userId")] int userId);
 
-    [Get("/contract/{contractId}/version/{id}")]
-    Task<ContractVersionModel> ContractVersionGet(int contractId, int id, [Header("userId")] int userId);
+    [Get("/contract/version/{id}")]
+    Task<ContractVersionModel> ContractVersionGet(int id, [Header("userId")] int userId);
 
     [Post("/contract/{contractId}/version")]
     Task<ContractVersionModel> ContractVersionCreate(

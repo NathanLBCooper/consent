@@ -47,13 +47,13 @@ public class ContractControllerTest_Provision : IDisposable
             permission.Id.ShouldBe(permissionId);
             permission.Href.ShouldBe(null); // todo, no controller
             model.Version.Id.ShouldBe(version.Id);
-            model.Version.Href.ShouldBe($"/Contract/{contract.Id}/version/{version.Id}");
+            model.Version.Href.ShouldBe($"/Contract/version/{version.Id}");
         }
 
         var created = await _sut.ProvisionCreate(contract.Id, version.Id, request, user.Id);
         Verify(created);
 
-        var fetchedVersion = await _sut.ContractVersionGet(contract.Id, version.Id, user.Id);
+        var fetchedVersion = await _sut.ContractVersionGet(version.Id, user.Id);
         var fetched = fetchedVersion.Provisions.Single(p => p.Id == created.Id);
         Verify(fetched);
     }

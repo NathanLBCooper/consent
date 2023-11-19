@@ -69,10 +69,10 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
             );
     }
 
-    [HttpGet("{contractId}/version/{id}", Name = "GetContractVersion")]
-    public async Task<ActionResult<ContractVersionModel>> ContractVersionGet(int contractId, int id, [FromHeader] int userId, CancellationToken cancellationToken)
+    [HttpGet("version/{id}", Name = "GetContractVersion")]
+    public async Task<ActionResult<ContractVersionModel>> ContractVersionGet(int id, [FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var query = new ContractVersionGetQuery(new ContractId(contractId), new ContractVersionId(id), new UserId(userId));
+        var query = new ContractVersionGetQuery(new ContractVersionId(id), new UserId(userId));
         var result = await _versionGet.Handle(query, cancellationToken);
         return result.Match<ContractVersionGetQueryResult, ActionResult<ContractVersionModel>>(
             r => Ok(r.Version.ToModel(r.Contract, Links)),
@@ -158,7 +158,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
 
         await _contractRepository.Update(contract);
 
-        return Ok(created.ToModel(version, contract, Links));
+        return Ok(created.ToModel(version, Links));
     }
 
     private bool UserHasPermissions(User user, WorkspaceId workspaceId, WorkspacePermission requiredPermission)

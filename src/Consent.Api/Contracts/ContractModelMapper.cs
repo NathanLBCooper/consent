@@ -17,7 +17,7 @@ internal static class ContractModelMapper
             v =>
             {
                 var versionId = Guard.NotNull(v.Id);
-                return new ResourceLink(versionId.Value, linkGenerator.GetContractVersion(contractId, versionId));
+                return new ResourceLink(versionId.Value, linkGenerator.GetContractVersion(versionId));
             }).ToArray();
 
         return new ContractModel(
@@ -34,21 +34,19 @@ internal static class ContractModelMapper
         var versionId = Guard.NotNull(version.Id);
         var contractId = Guard.NotNull(contract.Id);
         var contractLink = new ResourceLink(contractId.Value, linkGenerator.GetContract(contractId));
-        var provisions = version.Provisions.Select(p => p.ToModel(version, contract, linkGenerator)).ToArray();
+        var provisions = version.Provisions.Select(p => p.ToModel(version, linkGenerator)).ToArray();
 
         return new ContractVersionModel(versionId.Value, version.Name, version.Text, version.Status.ToModel(), provisions, contractLink);
     }
 
-    public static ProvisionModel ToModel(this Provision provision, ContractVersion version, Contract contract,
-        ConsentLinkGenerator linkGenerator)
+    public static ProvisionModel ToModel(this Provision provision, ContractVersion version, ConsentLinkGenerator linkGenerator)
     {
         var provisionId = Guard.NotNull(provision.Id);
         var versionId = Guard.NotNull(version.Id);
-        var contractId = Guard.NotNull(contract.Id);
         var permissionLinks = provision.PermissionIds.Select(
             pid => new ResourceLink(pid.Value, linkGenerator.GetPermission(pid))
             ).ToArray();
-        var versionLink = new ResourceLink(versionId.Value, linkGenerator.GetContractVersion(contractId, versionId));
+        var versionLink = new ResourceLink(versionId.Value, linkGenerator.GetContractVersion(versionId));
 
         return new ProvisionModel(provisionId.Value, provision.Text, permissionLinks, versionLink);
     }

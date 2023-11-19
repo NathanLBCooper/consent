@@ -49,7 +49,7 @@ public class ContractControllerTest_Version : IDisposable
         var created = await _sut.ContractVersionCreate(contract.Id, request, user.Id);
         Verify(created);
 
-        var fetched = await _sut.ContractVersionGet(contract.Id, created.Id, user.Id);
+        var fetched = await _sut.ContractVersionGet(created.Id, user.Id);
         fetched.Id.ShouldBe(created.Id);
         Verify(fetched);
     }
@@ -59,20 +59,6 @@ public class ContractControllerTest_Version : IDisposable
     {
         await Task.CompletedTask;
         // todo
-    }
-
-    [Fact(Skip = "Unimplemented")]
-    public async Task Cannot_get_a_contract_version_on_a_non_existant_contract()
-    {
-        await Task.CompletedTask;
-        // todo (wouldn't be needed if it didn't take both ids)
-    }
-
-    [Fact(Skip = "Unimplemented")]
-    public async Task Cannot_get_a_contract_version_that_does_not_belong_to_the_contract()
-    {
-        await Task.CompletedTask;
-        // todo (wouldn't be needed if it didn't take both ids)
     }
 
     [Fact(Skip = "Unimplemented")]
