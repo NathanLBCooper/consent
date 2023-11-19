@@ -35,7 +35,7 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
             return Result<Contract>.Failure(new UnauthorizedError()); // todo, bad error choice
         }
 
-        if (workspace.UserCanEdit(command.RequestedBy))
+        if (!workspace.UserCanEdit(command.RequestedBy))
         {
             return Result<Contract>.Failure(new UnauthorizedError());
         }

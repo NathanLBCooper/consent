@@ -24,23 +24,24 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private readonly LinkGenerator _linkGenerator;
     private readonly IContractRepository _contractRepository;
     private readonly IUserRepository _userRepository;
-    private readonly ContractCreateRequestModelValidator _contractValidator = new();
     private readonly ContractVersionCreateRequestModelValidator _contractVersionValidator = new();
     private readonly ProvisionCreateRequestModelValidator _provisionValidator = new();
     private readonly IContractGetQueryHandler _get;
+    private readonly IContractCreateCommandHandler _create;
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
     public ContractController(
         ILogger<ContractController> logger, LinkGenerator linkGenerator,
         IContractRepository contractRepository, IUserRepository userRepository,
-        IContractGetQueryHandler get)
+        IContractGetQueryHandler get, IContractCreateCommandHandler create)
     {
         _logger = logger;
         _linkGenerator = linkGenerator;
         _contractRepository = contractRepository;
         _userRepository = userRepository;
         _get = get;
+        _create = create;
     }
 
     [HttpGet("{id}", Name = "GetContract")]
@@ -55,29 +56,14 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     }
 
     [HttpPost("", Name = "CreateContract")]
-    public async Task<ActionResult<ContractModel>> ContractCreate(ContractCreateRequestModel request, [FromHeader] int userId)
+    public async Task<ActionResult<ContractModel>> ContractCreate(ContractCreateRequestModel request, [FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var validationResult = _contractValidator.Validate(request);
-        if (!validationResult.IsValid)
-        {
-            return UnprocessableEntity(validationResult.ToString());
-        }
-
-        var user = await _userRepository.Get(new UserId(userId));
-        if (user == null)
-        {
-            return Forbid();
-        }
-
-        var workspaceId = new WorkspaceId(request.WorkspaceId);
-        if (!UserHasPermissions(user, workspaceId, WorkspacePermission.Edit))
-        {
-            return Forbid();
-        }
-
-        var entity = await _contractRepository.Create(new Contract(Guard.NotNull(request.Name), workspaceId));
-
-        return Ok(entity.ToModel(Links));
+        var command = new ContractCreateCommand(request.Name, new WorkspaceId(request.WorkspaceId), new UserId(userId));
+        var result = await _create.Handle(command, cancellationToken);
+        return result.Match(
+            contract => Ok(contract.ToModel(Links)),
+            error => error.ToErrorResponse<ContractModel>(this)
+            );
     }
 
     [HttpGet("{contractId}/version/{id}", Name = "GetContractVersion")]
