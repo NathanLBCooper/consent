@@ -43,3 +43,5 @@ dotnet_code_quality_unused_parameters = all:warning
 csharp_prefer_braces = true:warning
 # remove unnecessary using directives
 dotnet_diagnostic.IDE0005.severity = warning
+# use "is null" rather than "== null"
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning # todo this doesn't work

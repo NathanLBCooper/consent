@@ -9,10 +9,10 @@ internal static class ErrorResponseMapper
     {
         return error switch
         {
-            NotFoundError => error.Message != null ? controller.NotFound(error.Message) : controller.NotFound(),
-            UnauthorizedError => error.Message != null ? controller.Unauthorized(error.Message) : controller.Unauthorized(),
-            ValidationError => error.Message != null ? controller.UnprocessableEntity(error.Message) : controller.UnprocessableEntity(),
-            _ => error.Message != null ? controller.BadRequest(error.Message) : controller.BadRequest()
+            NotFoundError => error.Message is not null ? controller.NotFound(error.Message) : controller.NotFound(),
+            UnauthorizedError => error.Message is not null ? controller.Unauthorized(error.Message) : controller.Unauthorized(),
+            ValidationError => error.Message is not null ? controller.UnprocessableEntity(error.Message) : controller.UnprocessableEntity(),
+            _ => error.Message is not null ? controller.BadRequest(error.Message) : controller.BadRequest()
         };
     }
 }

@@ -8,7 +8,7 @@ public static class Guard
     [return: NotNull]
     public static TValue NotNull<TValue>(TValue? value, [CallerArgumentExpression("value")] string? valueName = null) where TValue : class
     {
-        if (value == null)
+        if (value is null)
         {
             throw new System.ArgumentNullException(valueName);
         }
@@ -19,7 +19,7 @@ public static class Guard
     [return: NotNull]
     public static TValue NotNull<TValue>(TValue? value, [CallerArgumentExpression("value")] string? valueName = null) where TValue : struct
     {
-        if (value == null)
+        if (value is null)
         {
             throw new System.ArgumentNullException(valueName);
         }

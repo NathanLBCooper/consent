@@ -64,7 +64,7 @@ public class Provision
 
     public void OnAddedToVersion(ContractVersion version)
     {
-        if (ContractVersion != null)
+        if (ContractVersion is not null)
         {
             throw new InvalidOperationException("Provision is already attached to a version");
         }
@@ -81,7 +81,7 @@ public class Provision
 
     private void ThrowIfNotDraft()
     {
-        if (ContractVersion != null && ContractVersion.Status != ContractVersionStatus.Draft)
+        if (ContractVersion is not null && ContractVersion.Status != ContractVersionStatus.Draft)
         {
             throw new InvalidOperationException("Cannot mutate a non-draft Version");
         }

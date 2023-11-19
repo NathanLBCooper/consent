@@ -17,7 +17,7 @@ public static class Dependencies
     public static void Register(Container container, IConfiguration configuration)
     {
         var sqlSettings = configuration.GetSection(nameof(SqlSettings)).Get<SqlSettings>();
-        if (sqlSettings == null)
+        if (sqlSettings is null)
         {
             throw new ArgumentNullException(nameof(SqlSettings));
         }

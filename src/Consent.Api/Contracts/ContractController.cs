@@ -70,13 +70,13 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     public async Task<ActionResult<ContractVersionModel>> ContractVersionGet(int contractId, int id, [FromHeader] int userId)
     {
         var user = await _userRepository.Get(new UserId(userId));
-        if (user == null)
+        if (user is null)
         {
             return Forbid();
         }
 
         var contract = await _contractRepository.Get(new ContractId(contractId));
-        if (contract == null)
+        if (contract is null)
         {
             return NotFound();
         }
@@ -89,7 +89,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         var versionId = new ContractVersionId(id);
         var version = contract.Versions.SingleOrDefault(v => v.Id == versionId);
 
-        if (version == null)
+        if (version is null)
         {
             return NotFound();
         }
@@ -109,13 +109,13 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         }
 
         var user = await _userRepository.Get(new UserId(userId));
-        if (user == null)
+        if (user is null)
         {
             return Forbid();
         }
 
         var contract = await _contractRepository.Get(new ContractId(contractId));
-        if (contract == null)
+        if (contract is null)
         {
             return Forbid();
         }
@@ -146,13 +146,13 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         }
 
         var user = await _userRepository.Get(new UserId(userId));
-        if (user == null)
+        if (user is null)
         {
             return Forbid();
         }
 
         var contract = await _contractRepository.Get(new ContractId(contractId));
-        if (contract == null)
+        if (contract is null)
         {
             return NotFound();
         }
@@ -164,7 +164,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
 
         var versionIdent = new ContractVersionId(versionId);
         var version = contract.Versions.SingleOrDefault(v => v.Id == versionIdent);
-        if (version == null)
+        if (version is null)
         {
             return NotFound();
         }
@@ -182,7 +182,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private bool UserHasPermissions(User user, WorkspaceId workspaceId, WorkspacePermission requiredPermission)
     {
         var membership = user.WorkspaceMemberships.SingleOrDefault(m => m.WorkspaceId == workspaceId);
-        if (membership == null || !membership.Permissions.Contains(requiredPermission))
+        if (membership is null || !membership.Permissions.Contains(requiredPermission))
         {
             return false;
         }
