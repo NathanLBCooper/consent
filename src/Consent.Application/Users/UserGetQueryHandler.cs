@@ -5,6 +5,11 @@ using Consent.Domain.Users;
 
 namespace Consent.Application.Users;
 
+public record UserGetQuery(
+    UserId UserId,
+    UserId RequestedBy
+    );
+
 public interface IUserGetQueryHandler : IQueryHandler<UserGetQuery, Maybe<User>> { }
 
 public class UserGetQueryHandler : IUserGetQueryHandler
