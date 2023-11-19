@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Contracts;
 using Consent.Application.Contracts;
 using Consent.Application.Contracts.Create;
 using Consent.Application.Contracts.Get;
+using Consent.Application.Contracts.VersionCreate;
 using Consent.Application.Contracts.VersionGet;
 using Consent.Application.Users;
 using Consent.Domain.Contracts;
@@ -27,11 +27,11 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private readonly LinkGenerator _linkGenerator;
     private readonly IContractRepository _contractRepository;
     private readonly IUserRepository _userRepository;
-    private readonly ContractVersionCreateRequestModelValidator _contractVersionValidator = new();
     private readonly ProvisionCreateRequestModelValidator _provisionValidator = new();
     private readonly IContractGetQueryHandler _contractGet;
     private readonly IContractCreateCommandHandler _contractCreate;
     private readonly IContractVersionGetQueryHandler _versionGet;
+    private readonly IContractVersionCreateCommandHandler _versionCreate;
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
@@ -39,7 +39,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         ILogger<ContractController> logger, LinkGenerator linkGenerator,
         IContractRepository contractRepository, IUserRepository userRepository,
         IContractGetQueryHandler contractGet, IContractCreateCommandHandler contractCreate,
-        IContractVersionGetQueryHandler versionGet)
+        IContractVersionGetQueryHandler versionGet, IContractVersionCreateCommandHandler versionCreate)
     {
         _logger = logger;
         _linkGenerator = linkGenerator;
@@ -48,6 +48,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         _contractGet = contractGet;
         _contractCreate = contractCreate;
         _versionGet = versionGet;
+        _versionCreate = versionCreate;
     }
 
     [HttpGet("{id}", Name = "GetContract")]
@@ -85,39 +86,14 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
 
     [HttpPost("{contractId}/version", Name = "CreateContractVersion")]
     public async Task<ActionResult<ContractVersionModel>> ContractVersionCreate(
-        [FromRoute] int contractId, ContractVersionCreateRequestModel request, [FromHeader] int userId)
+        [FromRoute] int contractId, ContractVersionCreateRequestModel request, [FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var validationResult = _contractVersionValidator.Validate(request);
-        if (!validationResult.IsValid)
-        {
-            return UnprocessableEntity(validationResult.ToString());
-        }
-
-        var user = await _userRepository.Get(new UserId(userId));
-        if (user is null)
-        {
-            return Forbid();
-        }
-
-        var contract = await _contractRepository.Get(new ContractId(contractId));
-        if (contract is null)
-        {
-            return Forbid();
-        }
-
-        if (!UserHasPermissions(user, contract.WorkspaceId, WorkspacePermission.View))
-        {
-            return Forbid();
-        }
-
-        var created = new ContractVersion(
-            Guard.NotNull(request.Name), Guard.NotNull(request.Text), Array.Empty<Provision>()
+        var command = new ContractVersionCreateCommand(request.Name, request.Text, new ContractId(contractId), new UserId(userId));
+        var result = await _versionCreate.Handle(command, cancellationToken);
+        return result.Match(
+            r => Ok(r.Version.ToModel(r.Contract, Links)),
+            error => error.ToErrorResponse<ContractVersionModel>(this)
             );
-        contract.AddContractVersions(created);
-
-        await _contractRepository.Update(contract);
-
-        return Ok(created.ToModel(contract, Links));
     }
 
     [HttpPost("version/{versionId}/provision", Name = "CreateProvision")]
