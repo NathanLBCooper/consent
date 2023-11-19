@@ -54,6 +54,13 @@ public class ContractControllerTest_Contract : IDisposable
     }
 
     [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_non_existant_contract()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
     public async Task Cannot_get_a_contract_with_a_non_existant_user()
     {
         await Task.CompletedTask;

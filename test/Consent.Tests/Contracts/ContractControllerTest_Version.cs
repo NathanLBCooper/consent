@@ -55,6 +55,41 @@ public class ContractControllerTest_Version : IDisposable
     }
 
     [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_non_existant_contract_version()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_contract_version_on_a_non_existant_contract()
+    {
+        await Task.CompletedTask;
+        // todo (wouldn't be needed if it didn't take both ids)
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_contract_version_that_does_not_belong_to_the_contract()
+    {
+        await Task.CompletedTask;
+        // todo (wouldn't be needed if it didn't take both ids)
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_contract_version_with_a_non_existant_user()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_contract_version_with_user_without_view_permissions_on_workspace()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
     public async Task Cannot_create_a_contract_version_with_a_non_existant_user()
     {
         await Task.CompletedTask;

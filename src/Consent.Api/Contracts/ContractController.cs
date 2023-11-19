@@ -26,29 +26,32 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     private readonly IUserRepository _userRepository;
     private readonly ContractVersionCreateRequestModelValidator _contractVersionValidator = new();
     private readonly ProvisionCreateRequestModelValidator _provisionValidator = new();
-    private readonly IContractGetQueryHandler _get;
-    private readonly IContractCreateCommandHandler _create;
+    private readonly IContractGetQueryHandler _contractGet;
+    private readonly IContractCreateCommandHandler _contractCreate;
+    private readonly IContractVersionGetQueryHandler _versionGet;
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
     public ContractController(
         ILogger<ContractController> logger, LinkGenerator linkGenerator,
         IContractRepository contractRepository, IUserRepository userRepository,
-        IContractGetQueryHandler get, IContractCreateCommandHandler create)
+        IContractGetQueryHandler contractGet, IContractCreateCommandHandler contractCreate,
+        IContractVersionGetQueryHandler versionGet)
     {
         _logger = logger;
         _linkGenerator = linkGenerator;
         _contractRepository = contractRepository;
         _userRepository = userRepository;
-        _get = get;
-        _create = create;
+        _contractGet = contractGet;
+        _contractCreate = contractCreate;
+        _versionGet = versionGet;
     }
 
     [HttpGet("{id}", Name = "GetContract")]
     public async Task<ActionResult<ContractModel>> ContractGet(int id, [FromHeader] int userId, CancellationToken cancellationToken)
     {
         var query = new ContractGetQuery(new ContractId(id), new UserId(userId));
-        var maybe = await _get.Handle(query, cancellationToken);
+        var maybe = await _contractGet.Handle(query, cancellationToken);
         return maybe.Match<Contract, ActionResult<ContractModel>>(
             contract => Ok(contract.ToModel(Links)),
             () => NotFound()
@@ -59,7 +62,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     public async Task<ActionResult<ContractModel>> ContractCreate(ContractCreateRequestModel request, [FromHeader] int userId, CancellationToken cancellationToken)
     {
         var command = new ContractCreateCommand(request.Name, new WorkspaceId(request.WorkspaceId), new UserId(userId));
-        var result = await _create.Handle(command, cancellationToken);
+        var result = await _contractCreate.Handle(command, cancellationToken);
         return result.Match(
             contract => Ok(contract.ToModel(Links)),
             error => error.ToErrorResponse<ContractModel>(this)
@@ -67,35 +70,14 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     }
 
     [HttpGet("{contractId}/version/{id}", Name = "GetContractVersion")]
-    public async Task<ActionResult<ContractVersionModel>> ContractVersionGet(int contractId, int id, [FromHeader] int userId)
+    public async Task<ActionResult<ContractVersionModel>> ContractVersionGet(int contractId, int id, [FromHeader] int userId, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.Get(new UserId(userId));
-        if (user is null)
-        {
-            return Forbid();
-        }
-
-        var contract = await _contractRepository.Get(new ContractId(contractId));
-        if (contract is null)
-        {
-            return NotFound();
-        }
-
-        if (!UserHasPermissions(user, contract.WorkspaceId, WorkspacePermission.View))
-        {
-            return NotFound();
-        }
-
-        var versionId = new ContractVersionId(id);
-        var version = contract.Versions.SingleOrDefault(v => v.Id == versionId);
-
-        if (version is null)
-        {
-            return NotFound();
-        }
-
-        var model = version.ToModel(contract, Links);
-        return Ok(model);
+        var query = new ContractVersionGetQuery(new ContractId(contractId), new ContractVersionId(id), new UserId(userId));
+        var result = await _versionGet.Handle(query, cancellationToken);
+        return result.Match<ContractVersionGetQueryResult, ActionResult<ContractVersionModel>>(
+            r => Ok(r.Version.ToModel(r.Contract, Links)),
+            () => NotFound()
+            );
     }
 
     [HttpPost("{contractId}/version", Name = "CreateContractVersion")]
