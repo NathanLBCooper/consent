@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Consent.Application.Users;
+using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 
@@ -11,30 +11,24 @@ public interface IContractGetQueryHandler : IQueryHandler<ContractGetQuery, Mayb
 public class ContractGetQueryHandler : IContractGetQueryHandler
 {
     private readonly IContractRepository _contractRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IWorkspaceRepository _workspaceRepository;
 
-    public ContractGetQueryHandler(IContractRepository contractRepository, IUserRepository userRepository)
+    public ContractGetQueryHandler(IContractRepository contractRepository, IWorkspaceRepository workspaceRepository)
     {
         _contractRepository = contractRepository;
-        _userRepository = userRepository;
+        _workspaceRepository = workspaceRepository;
     }
 
     public async Task<Maybe<Contract>> Handle(ContractGetQuery query, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.Get(query.RequestedBy);
-        if (user == null)
-        {
-            return Maybe<Contract>.None;
-        }
-
         var contract = await _contractRepository.Get(query.ContractId);
-        if (contract == null)
+        if (contract is null)
         {
             return Maybe<Contract>.None;
         }
 
-        // todo go through contract
-        if (!user.CanViewWorkspace(contract.WorkspaceId))
+        var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
+        if (!workspace.UserCanView(query.RequestedBy))
         {
             return Maybe<Contract>.None;
         }

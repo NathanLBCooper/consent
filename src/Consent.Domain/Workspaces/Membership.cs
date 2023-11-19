@@ -21,8 +21,8 @@ public class Membership
     public ImmutableList<WorkspacePermission> Permissions { get; private init; }
 
     public bool IsSuperUser { get; }
-    public bool CanView => Permissions.CanView();
-    public bool CanEdit => Permissions.CanEdit();
+    public bool CanView => Permissions.Contains(WorkspacePermission.View);
+    public bool CanEdit => Permissions.Contains(WorkspacePermission.Edit);
 
     public Membership(UserId userId, IEnumerable<WorkspacePermission> permissions)
     {

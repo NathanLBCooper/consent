@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Consent.Application.Users;
+using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
@@ -12,13 +12,13 @@ public interface IContractCreateCommandHandler : ICommandHandler<ContractCreateC
 public class ContractCreateCommandHandler : IContractCreateCommandHandler
 {
     private readonly IContractRepository _contractRepository;
-    private readonly IUserRepository _userRepository;
+    private readonly IWorkspaceRepository _workspaceRepository;
     private readonly ContractCreateCommandValidator _validator = new();
 
-    public ContractCreateCommandHandler(IContractRepository contractRepository, IUserRepository userRepository)
+    public ContractCreateCommandHandler(IContractRepository contractRepository, IWorkspaceRepository workspaceRepository)
     {
         _contractRepository = contractRepository;
-        _userRepository = userRepository;
+        _workspaceRepository = workspaceRepository;
     }
 
     public async Task<Result<Contract>> Handle(ContractCreateCommand command, CancellationToken cancellationToken)
@@ -29,9 +29,13 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
             return Result<Contract>.Failure(new ValidationError(validationResult.ToString()));
         }
 
-        // todo go through workspace. Maybe remove CanView and CanEdit from User?
-        var user = await _userRepository.Get(command.RequestedBy);
-        if (user == null || !user.CanEditWorkspace(command.WorkspaceId))
+        var workspace = await _workspaceRepository.Get(command.WorkspaceId);
+        if (workspace is null)
+        {
+            return Result<Contract>.Failure(new UnauthorizedError()); // todo, bad error choice
+        }
+
+        if (workspace.UserCanEdit(command.RequestedBy))
         {
             return Result<Contract>.Failure(new UnauthorizedError());
         }
