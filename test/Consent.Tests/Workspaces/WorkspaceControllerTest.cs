@@ -49,31 +49,27 @@ public class WorkspaceControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Workspace_creater_gets_all_permissions()
+    public async Task Cannot_get_nonexistant_workspace()
     {
         var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
-        var request = new WorkspaceCreateRequestModelBuilder().Build();
 
-        var created = await _sut.WorkspaceCreate(request, user.Id);
+        var fetch = async () => await _sut.WorkspaceGet(-1, user.Id);
 
-        var membership = created.Memberships.ShouldHaveSingleItem();
-        membership.UserId.ShouldBe(user.Id);
-        membership.Permissions.ShouldBeEquivalentTo(
-            new[] {
-                WorkspacePermissionModel.View, WorkspacePermissionModel.Edit,
-                WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
-            );
+        var error = await fetch.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
     }
 
     [Fact]
-    public async Task Cannot_create_workspace_with_nonexistant_user()
+    public async Task Cannot_get_workspace_with_nonexistant_user()
     {
-        var request = new WorkspaceCreateRequestModelBuilder().Build();
+        var userBuilder = new UserCreateRequestModelBuilder();
+        var user = await _userEndpoint.UserCreate(userBuilder.Build());
+        var workspace = await _sut.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), user.Id);
 
-        var createWorkspace = async () => await _sut.WorkspaceCreate(request, -1);
+        var eveFetchesAlicesWorkspace = async () => await _sut.WorkspaceGet(workspace.Id, -1);
 
-        var error = await createWorkspace.ShouldThrowAsync<ValidationApiException>();
-        Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.Unauthorized);
+        var error = await eveFetchesAlicesWorkspace.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -88,6 +84,34 @@ public class WorkspaceControllerTest : IDisposable
 
         var error = await eveFetchesAlicesWorkspace.ShouldThrowAsync<ValidationApiException>();
         Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Cannot_create_workspace_with_nonexistant_user()
+    {
+        var request = new WorkspaceCreateRequestModelBuilder().Build();
+
+        var createWorkspace = async () => await _sut.WorkspaceCreate(request, -1);
+
+        var error = await createWorkspace.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Workspace_creater_gets_all_permissions()
+    {
+        var user = await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
+        var request = new WorkspaceCreateRequestModelBuilder().Build();
+
+        var created = await _sut.WorkspaceCreate(request, user.Id);
+
+        var membership = created.Memberships.ShouldHaveSingleItem();
+        membership.UserId.ShouldBe(user.Id);
+        membership.Permissions.ShouldBeEquivalentTo(
+            new[] {
+                WorkspacePermissionModel.View, WorkspacePermissionModel.Edit,
+                WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
+            );
     }
 
     public void Dispose()

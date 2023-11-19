@@ -78,6 +78,28 @@ public class UserControllerTest : IDisposable
     }
 
     [Fact]
+    public async Task Cannot_get_nonexistant_user()
+    {
+        var user = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+
+        var fetch = async () => await _sut.UserGet(-1, user.Id);
+
+        var error = await fetch.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task Cannot_get_user_with_nonexistant_requesting_user()
+    {
+        var user = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+
+        var fetch = async () => await _sut.UserGet(user.Id, -1);
+
+        var error = await fetch.ShouldThrowAsync<ValidationApiException>();
+        Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task User_can_only_get_themselves() // ie pointless endpoint. But I would like user permissions or something soon
     {
         var bob = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
