@@ -32,7 +32,7 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
         var workspace = await _workspaceRepository.Get(command.WorkspaceId);
         if (workspace is null)
         {
-            return Result<Contract>.Failure(new UnauthorizedError()); // todo, bad error choice
+            return Result<Contract>.Failure(new NotFoundError());
         }
 
         if (!workspace.UserCanEdit(command.RequestedBy))

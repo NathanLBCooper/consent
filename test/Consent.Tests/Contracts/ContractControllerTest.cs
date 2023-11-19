@@ -55,6 +55,18 @@ public class ContractControllerTest : IDisposable
     }
 
     [Fact]
+    public async Task Cannot_create_a_contract_on_a_nonexistant_workspace()
+    {
+        var user = await CreateUser();
+        var request = new ContractCreateRequestModelBuilder(-1).Build();
+
+        var create = async () => await _sut.ContractCreate(request, user.Id);
+
+        var error = await create.ShouldThrowAsync<ApiException>();
+        ((int)error.StatusCode).ShouldBe((int)HttpStatusCode.NotFound);
+    }
+
+[Fact]
     public async Task Can_create_and_get_a_contract_version()
     {
         var user = await CreateUser();
