@@ -33,6 +33,7 @@ public class ContractGetQueryHandler : IContractGetQueryHandler
             return Maybe<Contract>.None;
         }
 
+        // todo go through contract
         if (!user.CanViewWorkspace(contract.WorkspaceId))
         {
             return Maybe<Contract>.None;

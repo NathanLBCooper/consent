@@ -29,6 +29,7 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
             return Result<Contract>.Failure(new ValidationError(validationResult.ToString()));
         }
 
+        // todo go through workspace. Maybe remove CanView and CanEdit from User?
         var user = await _userRepository.Get(command.RequestedBy);
         if (user == null || !user.CanEditWorkspace(command.WorkspaceId))
         {
