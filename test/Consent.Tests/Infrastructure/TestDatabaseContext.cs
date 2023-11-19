@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Reflection;
 using Dapper;
 using SimpleMigrations;
@@ -74,17 +75,16 @@ internal class TestDatabaseContext : IDisposable
      */
     private static void DisjoinIdRanges(IDbConnection connection)
     {
-        var tables = new[]
-        {
-            "[users].[Users]",
-            "[workspaces].[Membership]", "[workspaces].[Workspaces]",
-            "[contracts].[Provision]", "[contracts].[ContractVersion]", "[contracts].[Contracts]",
-        };
+        var tables = connection.Query<(string schema, string name, string type)>($"select table_schema, table_name, table_type FROM information_schema.tables")
+            .Where(t => t.type == "BASE TABLE") // ie, not a VIEW
+            .Where(t => t.name != "VersionInfo")
+            .Select(t => $"[{t.schema}].[{t.name}]");
 
         var startId = 10000;
         const int step = 10000;
         foreach (var table in tables)
         {
+            // todo might break when there are tables with int identity
             _ = connection.Execute($"dbcc checkident ('{table}', reseed, {startId})");
             startId = startId + step;
         }
