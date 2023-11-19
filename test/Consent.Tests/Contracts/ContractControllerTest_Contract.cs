@@ -53,6 +53,27 @@ public class ContractControllerTest_Contract : IDisposable
         Verify(fetched);
     }
 
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_contract_with_a_non_existant_user()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_get_a_contract_with_user_without_view_permissions_on_workspace()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_contract_with_a_non_existant_user()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
     [Fact]
     public async Task Cannot_create_a_contract_on_a_nonexistant_workspace()
     {
@@ -63,6 +84,13 @@ public class ContractControllerTest_Contract : IDisposable
 
         var error = await create.ShouldThrowAsync<ApiException>();
         ((int)error.StatusCode).ShouldBe((int)HttpStatusCode.NotFound);
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_contract_with_user_without_edit_permissions_on_workspace()
+    {
+        await Task.CompletedTask;
+        // todo
     }
 
     private async Task<UserModel> CreateUser()

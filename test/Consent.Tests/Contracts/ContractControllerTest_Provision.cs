@@ -72,6 +72,56 @@ public class ContractControllerTest_Provision : IDisposable
         ((int)error.StatusCode).ShouldBe((int)HttpStatusCode.UnprocessableEntity);
     }
 
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_provision_with_a_non_existant_user()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_provision_on_a_non_existant_contract()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_provision_on_a_non_existant_contract_version()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_provision_with_user_without_edit_permissions_on_workspace()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_provision_with_null_or_empty_permissions()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_provision_with_non_existant_permissions()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
+
+    [Fact(Skip = "Unimplemented")]
+    public async Task Cannot_create_a_provision_with_duplicate_permissions()
+    {
+        await Task.CompletedTask;
+        // todo
+    }
+
     private async Task<UserModel> CreateUser()
     {
         return await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
