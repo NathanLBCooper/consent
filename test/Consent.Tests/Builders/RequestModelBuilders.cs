@@ -1,5 +1,6 @@
 ﻿using System;
 using Consent.Api.Client.Models.Contracts;
+using Consent.Api.Client.Models.Permissions;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 
@@ -17,6 +18,15 @@ public record WorkspaceCreateRequestModelBuilder(string Name = "workspacename")
     public WorkspaceCreateRequestModel Build()
     {
         return new(Name);
+    }
+}
+
+public record PermissionCreateRequestModelBuilder(
+    int WorkspaceId, string Name = "permissionname", string Description = "permissiondescription")
+{
+    public PermissionCreateRequestModel Build()
+    {
+        return new(Name, Description, WorkspaceId);
     }
 }
 
