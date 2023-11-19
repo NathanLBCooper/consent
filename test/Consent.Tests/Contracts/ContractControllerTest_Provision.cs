@@ -50,7 +50,7 @@ public class ContractControllerTest_Provision : IDisposable
             model.Version.Href.ShouldBe($"/Contract/version/{version.Id}");
         }
 
-        var created = await _sut.ProvisionCreate(contract.Id, version.Id, request, user.Id);
+        var created = await _sut.ProvisionCreate(version.Id, request, user.Id);
         Verify(created);
 
         var fetchedVersion = await _sut.ContractVersionGet(version.Id, user.Id);
@@ -66,7 +66,7 @@ public class ContractControllerTest_Provision : IDisposable
         var version = await CreateVersion(contract, user);
         var request = new ProvisionCreateRequestModelBuilder(Array.Empty<int>()).Build();
 
-        var createProvision = async () => await _sut.ProvisionCreate(contract.Id, version.Id, request, user.Id);
+        var createProvision = async () => await _sut.ProvisionCreate(version.Id, request, user.Id);
 
         var error = await createProvision.ShouldThrowAsync<ApiException>();
         ((int)error.StatusCode).ShouldBe((int)HttpStatusCode.UnprocessableEntity);

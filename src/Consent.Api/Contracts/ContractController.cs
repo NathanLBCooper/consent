@@ -117,9 +117,8 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         return Ok(created.ToModel(contract, Links));
     }
 
-    [HttpPost("{contractId}/version/{versionId}/provision", Name = "CreateProvision")]
-    public async Task<ActionResult<ProvisionModel>> ProvisionCreate(
-        [FromRoute] int contractId, [FromRoute] int versionId, ProvisionCreateRequestModel request, [FromHeader] int userId)
+    [HttpPost("version/{versionId}/provision", Name = "CreateProvision")]
+    public async Task<ActionResult<ProvisionModel>> ProvisionCreate([FromRoute] int versionId, ProvisionCreateRequestModel request, [FromHeader] int userId)
     {
         var validationResult = _provisionValidator.Validate(request);
         if (!validationResult.IsValid)
@@ -133,7 +132,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
             return Forbid();
         }
 
-        var contract = await _contractRepository.Get(new ContractId(contractId));
+        var contract = await _contractRepository.FindByContractVersion(new ContractVersionId(versionId));
         if (contract is null)
         {
             return NotFound();
