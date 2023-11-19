@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.Reflection;
 using Dapper;
@@ -43,6 +44,8 @@ internal class TestDatabaseContext : IDisposable
         var migrator = new SimpleMigrator(typeof(Storage.Migrator.Program).GetTypeInfo().Assembly, databaseProvider);
         migrator.Load();
         migrator.MigrateToLatest();
+
+        DisjoinIdRanges(connection);
     }
 
     public void Dispose()
@@ -64,5 +67,26 @@ internal class TestDatabaseContext : IDisposable
             InitialCatalog = database,
             TrustServerCertificate = true,
         }.ToString();
+    }
+
+    /**
+     * Avoid collisions between the ids of different entities
+     */
+    private static void DisjoinIdRanges(IDbConnection connection)
+    {
+        var tables = new[]
+        {
+            "[users].[Users]",
+            "[workspaces].[Membership]", "[workspaces].[Workspaces]",
+            "[contracts].[Provision]", "[contracts].[ContractVersion]", "[contracts].[Contracts]",
+        };
+
+        var startId = 10000;
+        const int step = 10000;
+        foreach (var table in tables)
+        {
+            _ = connection.Execute($"dbcc checkident ('{table}', reseed, {startId})");
+            startId = startId + step;
+        }
     }
 }

@@ -83,7 +83,7 @@ FROM [workspaces].[Membership]
     protected override void Down()
     {
         Execute(@"
-DROP TABLE [users].[WorkspaceMembership];
+DROP VIEW [users].[WorkspaceMembership]
 
 DROP TABLE [users].[Users];
 
@@ -100,10 +100,6 @@ DROP TABLE [contracts].[Provision];
 DROP TABLE [contracts].[ContractVersion];
 
 DROP TABLE [contracts].[Contracts];
-
-
-
-DROP VIEW [users].[WorkspaceMembership]
 ");
     }
 }
