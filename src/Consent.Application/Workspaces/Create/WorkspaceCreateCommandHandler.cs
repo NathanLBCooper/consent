@@ -3,25 +3,9 @@ using System.Threading.Tasks;
 using Consent.Application.Users;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
-using FluentValidation;
 
-namespace Consent.Application.Workspaces;
-
-public record WorkspaceCreateCommand(
-    string? Name,
-    UserId RequestedBy
-    );
-
-public class WorkspaceCreateCommandValidator : AbstractValidator<WorkspaceCreateCommand>
-{
-    public WorkspaceCreateCommandValidator()
-    {
-        _ = RuleFor(q => q).NotEmpty();
-        _ = RuleFor(q => q.Name).NotEmpty();
-    }
-}
+namespace Consent.Application.Workspaces.Create;
 
 public interface IWorkspaceCreateCommandHandler : ICommandHandler<WorkspaceCreateCommand, Result<Workspace>> { }
 

@@ -2,21 +2,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Consent.Application.Workspaces;
-using Consent.Domain.Contracts;
 using Consent.Domain.Core;
-using Consent.Domain.Users;
 
-namespace Consent.Application.Contracts;
-
-public record ContractVersionGetQuery(
-    ContractVersionId ContractVersionId,
-    UserId RequestedBy
-    );
-
-public record ContractVersionGetQueryResult(
-    Contract Contract,
-    ContractVersion Version
-    );
+namespace Consent.Application.Contracts.VersionGet;
 
 public interface IContractVersionGetQueryHandler : IQueryHandler<ContractVersionGetQuery, Maybe<ContractVersionGetQueryResult>> { }
 

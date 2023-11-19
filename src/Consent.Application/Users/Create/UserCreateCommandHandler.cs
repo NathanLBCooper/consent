@@ -3,22 +3,8 @@ using System.Threading.Tasks;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
 using Consent.Domain.Users;
-using FluentValidation;
 
-namespace Consent.Application.Users;
-
-public record UserCreateCommand(
-    string? Name
-    );
-
-public class UserCreateCommandValidator : AbstractValidator<UserCreateCommand>
-{
-    public UserCreateCommandValidator()
-    {
-        _ = RuleFor(q => q).NotEmpty();
-        _ = RuleFor(q => q.Name).NotEmpty();
-    }
-}
+namespace Consent.Application.Users.Create;
 
 public interface IUserCreateCommandHandler : ICommandHandler<UserCreateCommand, Result<User>> { }
 

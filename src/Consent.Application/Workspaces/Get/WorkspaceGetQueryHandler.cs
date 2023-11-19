@@ -1,15 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Consent.Domain.Core;
-using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 
-namespace Consent.Application.Workspaces;
-
-public record WorkspaceGetQuery(
-    WorkspaceId WorkspaceId,
-    UserId RequestedBy
-    );
+namespace Consent.Application.Workspaces.Get;
 
 public interface IWorkspaceGetQueryHandler : IQueryHandler<WorkspaceGetQuery, Maybe<Workspace>> { }
 

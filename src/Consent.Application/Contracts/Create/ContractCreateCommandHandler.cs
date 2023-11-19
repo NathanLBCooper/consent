@@ -4,26 +4,8 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using Consent.Domain.Users;
-using Consent.Domain.Workspaces;
-using FluentValidation;
 
-namespace Consent.Application.Contracts;
-
-public record ContractCreateCommand(
-    string? Name,
-    WorkspaceId WorkspaceId,
-    UserId RequestedBy
-    );
-
-internal class ContractCreateCommandValidator : AbstractValidator<ContractCreateCommand>
-{
-    public ContractCreateCommandValidator()
-    {
-        _ = RuleFor(q => q).NotEmpty();
-        _ = RuleFor(q => q.Name).NotEmpty();
-    }
-}
+namespace Consent.Application.Contracts.Create;
 
 public interface IContractCreateCommandHandler : ICommandHandler<ContractCreateCommand, Result<Contract>> { }
 

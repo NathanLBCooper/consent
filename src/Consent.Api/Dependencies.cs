@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Consent.Application.Users;
+using Consent.Application.Users.Create;
+using Consent.Application.Users.Get;
 using Consent.Storage;
 using Consent.Storage.Contracts;
 using Consent.Storage.Users;

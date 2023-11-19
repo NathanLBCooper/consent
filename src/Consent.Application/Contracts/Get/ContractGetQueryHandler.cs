@@ -3,14 +3,8 @@ using System.Threading.Tasks;
 using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
-using Consent.Domain.Users;
 
-namespace Consent.Application.Contracts;
-
-public record ContractGetQuery(
-    ContractId ContractId,
-    UserId RequestedBy
-    );
+namespace Consent.Application.Contracts.Get;
 
 public interface IContractGetQueryHandler : IQueryHandler<ContractGetQuery, Maybe<Contract>> { }
 

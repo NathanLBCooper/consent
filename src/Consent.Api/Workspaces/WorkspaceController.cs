@@ -1,7 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Workspaces;
-using Consent.Application.Workspaces;
+using Consent.Application.Workspaces.Create;
+using Consent.Application.Workspaces.Get;
 using Consent.Domain.Core;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;

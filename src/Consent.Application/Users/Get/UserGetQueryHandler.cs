@@ -3,12 +3,7 @@ using System.Threading.Tasks;
 using Consent.Domain.Core;
 using Consent.Domain.Users;
 
-namespace Consent.Application.Users;
-
-public record UserGetQuery(
-    UserId UserId,
-    UserId RequestedBy
-    );
+namespace Consent.Application.Users.Get;
 
 public interface IUserGetQueryHandler : IQueryHandler<UserGetQuery, Maybe<User>> { }
 

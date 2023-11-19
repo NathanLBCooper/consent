@@ -1,7 +1,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Consent.Api.Client.Models.Users;
-using Consent.Application.Users;
+using Consent.Application.Users.Create;
+using Consent.Application.Users.Get;
 using Consent.Domain.Core;
 using Consent.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
