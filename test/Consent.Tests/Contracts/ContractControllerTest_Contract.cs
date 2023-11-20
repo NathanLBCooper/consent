@@ -4,12 +4,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Contracts;
-using Consent.Api.Client.Models.Users;
-using Consent.Api.Client.Models.Workspaces;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
 using Refit;
 using Shouldly;
+using static Consent.Tests.Builders.EndpointExtensions;
 
 namespace Consent.Tests.Contracts;
 
@@ -33,24 +32,24 @@ public class ContractControllerTest_Contract : IDisposable
     [Fact]
     public async Task Can_create_and_get_a_contract()
     {
-        var user = await CreateUser();
-        var workspace = await CreateWorkspace(user);
+        var user = await UserCreate(_userEndpoint);
+        var workspace = await WorkspaceCreate(_workspaceEndpoint, user);
         var request = new ContractCreateRequestModelBuilder(workspace.Id).Build();
 
-        void Verify(ContractModel model)
+        var createdContract = await _sut.ContractCreate(request, user.Id);
+        Verify(createdContract);
+
+        var fetchedContract = await _sut.ContractGet(createdContract.Id, user.Id);
+        fetchedContract.Id.ShouldBe(createdContract.Id);
+        Verify(fetchedContract);
+
+        void Verify(ContractModel c)
         {
-            model.Name.ShouldBe(request.Name);
-            model.Workspace.Id.ShouldBe(workspace.Id);
-            model.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
-            model.Versions.ShouldBeEmpty();
+            c.Name.ShouldBe(request.Name);
+            c.Workspace.Id.ShouldBe(workspace.Id);
+            c.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
+            c.Versions.ShouldBeEmpty();
         }
-
-        var created = await _sut.ContractCreate(request, user.Id);
-        Verify(created);
-
-        var fetched = await _sut.ContractGet(created.Id, user.Id);
-        fetched.Id.ShouldBe(created.Id);
-        Verify(fetched);
     }
 
     [Fact(Skip = "Unimplemented")]
@@ -84,7 +83,7 @@ public class ContractControllerTest_Contract : IDisposable
     [Fact]
     public async Task Cannot_create_a_contract_on_a_nonexistant_workspace()
     {
-        var user = await CreateUser();
+        var user = await UserCreate(_userEndpoint);
         var request = new ContractCreateRequestModelBuilder(-1).Build();
 
         var create = async () => await _sut.ContractCreate(request, user.Id);
@@ -99,19 +98,6 @@ public class ContractControllerTest_Contract : IDisposable
         await Task.CompletedTask;
         // todo
         // todo maybe it should be unauthorized, but if no view permissions as well, notfound
-    }
-
-    private async Task<UserModel> CreateUser()
-    {
-        return await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
-    }
-
-    private async Task<WorkspaceModel> CreateWorkspace(UserModel user)
-    {
-        return await _workspaceEndpoint.WorkspaceCreate(
-            request: new WorkspaceCreateRequestModelBuilder().Build(),
-            userId: user.Id
-            );
     }
 
     public void Dispose()

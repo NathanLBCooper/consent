@@ -3,12 +3,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Contracts;
-using Consent.Api.Client.Models.Users;
-using Consent.Api.Client.Models.Workspaces;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
 using Refit;
 using Shouldly;
+using static Consent.Tests.Builders.EndpointExtensions;
 
 namespace Consent.Tests.Contracts;
 
@@ -32,26 +31,26 @@ public class ContractControllerTest_Version : IDisposable
     [Fact]
     public async Task Can_create_and_get_a_contract_version()
     {
-        var user = await CreateUser();
-        var contract = await CreateContact(await CreateWorkspace(user), user);
+        var user = await UserCreate(_userEndpoint);
+        var contract = await ContractCreate(_sut, await WorkspaceCreate(_workspaceEndpoint, user), user);
         var request = new ContractVersionCreateRequestModelBuilder().Build();
 
-        void Verify(ContractVersionModel model)
+        var createdVersion = await _sut.ContractVersionCreate(contract.Id, request, user.Id);
+        Verify(createdVersion);
+
+        var fetchedVersion = await _sut.ContractVersionGet(createdVersion.Id, user.Id);
+        fetchedVersion.Id.ShouldBe(createdVersion.Id);
+        Verify(fetchedVersion);
+
+        void Verify(ContractVersionModel v)
         {
-            model.Contract.Id.ShouldBe(contract.Id);
-            model.Contract.Href.ShouldBe($"/Contract/{contract.Id}");
-            model.Name.ShouldBe(model.Name);
-            model.Text.ShouldBe(model.Text);
-            model.Status.ShouldBe(ContractVersionStatusModel.Draft);
-            model.Provisions.ShouldBeEmpty();
+            v.Contract.Id.ShouldBe(contract.Id);
+            v.Contract.Href.ShouldBe($"/Contract/{contract.Id}");
+            v.Name.ShouldBe(v.Name);
+            v.Text.ShouldBe(v.Text);
+            v.Status.ShouldBe(ContractVersionStatusModel.Draft);
+            v.Provisions.ShouldBeEmpty();
         }
-
-        var created = await _sut.ContractVersionCreate(contract.Id, request, user.Id);
-        Verify(created);
-
-        var fetched = await _sut.ContractVersionGet(created.Id, user.Id);
-        fetched.Id.ShouldBe(created.Id);
-        Verify(fetched);
     }
 
     [Fact(Skip = "Unimplemented")]
@@ -95,24 +94,6 @@ public class ContractControllerTest_Version : IDisposable
         await Task.CompletedTask;
         // todo
         // todo maybe it should be unauthorized, but if no view permissions as well, notfound
-    }
-
-    private async Task<UserModel> CreateUser()
-    {
-        return await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
-    }
-
-    private async Task<WorkspaceModel> CreateWorkspace(UserModel user)
-    {
-        return await _workspaceEndpoint.WorkspaceCreate(
-            request: new WorkspaceCreateRequestModelBuilder().Build(),
-            userId: user.Id
-            );
-    }
-
-    private async Task<ContractModel> CreateContact(WorkspaceModel workspace, UserModel user)
-    {
-        return await _sut.ContractCreate(new ContractCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
     }
 
     public void Dispose()

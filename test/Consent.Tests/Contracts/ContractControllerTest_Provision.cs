@@ -5,12 +5,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Contracts;
-using Consent.Api.Client.Models.Users;
-using Consent.Api.Client.Models.Workspaces;
 using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
 using Refit;
 using Shouldly;
+using static Consent.Tests.Builders.EndpointExtensions;
 
 namespace Consent.Tests.Contracts;
 
@@ -34,36 +33,36 @@ public class ContractControllerTest_Provision : IDisposable
     [Fact]
     public async Task Can_create_a_provision()
     {
-        var user = await CreateUser();
-        var contract = await CreateContact(await CreateWorkspace(user), user);
-        var version = await CreateVersion(contract, user);
+        var user = await UserCreate(_userEndpoint);
+        var contract = await ContractCreate(_sut, await WorkspaceCreate(_workspaceEndpoint, user), user);
+        var version = await VersionCreate(_sut, contract, user);
         var permissionId = 1; // todo, doesn't validate existance
         var request = new ProvisionCreateRequestModelBuilder(new[] { permissionId }).Build();
 
-        void Verify(ProvisionModel model)
-        {
-            model.Text.ShouldBe(request.Text);
-            var permission = model.Permissions.ShouldHaveSingleItem();
-            permission.Id.ShouldBe(permissionId);
-            permission.Href.ShouldBe(null); // todo, no controller
-            model.Version.Id.ShouldBe(version.Id);
-            model.Version.Href.ShouldBe($"/Contract/version/{version.Id}");
-        }
-
-        var created = await _sut.ProvisionCreate(version.Id, request, user.Id);
-        Verify(created);
+        var createdProvision = await _sut.ProvisionCreate(version.Id, request, user.Id);
+        Verify(createdProvision);
 
         var fetchedVersion = await _sut.ContractVersionGet(version.Id, user.Id);
-        var fetched = fetchedVersion.Provisions.Single(p => p.Id == created.Id);
-        Verify(fetched);
+        var fetchedProvision = fetchedVersion.Provisions.Single(p => p.Id == createdProvision.Id);
+        Verify(fetchedProvision);
+
+        void Verify(ProvisionModel p)
+        {
+            p.Text.ShouldBe(request.Text);
+            var permission = p.Permissions.ShouldHaveSingleItem();
+            permission.Id.ShouldBe(permissionId);
+            permission.Href.ShouldBe(null); // todo, no controller
+            p.Version.Id.ShouldBe(version.Id);
+            p.Version.Href.ShouldBe($"/Contract/version/{version.Id}");
+        }
     }
 
     [Fact]
     public async Task Cannot_create_a_provision_without_any_permissions()
     {
-        var user = await CreateUser();
-        var contract = await CreateContact(await CreateWorkspace(user), user);
-        var version = await CreateVersion(contract, user);
+        var user = await UserCreate(_userEndpoint);
+        var contract = await ContractCreate(_sut, await WorkspaceCreate(_workspaceEndpoint, user), user);
+        var version = await VersionCreate(_sut, contract, user);
         var request = new ProvisionCreateRequestModelBuilder(Array.Empty<int>()).Build();
 
         var createProvision = async () => await _sut.ProvisionCreate(version.Id, request, user.Id);
@@ -121,30 +120,6 @@ public class ContractControllerTest_Provision : IDisposable
     {
         await Task.CompletedTask;
         // todo
-    }
-
-    private async Task<UserModel> CreateUser()
-    {
-        return await _userEndpoint.UserCreate(new UserCreateRequestModelBuilder().Build());
-    }
-
-    private async Task<WorkspaceModel> CreateWorkspace(UserModel user)
-    {
-        return await _workspaceEndpoint.WorkspaceCreate(
-            request: new WorkspaceCreateRequestModelBuilder().Build(),
-            userId: user.Id
-            );
-    }
-
-    private async Task<ContractModel> CreateContact(WorkspaceModel workspace, UserModel user)
-    {
-        return await _sut.ContractCreate(new ContractCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
-    }
-
-    private async Task<ContractVersionModel> CreateVersion(ContractModel contract, UserModel user)
-    {
-        return await _sut.ContractVersionCreate(
-            contract.Id, new ContractVersionCreateRequestModelBuilder().Build(), user.Id);
     }
 
     public void Dispose()

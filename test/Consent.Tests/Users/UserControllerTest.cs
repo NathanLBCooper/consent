@@ -10,6 +10,7 @@ using Consent.Tests.Builders;
 using Consent.Tests.Infrastructure;
 using Refit;
 using Shouldly;
+using static Consent.Tests.Builders.EndpointExtensions;
 
 namespace Consent.Tests.Users;
 
@@ -32,35 +33,41 @@ public class UserControllerTest : IDisposable
     [Fact]
     public async Task Can_create_and_get_a_user()
     {
-        var request = new UserCreateRequestModelBuilder().Build();
+        var createRequest = new UserCreateRequestModelBuilder().Build();
 
-        void Verify(UserModel model)
+        var createdUser = await _sut.UserCreate(createRequest);
+        Verify(createdUser);
+
+        var selfFetchedUser = await _sut.UserGet(createdUser.Id);
+        selfFetchedUser.Id.ShouldBe(createdUser.Id);
+        Verify(selfFetchedUser);
+
+        var fetchedUser = await _sut.UserGet(createdUser.Id, createdUser.Id);
+        fetchedUser.Id.ShouldBe(createdUser.Id);
+        Verify(fetchedUser);
+
+        void Verify(UserModel u)
         {
-            model.Name.ShouldBe(request.Name);
-            model.WorkspaceMemberships.ShouldBeEmpty();
+            u.Name.ShouldBe(createRequest.Name);
+            u.WorkspaceMemberships.ShouldBeEmpty();
         }
-
-        var created = await _sut.UserCreate(request);
-        Verify(created);
-
-        var fetched = await _sut.UserGet(created.Id);
-        fetched.Id.ShouldBe(created.Id);
-        Verify(fetched);
-
-        fetched = await _sut.UserGet(created.Id, created.Id);
-        fetched.Id.ShouldBe(created.Id);
-        Verify(fetched);
     }
 
     [Fact]
     public async Task Can_get_workspace_memberships_for_user()
     {
-        var created = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
-        var workspace = await _workspaceEndpoint.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), created.Id);
+        var createdUser = await UserCreate(_sut);
+        var workspace = await WorkspaceCreate(_workspaceEndpoint, createdUser);
 
-        void Verify(UserModel model)
+        var selfFetchedUser= await _sut.UserGet(createdUser.Id);
+        Verify(selfFetchedUser);
+
+        var fetchedUser = await _sut.UserGet(createdUser.Id, createdUser.Id);
+        Verify(fetchedUser);
+
+        void Verify(UserModel u)
         {
-            var membership = model.WorkspaceMemberships.ShouldHaveSingleItem();
+            var membership = u.WorkspaceMemberships.ShouldHaveSingleItem();
             membership.Workspace.Id.ShouldBe(workspace.Id);
             membership.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
             membership.Permissions.ShouldBeEquivalentTo(
@@ -69,20 +76,15 @@ public class UserControllerTest : IDisposable
                 WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
                 );
         }
-
-        var fetched = await _sut.UserGet(created.Id);
-        Verify(fetched);
-
-        fetched = await _sut.UserGet(created.Id, created.Id);
-        Verify(fetched);
     }
 
     [Fact]
     public async Task Cannot_get_nonexistant_user()
     {
-        var user = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+        var userId = -1;
+        var requestingUser = await UserCreate(_sut);
 
-        var fetch = async () => await _sut.UserGet(-1, user.Id);
+        var fetch = async () => await _sut.UserGet(userId, requestingUser.Id);
 
         var error = await fetch.ShouldThrowAsync<ValidationApiException>();
         Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
@@ -91,9 +93,10 @@ public class UserControllerTest : IDisposable
     [Fact]
     public async Task Cannot_get_user_with_nonexistant_requesting_user()
     {
-        var user = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+        var user = await UserCreate(_sut);
+        var requestingUserId = -1;
 
-        var fetch = async () => await _sut.UserGet(user.Id, -1);
+        var fetch = async () => await _sut.UserGet(user.Id, requestingUserId);
 
         var error = await fetch.ShouldThrowAsync<ValidationApiException>();
         Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
@@ -102,8 +105,8 @@ public class UserControllerTest : IDisposable
     [Fact]
     public async Task User_can_only_get_themselves() // ie pointless endpoint. But I would like user permissions or something soon
     {
-        var bob = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
-        var eve = await _sut.UserCreate(new UserCreateRequestModelBuilder().Build());
+        var bob = await UserCreate(_sut);
+        var eve = await UserCreate(_sut);
 
         var bobFetchedByBob = await _sut.UserGet(bob.Id, bob.Id);
         bobFetchedByBob.Id.ShouldBe(bob.Id);
