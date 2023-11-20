@@ -42,7 +42,7 @@ internal class TestDatabaseContext : IDisposable
     {
         using var connection = new SqlConnection(connectionString);
         var databaseProvider = new MssqlDatabaseProvider(connection);
-        var migrator = new SimpleMigrator(typeof(Storage.Migrator.Program).GetTypeInfo().Assembly, databaseProvider);
+        var migrator = new SimpleMigrator(typeof(Consent.Storage.Migrator.Program).GetTypeInfo().Assembly, databaseProvider);
         migrator.Load();
         migrator.MigrateToLatest();
 
