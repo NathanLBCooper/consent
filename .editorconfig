@@ -29,12 +29,16 @@ dotnet_style_prefer_conditional_expression_over_return = false
 # Don't force `var (a, b) = Foo();` over `var aandbTuple = Foo();`
 csharp_style_deconstructed_variable_declaration = false
 # private member underscores
-dotnet_naming_rule.instance_fields_should_be_camel_case.severity = suggestion:warning
-dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields:warning
-dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style:warning
-dotnet_naming_symbols.instance_fields.applicable_kinds = field:warning
-dotnet_naming_style.instance_field_style.capitalization = camel_case:warning
-dotnet_naming_style.instance_field_style.required_prefix = _:warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+dotnet_naming_style.underscored.capitalization = camel_case
+dotnet_naming_style.underscored.required_prefix = _
+dotnet_naming_rule.private_fields_underscored.symbols = private_fields
+dotnet_naming_rule.private_fields_underscored.style = underscored
+dotnet_naming_rule.private_fields_underscored.severity = warning
 # prevent discarded variables
 csharp_style_unused_value_expression_statement_preference = discard_variable:warning
 csharp_style_unused_value_assignment_preference = discard_variable:warning
