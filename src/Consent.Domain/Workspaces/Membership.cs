@@ -9,22 +9,18 @@ namespace Consent.Domain.Workspaces;
 
 public class Membership
 {
-    public static ImmutableArray<WorkspacePermission> SuperUser { get; } = ImmutableArray.Create(
-        WorkspacePermission.View,
-        WorkspacePermission.Edit,
-        WorkspacePermission.Admin,
-        WorkspacePermission.Buyer
-        );
+    public static ImmutableArray<Permission> SuperUser { get; } =
+        [Permission.View, Permission.Edit, Permission.Admin, Permission.Buyer];
 
     public MembershipId Id { get; init; }
     public UserId UserId { get; private init; }
-    public ImmutableList<WorkspacePermission> Permissions { get; private init; }
+    public ImmutableList<Permission> Permissions { get; private init; }
 
     public bool IsSuperUser { get; }
-    public bool CanView => Permissions.Contains(WorkspacePermission.View);
-    public bool CanEdit => Permissions.Contains(WorkspacePermission.Edit);
+    public bool CanView => Permissions.Contains(Permission.View);
+    public bool CanEdit => Permissions.Contains(Permission.Edit);
 
-    public Membership(UserId userId, IEnumerable<WorkspacePermission> permissions)
+    public Membership(UserId userId, IEnumerable<Permission> permissions)
     {
         UserId = userId;
         Permissions = permissions.ToImmutableList();
@@ -32,7 +28,7 @@ public class Membership
         IsSuperUser = SuperUser.All(Permissions.Contains);
     }
 
-    private Membership(UserId userId) : this(userId, Array.Empty<WorkspacePermission>())
+    private Membership(UserId userId) : this(userId, Array.Empty<Permission>())
     {
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Consent.Domain.Workspaces;
 
-public enum WorkspacePermission
+public enum Permission
 {
     View,
     Edit,

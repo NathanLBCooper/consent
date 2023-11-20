@@ -10,5 +10,5 @@ public record UserModel(
 
 public record UserWorkspaceMembershipModel(
     ResourceLink Workspace,
-    WorkspacePermissionModel[] Permissions
+    PermissionModel[] Permissions
     );

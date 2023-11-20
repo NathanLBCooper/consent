@@ -72,8 +72,8 @@ public class UserControllerTest : IDisposable
             membership.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
             membership.Permissions.ShouldBeEquivalentTo(
                 new[] {
-                WorkspacePermissionModel.View, WorkspacePermissionModel.Edit,
-                WorkspacePermissionModel.Admin, WorkspacePermissionModel.Buyer }
+                PermissionModel.View, PermissionModel.Edit,
+                PermissionModel.Admin, PermissionModel.Buyer }
                 );
         }
     }

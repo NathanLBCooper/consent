@@ -8,10 +8,10 @@ public record WorkspaceModel(
 
 public record MembershipModel(
     int UserId,
-    WorkspacePermissionModel[] Permissions
+    PermissionModel[] Permissions
     );
 
-public enum WorkspacePermissionModel
+public enum PermissionModel
 {
     View,
     Edit,

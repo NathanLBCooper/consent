@@ -55,12 +55,12 @@ public class PurposeControllerTest : IDisposable
 
     // Cannot_get_nonexistant_purpose
     // Cannot_get_purpose_with_nonexistant_user
-    // Cannot_get_purpose_with_user_with_no_workspacePermissions
+    // Cannot_get_purpose_with_user_with_no_permission
     // ...
 
     // Cannot_create_purpose_with_nonexistant_user
     // Cannot_create_purpose_with_nonexistant_workspace
-    // Cannot_create_purpose_with_user_with_no_workspacePermissions
+    // Cannot_create_purpose_with_user_with_no_permission
     // ...
 
     private async Task<UserModel> CreateUser()

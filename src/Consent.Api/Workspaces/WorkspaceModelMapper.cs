@@ -19,14 +19,14 @@ internal static class WorkspaceModelMapper
         return new MembershipModel(membership.UserId.Value, membership.Permissions.Select(p => p.ToModel()).ToArray());
     }
 
-    public static WorkspacePermissionModel ToModel(this WorkspacePermission permission)
+    public static PermissionModel ToModel(this Permission permission)
     {
         return permission switch
         {
-            WorkspacePermission.View => WorkspacePermissionModel.View,
-            WorkspacePermission.Edit => WorkspacePermissionModel.Edit,
-            WorkspacePermission.Admin => WorkspacePermissionModel.Admin,
-            WorkspacePermission.Buyer => WorkspacePermissionModel.Buyer,
+            Permission.View => PermissionModel.View,
+            Permission.Edit => PermissionModel.Edit,
+            Permission.Admin => PermissionModel.Admin,
+            Permission.Buyer => PermissionModel.Buyer,
             _ => throw new ArgumentException()
         };
     }

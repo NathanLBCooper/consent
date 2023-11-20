@@ -47,7 +47,7 @@ public class WorkspaceDbContext : DbContext
         _ = builder.Property(e => e.Permissions)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, enumToStr),
-                v => JsonSerializer.Deserialize<ImmutableList<WorkspacePermission>>(v, enumToStr)!
+                v => JsonSerializer.Deserialize<ImmutableList<Permission>>(v, enumToStr)!
                 );
     }
 }

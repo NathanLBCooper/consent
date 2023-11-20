@@ -77,10 +77,10 @@ public class Workspace : IEntity<WorkspaceId>
         return Memberships.SingleOrDefault(m => m.UserId == userId)?.CanEdit ?? false;
     }
 
-    public IEnumerable<WorkspacePermission> GetUserPermissions(UserId userId)
+    public IEnumerable<Permission> GetUserPermissions(UserId userId)
     {
         return Memberships.SingleOrDefault(m => m.UserId == userId)?.Permissions
-            ?? Enumerable.Empty<WorkspacePermission>();
+            ?? Enumerable.Empty<Permission>();
     }
 }
 

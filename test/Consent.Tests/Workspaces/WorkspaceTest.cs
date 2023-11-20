@@ -25,14 +25,14 @@ public class WorkspaceTest
     public void Can_get_user_permissions()
     {
         var userId = new UserId(1);
-        var permissions = new List<WorkspacePermission> { WorkspacePermission.Edit, WorkspacePermission.View };
+        var permissions = new List<Permission> { Permission.Edit, Permission.View };
         var workspace = new Workspace("myworkspace", new List<Membership> {
             new(userId, permissions ),
             new(new UserId(2), Membership.SuperUser)
         });
 
         workspace.GetUserPermissions(userId).ShouldBe(permissions);
-        workspace.GetUserPermissions(new UserId(3)).ShouldBe(Array.Empty<WorkspacePermission>());
+        workspace.GetUserPermissions(new UserId(3)).ShouldBe(Array.Empty<Permission>());
     }
 
     [Fact]
@@ -41,8 +41,8 @@ public class WorkspaceTest
         var bob = new UserId(10);
         var eve = new UserId(11);
         var workspace = new Workspace("myworkspace", new List<Membership> {
-            new (bob, new[] { WorkspacePermission.View }),
-            new (eve, new[] { WorkspacePermission.Edit }),
+            new (bob, new[] { Permission.View }),
+            new (eve, new[] { Permission.Edit }),
             new (new UserId(12), Membership.SuperUser)
         });
 
@@ -57,8 +57,8 @@ public class WorkspaceTest
         var bob = new UserId(10);
         var eve = new UserId(11);
         var workspace = new Workspace("myworkspace", new List<Membership> {
-            new (bob, new[] { WorkspacePermission.Edit }),
-            new (eve, new[] { WorkspacePermission.Admin }),
+            new (bob, new[] { Permission.Edit }),
+            new (eve, new[] { Permission.Admin }),
             new (new UserId(12), Membership.SuperUser)
         });
 
@@ -75,8 +75,8 @@ public class WorkspaceTest
 
         workspace.GetUserPermissions(userId).ShouldBe(
             new[] {
-                WorkspacePermission.View, WorkspacePermission.Edit,
-                WorkspacePermission.Admin, WorkspacePermission.Buyer }
+                Permission.View, Permission.Edit,
+                Permission.Admin, Permission.Buyer }
             );
     }
 
@@ -86,8 +86,8 @@ public class WorkspaceTest
         var empty = () => new Workspace("myworkspace", new List<Membership>());
         var nonSuper = () => new Workspace("myworkspace",
             new List<Membership> {
-                new Membership(new UserId(1), new List<WorkspacePermission> {
-                    WorkspacePermission.Edit, WorkspacePermission.View
+                new Membership(new UserId(1), new List<Permission> {
+                    Permission.Edit, Permission.View
                 })
             });
 
