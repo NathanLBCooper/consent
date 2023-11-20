@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
-using Consent.Api.Client.Models.Permissions;
+using Consent.Api.Client.Models.Purposes;
 using Refit;
 
 namespace Consent.Api.Client.Endpoints;
 
-public interface IPermissionEndpoint
+public interface IPurposeEndpoint
 {
-    [Get("/permission/{id}")]
-    Task<PermissionModel> PermissioGet(int id, [Header("userId")] int userId);
+    [Get("/purpose/{id}")]
+    Task<PurposeModel> PurposeGet(int id, [Header("userId")] int userId);
 
-    [Post("/permission")]
-    Task<PermissionModel> PermissionCreate([Body] PermissionCreateRequestModel request, [Header("userId")] int userId);
+    [Post("/purpose")]
+    Task<PurposeModel> PurposeCreate([Body] PurposeCreateRequestModel request, [Header("userId")] int userId);
 }

@@ -59,7 +59,7 @@ public class UserControllerTest : IDisposable
         var createdUser = await UserCreate(_sut);
         var workspace = await WorkspaceCreate(_workspaceEndpoint, createdUser);
 
-        var selfFetchedUser= await _sut.UserGet(createdUser.Id);
+        var selfFetchedUser = await _sut.UserGet(createdUser.Id);
         Verify(selfFetchedUser);
 
         var fetchedUser = await _sut.UserGet(createdUser.Id, createdUser.Id);

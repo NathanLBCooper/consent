@@ -43,12 +43,12 @@ internal static class ContractModelMapper
     {
         var provisionId = Guard.NotNull(provision.Id);
         var versionId = Guard.NotNull(version.Id);
-        var permissionLinks = provision.PermissionIds.Select(
-            pid => new ResourceLink(pid.Value, linkGenerator.GetPermission(pid))
+        var purposeLinks = provision.PurposeIds.Select(
+            pid => new ResourceLink(pid.Value, linkGenerator.GetPurpose(pid))
             ).ToArray();
         var versionLink = new ResourceLink(versionId.Value, linkGenerator.GetContractVersion(versionId));
 
-        return new ProvisionModel(provisionId.Value, provision.Text, permissionLinks, versionLink);
+        return new ProvisionModel(provisionId.Value, provision.Text, purposeLinks, versionLink);
     }
 
     private static ContractVersionStatusModel ToModel(this ContractVersionStatus status)

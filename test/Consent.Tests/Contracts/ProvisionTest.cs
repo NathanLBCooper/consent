@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Consent.Domain.Contracts;
-using Consent.Domain.Permissions;
+using Consent.Domain.Purposes;
 using Consent.Tests.Builders;
 using Shouldly;
 
@@ -15,7 +15,7 @@ public class ProvisionTest
     [InlineData("  ")]
     public void Cannot_create_provision_with_empty_name(string text)
     {
-        var ctor = () => new Provision(text, new[] { new PermissionId(1001) });
+        var ctor = () => new Provision(text, new[] { new PurposeId(1001) });
         _ = ctor.ShouldThrow<ArgumentException>();
     }
 
@@ -24,17 +24,17 @@ public class ProvisionTest
     {
         var version = new ContractVersionBuilder()
         {
-            Provisions = new[] { new Provision("text", new[] { new PermissionId(1010) }) }
+            Provisions = new[] { new Provision("text", new[] { new PurposeId(1010) }) }
         }.Build();
         var provision = version.Provisions.Single();
 
-        provision.AddPermissionIds(new[] { new PermissionId(1011) });
+        provision.AddPurposeIds(new[] { new PurposeId(1011) });
         provision.Text = "new text";
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var addPermissionId = () => { provision.AddPermissionIds(new[] { new PermissionId(1012) }); };
-            _ = addPermissionId.ShouldThrow<InvalidOperationException>();
+            var addPurposeId = () => { provision.AddPurposeIds(new[] { new PurposeId(1012) }); };
+            _ = addPurposeId.ShouldThrow<InvalidOperationException>();
         }, version);
 
         Util.InvokeForAllNonDraftStatuses(() =>
@@ -48,7 +48,7 @@ public class ProvisionTest
     public void Provision_can_only_be_attached_to_one_version_once()
     {
         var version = new ContractVersionBuilder().Build();
-        var provison = new Provision("text", new[] { new PermissionId(1002) });
+        var provison = new Provision("text", new[] { new PurposeId(1002) });
 
         // Calling this not from the version is wrong and doesn't actually add to contract. Use domain event or something?
         provison.OnAddedToVersion(version);
@@ -62,9 +62,9 @@ public class ProvisionTest
     }
 
     [Fact]
-    public void Permissions_must_not_be_empty()
+    public void Purposes_must_not_be_empty()
     {
-        var ctor = () => new Provision("text", Array.Empty<PermissionId>());
+        var ctor = () => new Provision("text", Array.Empty<PurposeId>()); // todo null
         _ = ctor.ShouldThrow<ArgumentException>();
     }
 }

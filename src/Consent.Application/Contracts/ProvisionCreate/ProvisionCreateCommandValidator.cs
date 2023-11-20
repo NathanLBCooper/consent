@@ -8,6 +8,6 @@ internal class ProvisionCreateCommandValidator : AbstractValidator<ProvisionCrea
     {
         _ = RuleFor(q => q).NotEmpty();
         _ = RuleFor(q => q.Text).NotEmpty();
-        _ = RuleFor(q => q.PermissionIds).NotEmpty();
+        _ = RuleFor(q => q.PurposeIds).NotEmpty();
     }
 }

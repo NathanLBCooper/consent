@@ -44,7 +44,7 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
 
         var version = contract.Versions.Single(v => v.Id == command.ContractVersionId);
 
-        var created = new Provision(Guard.NotNull(command.Text), Guard.NotNull(command.PermissionIds));
+        var created = new Provision(Guard.NotNull(command.Text), Guard.NotNull(command.PurposeIds));
         version.AddProvisions(created);
 
         await _contractRepository.Update(contract);

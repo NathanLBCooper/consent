@@ -31,9 +31,9 @@ CREATE TABLE [workspaces].[Membership] (
     [Id] int NOT NULL IDENTITY,
     [UserId] int NOT NULL,
     [Permissions] nvarchar(max) NOT NULL,
-    [WorkspaceId] int NULL,
+    [WorkspaceId] int NOT NULL,
     CONSTRAINT [PK_Membership] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_Membership_Workspaces_WorkspaceId] FOREIGN KEY ([WorkspaceId]) REFERENCES [workspaces].[Workspaces] ([Id])
+    CONSTRAINT [FK_Membership_Workspaces_WorkspaceId] FOREIGN KEY ([WorkspaceId]) REFERENCES [workspaces].[Workspaces] ([Id]) ON DELETE CASCADE
 );
 
 CREATE INDEX [IX_Membership_WorkspaceId] ON [workspaces].[Membership] ([WorkspaceId]);
@@ -54,18 +54,18 @@ CREATE TABLE [contracts].[ContractVersion] (
     [Name] nvarchar(max) NOT NULL,
     [Text] nvarchar(max) NOT NULL,
     [Status] int NOT NULL,
-    [ContractId] int NULL,
+    [ContractId] int NOT NULL,
     CONSTRAINT [PK_ContractVersion] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_ContractVersion_Contracts_ContractId] FOREIGN KEY ([ContractId]) REFERENCES [contracts].[Contracts] ([Id])
+    CONSTRAINT [FK_ContractVersion_Contracts_ContractId] FOREIGN KEY ([ContractId]) REFERENCES [contracts].[Contracts] ([Id]) ON DELETE CASCADE
 );
 
 CREATE TABLE [contracts].[Provision] (
     [Id] int NOT NULL IDENTITY,
-    [ContractVersionId] int NULL,
+    [ContractVersionId] int NOT NULL,
     [Text] nvarchar(max) NOT NULL,
-    [PermissionIds] nvarchar(max) NOT NULL,
+    [PurposeIds] nvarchar(max) NOT NULL,
     CONSTRAINT [PK_Provision] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_Provision_ContractVersion_ContractVersionId] FOREIGN KEY ([ContractVersionId]) REFERENCES [contracts].[ContractVersion] ([Id])
+    CONSTRAINT [FK_Provision_ContractVersion_ContractVersionId] FOREIGN KEY ([ContractVersionId]) REFERENCES [contracts].[ContractVersion] ([Id]) ON DELETE CASCADE
 );
 
 CREATE INDEX [IX_ContractVersion_ContractId] ON [contracts].[ContractVersion] ([ContractId]);

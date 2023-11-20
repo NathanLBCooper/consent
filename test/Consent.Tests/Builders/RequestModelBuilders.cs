@@ -1,6 +1,6 @@
 ﻿using System;
 using Consent.Api.Client.Models.Contracts;
-using Consent.Api.Client.Models.Permissions;
+using Consent.Api.Client.Models.Purposes;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 
@@ -21,10 +21,10 @@ public record WorkspaceCreateRequestModelBuilder(string Name = "workspacename")
     }
 }
 
-public record PermissionCreateRequestModelBuilder(
-    int WorkspaceId, string Name = "permissionname", string Description = "permissiondescription")
+public record PurposeCreateRequestModelBuilder(
+    int WorkspaceId, string Name = "purposename", string Description = "purposedescription")
 {
-    public PermissionCreateRequestModel Build()
+    public PurposeCreateRequestModel Build()
     {
         return new(Name, Description, WorkspaceId);
     }
@@ -46,10 +46,10 @@ public record ContractVersionCreateRequestModelBuilder(string Name = "contractve
     }
 }
 
-public record ProvisionCreateRequestModelBuilder(int[] Permissions, string Text = "provisiontext")
+public record ProvisionCreateRequestModelBuilder(int[] PurposeIds, string Text = "provisiontext")
 {
     public ProvisionCreateRequestModel Build()
     {
-        return new(Text, Permissions ?? Array.Empty<int>());
+        return new(Text, PurposeIds ?? Array.Empty<int>());
     }
 }

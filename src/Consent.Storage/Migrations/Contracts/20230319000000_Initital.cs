@@ -38,7 +38,7 @@ public partial class Initital : Migration
                 Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
                 Status = table.Column<int>(type: "int", nullable: false),
-                ContractId = table.Column<int>(type: "int", nullable: true)
+                ContractId = table.Column<int>(type: "int", nullable: false)
             },
             constraints: table =>
             {
@@ -48,7 +48,8 @@ public partial class Initital : Migration
                     column: x => x.ContractId,
                     principalSchema: "contracts",
                     principalTable: "Contracts",
-                    principalColumn: "Id");
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
             });
 
         _ = migrationBuilder.CreateTable(
@@ -58,9 +59,9 @@ public partial class Initital : Migration
             {
                 Id = table.Column<int>(type: "int", nullable: false)
                     .Annotation("SqlServer:Identity", "1, 1"),
-                ContractVersionId = table.Column<int>(type: "int", nullable: true),
+                ContractVersionId = table.Column<int>(type: "int", nullable: false),
                 Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                PermissionIds = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                PurposeIds = table.Column<string>(type: "nvarchar(max)", nullable: false)
             },
             constraints: table =>
             {
@@ -70,7 +71,8 @@ public partial class Initital : Migration
                     column: x => x.ContractVersionId,
                     principalSchema: "contracts",
                     principalTable: "ContractVersion",
-                    principalColumn: "Id");
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
             });
 
         _ = migrationBuilder.CreateIndex(

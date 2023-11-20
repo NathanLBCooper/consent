@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Consent.Storage.Migrations.Workspaces
 {
     [DbContext(typeof(WorkspaceDbContext))]
-    [Migration("20230416114102_Initital")]
+    [Migration("20230319000000_Initital")]
     partial class Initital
     {
         /// <inheritdoc />
@@ -20,35 +20,10 @@ namespace Consent.Storage.Migrations.Workspaces
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("workspaces")
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Consent.Domain.Workspaces.Membership", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Permissions")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("WorkspaceId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WorkspaceId");
-
-                    b.ToTable("Membership", "workspaces");
-                });
 
             modelBuilder.Entity("Consent.Domain.Workspaces.Workspace", b =>
                 {
@@ -67,15 +42,36 @@ namespace Consent.Storage.Migrations.Workspaces
                     b.ToTable("Workspaces", "workspaces");
                 });
 
-            modelBuilder.Entity("Consent.Domain.Workspaces.Membership", b =>
-                {
-                    b.HasOne("Consent.Domain.Workspaces.Workspace", null)
-                        .WithMany("Memberships")
-                        .HasForeignKey("WorkspaceId");
-                });
-
             modelBuilder.Entity("Consent.Domain.Workspaces.Workspace", b =>
                 {
+                    b.OwnsMany("Consent.Domain.Workspaces.Membership", "Memberships", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("Permissions")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("WorkspaceId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("WorkspaceId");
+
+                            b1.ToTable("Membership", "workspaces");
+
+                            b1.WithOwner()
+                                .HasForeignKey("WorkspaceId");
+                        });
+
                     b.Navigation("Memberships");
                 });
 #pragma warning restore 612, 618

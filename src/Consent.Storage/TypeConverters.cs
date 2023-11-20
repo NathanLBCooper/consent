@@ -1,7 +1,7 @@
 ﻿using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Participants;
-using Consent.Domain.Permissions;
+using Consent.Domain.Purposes;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.EntityFrameworkCore;
@@ -22,8 +22,8 @@ internal static class TypeConverters
             .Properties<MembershipId>()
             .HaveConversion<IdentifierTypeConverter<MembershipId>>();
         _ = configurationBuilder
-            .Properties<PermissionId>()
-            .HaveConversion<IdentifierTypeConverter<PermissionId>>();
+            .Properties<PurposeId>()
+            .HaveConversion<IdentifierTypeConverter<PurposeId>>();
         _ = configurationBuilder
             .Properties<ParticipantId>()
             .HaveConversion<IdentifierTypeConverter<ParticipantId>>();

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json;
 using Consent.Domain.Contracts;
-using Consent.Domain.Permissions;
+using Consent.Domain.Purposes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -52,10 +52,10 @@ public class ContractDbContext : DbContext
         _ = builder.HasKey(e => e.Id);
         _ = builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
-        _ = builder.Property(e => e.PermissionIds)
+        _ = builder.Property(e => e.PurposeIds)
            .HasConversion(
                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null!),
-               v => JsonSerializer.Deserialize<ImmutableList<PermissionId>>(v, (JsonSerializerOptions)null!)!
+               v => JsonSerializer.Deserialize<ImmutableList<PurposeId>>(v, (JsonSerializerOptions)null!)!
                );
     }
 }

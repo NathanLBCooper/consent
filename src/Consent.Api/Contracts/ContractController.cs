@@ -9,7 +9,7 @@ using Consent.Application.Contracts.VersionCreate;
 using Consent.Application.Contracts.VersionGet;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
-using Consent.Domain.Permissions;
+using Consent.Domain.Purposes;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Mvc;
@@ -94,7 +94,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
         [FromRoute] int versionId, ProvisionCreateRequestModel request, [FromHeader] int userId, CancellationToken cancellationToken)
     {
         var command = new ProvisionCreateCommand(
-            request.Text, request.PermissionIds?.Select(p => new PermissionId(p)).ToArray(), new ContractVersionId(versionId), new UserId(userId)
+            request.Text, request.PurposeIds?.Select(p => new PurposeId(p)).ToArray(), new ContractVersionId(versionId), new UserId(userId)
             );
         var result = await _provisionCreate.Handle(command, cancellationToken);
         return result.Match(

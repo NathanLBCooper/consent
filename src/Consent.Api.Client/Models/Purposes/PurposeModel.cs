@@ -1,6 +1,6 @@
-﻿namespace Consent.Api.Client.Models.Permissions;
+﻿namespace Consent.Api.Client.Models.Purposes;
 
-public record PermissionModel(
+public record PurposeModel(
     int Id,
     string Name,
     string Description,

@@ -22,9 +22,4 @@
     <ProjectReference Include="..\Consent.Application\Consent.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\Users\" />
-    <Folder Include="Migrations\Workspaces\" />
-  </ItemGroup>
-
 </Project>

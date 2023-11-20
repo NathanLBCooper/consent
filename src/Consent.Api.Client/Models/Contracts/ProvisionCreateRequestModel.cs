@@ -1,5 +1,5 @@
 namespace Consent.Api.Client.Models.Contracts;
 
 public record ProvisionCreateRequestModel(
-    string? Text, int[]? PermissionIds
+    string? Text, int[]? PurposeIds
     );

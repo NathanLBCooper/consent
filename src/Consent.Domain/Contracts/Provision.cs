@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Consent.Domain.Core;
-using Consent.Domain.Permissions;
+using Consent.Domain.Purposes;
 
 namespace Consent.Domain.Contracts;
 
 /*
- * A yes or no choice to accept one or many permissions. May not contain all information required for informed consent
+ * A yes or no choice to accept one or many purposes. May not contain all information required for informed consent
  */
 public class Provision
 {
@@ -34,32 +34,32 @@ public class Provision
         }
     }
 
-    private ImmutableList<PermissionId> _permissionIds;
-    public ImmutableList<PermissionId> PermissionIds
+    private ImmutableList<PurposeId> _purposeIds;
+    public ImmutableList<PurposeId> PurposeIds
     {
-        get => _permissionIds;
-        [MemberNotNull(nameof(_permissionIds))]
+        get => _purposeIds;
+        [MemberNotNull(nameof(_purposeIds))]
         private set
         {
             if (value.IsEmpty)
             {
-                throw new ArgumentException("Cannot be empty", nameof(PermissionIds));
+                throw new ArgumentException("Cannot be empty", nameof(PurposeIds));
             }
 
-            _permissionIds = value;
+            _purposeIds = value;
         }
     }
 
-    public Provision(string text, IEnumerable<PermissionId> permissionIds)
+    public Provision(string text, IEnumerable<PurposeId> purposeIds)
     {
         Text = text;
-        PermissionIds = permissionIds.ToImmutableList();
+        PurposeIds = purposeIds.ToImmutableList();
     }
 
     private Provision(string text)
     {
         Text = text;
-        _permissionIds = ImmutableList.Create<PermissionId>();
+        _purposeIds = [];
     }
 
     public void OnAddedToVersion(ContractVersion version)
@@ -72,11 +72,11 @@ public class Provision
         ContractVersion = version;
     }
 
-    public void AddPermissionIds(IEnumerable<PermissionId> permissionIds)
+    public void AddPurposeIds(IEnumerable<PurposeId> purposeIds)
     {
         ThrowIfNotDraft();
 
-        PermissionIds = PermissionIds.AddRange(permissionIds);
+        PurposeIds = PurposeIds.AddRange(purposeIds);
     }
 
     private void ThrowIfNotDraft()

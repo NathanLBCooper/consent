@@ -36,8 +36,8 @@ public class ContractControllerTest_Provision : IDisposable
         var user = await UserCreate(_userEndpoint);
         var contract = await ContractCreate(_sut, await WorkspaceCreate(_workspaceEndpoint, user), user);
         var version = await VersionCreate(_sut, contract, user);
-        var permissionId = 1; // todo, doesn't validate existance
-        var request = new ProvisionCreateRequestModelBuilder(new[] { permissionId }).Build();
+        var purposeId = 1; // todo, doesn't validate existance
+        var request = new ProvisionCreateRequestModelBuilder(new[] { purposeId }).Build();
 
         var createdProvision = await _sut.ProvisionCreate(version.Id, request, user.Id);
         Verify(createdProvision);
@@ -49,21 +49,21 @@ public class ContractControllerTest_Provision : IDisposable
         void Verify(ProvisionModel p)
         {
             p.Text.ShouldBe(request.Text);
-            var permission = p.Permissions.ShouldHaveSingleItem();
-            permission.Id.ShouldBe(permissionId);
-            permission.Href.ShouldBe(null); // todo, no controller
+            var purpose = p.Purposes.ShouldHaveSingleItem();
+            purpose.Id.ShouldBe(purposeId);
+            purpose.Href.ShouldBe(null); // todo, no controller
             p.Version.Id.ShouldBe(version.Id);
             p.Version.Href.ShouldBe($"/Contract/version/{version.Id}");
         }
     }
 
     [Fact]
-    public async Task Cannot_create_a_provision_without_any_permissions()
+    public async Task Cannot_create_a_provision_without_any_purposes()
     {
         var user = await UserCreate(_userEndpoint);
         var contract = await ContractCreate(_sut, await WorkspaceCreate(_workspaceEndpoint, user), user);
         var version = await VersionCreate(_sut, contract, user);
-        var request = new ProvisionCreateRequestModelBuilder(Array.Empty<int>()).Build();
+        var request = new ProvisionCreateRequestModelBuilder(Array.Empty<int>()).Build(); // todo null
 
         var createProvision = async () => await _sut.ProvisionCreate(version.Id, request, user.Id);
 
@@ -101,14 +101,7 @@ public class ContractControllerTest_Provision : IDisposable
     }
 
     [Fact(Skip = "Unimplemented")]
-    public async Task Cannot_create_a_provision_with_null_or_empty_permissions()
-    {
-        await Task.CompletedTask;
-        // todo
-    }
-
-    [Fact(Skip = "Unimplemented")]
-    public async Task Cannot_create_a_provision_with_non_existant_permissions()
+    public async Task Cannot_create_a_provision_with_non_existant_purpose()
     {
         await Task.CompletedTask;
         // todo
@@ -116,7 +109,7 @@ public class ContractControllerTest_Provision : IDisposable
 
 
     [Fact(Skip = "Unimplemented")]
-    public async Task Cannot_create_a_provision_with_duplicate_permissions()
+    public async Task Cannot_create_a_provision_with_duplicate_purposes()
     {
         await Task.CompletedTask;
         // todo

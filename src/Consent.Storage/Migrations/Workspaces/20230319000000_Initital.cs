@@ -36,7 +36,7 @@ public partial class Initital : Migration
                     .Annotation("SqlServer:Identity", "1, 1"),
                 UserId = table.Column<int>(type: "int", nullable: false),
                 Permissions = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                WorkspaceId = table.Column<int>(type: "int", nullable: true)
+                WorkspaceId = table.Column<int>(type: "int", nullable: false)
             },
             constraints: table =>
             {
@@ -46,7 +46,8 @@ public partial class Initital : Migration
                     column: x => x.WorkspaceId,
                     principalSchema: "workspaces",
                     principalTable: "Workspaces",
-                    principalColumn: "Id");
+                    principalColumn: "Id",
+                    onDelete: ReferentialAction.Cascade);
             });
 
         _ = migrationBuilder.CreateIndex(

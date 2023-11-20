@@ -8,7 +8,7 @@ using Consent.Domain.Users;
 namespace Consent.Domain.Workspaces;
 
 /**
- *  A container for collaborating on contracts, permissions etc
+ *  A container for collaborating on contracts, purposes etc
  */
 
 public class Workspace : IEntity<WorkspaceId>

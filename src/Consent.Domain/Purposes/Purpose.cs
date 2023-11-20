@@ -2,15 +2,15 @@
 using Consent.Domain.Core;
 using Consent.Domain.Workspaces;
 
-namespace Consent.Domain.Permissions;
+namespace Consent.Domain.Purposes;
 
 /*
  *  A specific idea that can be agreed to
  */
 
-public class Permission : IEntity<PermissionId>
+public class Purpose : IEntity<PurposeId>
 {
-    public PermissionId? Id { get; init; }
+    public PurposeId? Id { get; init; }
     public WorkspaceId WorkspaceId { get; private init; }
 
     public string Name { get; private init; }
@@ -24,7 +24,7 @@ public class Permission : IEntity<PermissionId>
 
     public string Description { get; private init; }
 
-    public Permission(WorkspaceId workspaceId, string name, string description)
+    public Purpose(WorkspaceId workspaceId, string name, string description)
     {
         WorkspaceId = workspaceId;
 
@@ -35,4 +35,4 @@ public class Permission : IEntity<PermissionId>
     }
 }
 
-public readonly record struct PermissionId(int Value) : IIdentifier;
+public readonly record struct PurposeId(int Value) : IIdentifier;

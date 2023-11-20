@@ -1,6 +1,6 @@
 ﻿using System;
 using Consent.Domain.Contracts;
-using Consent.Domain.Permissions;
+using Consent.Domain.Purposes;
 using Consent.Tests.Builders;
 using Shouldly;
 
@@ -22,7 +22,7 @@ public class ContractVersionTest
     public void Can_add_provision()
     {
         var version = new ContractVersionBuilder().Build();
-        var provision = new ProvisionBuilder(new PermissionId(1)).Build();
+        var provision = new ProvisionBuilder(new PurposeId(1)).Build();
 
         version.AddProvisions(provision);
 

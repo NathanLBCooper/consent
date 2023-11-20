@@ -19,3 +19,5 @@
 2) Create a new migration in this project.
     Copy in the SQL from the previous step.
     But discard any changes to `[__EFMigrationsHistory]`. This project doesn't use EF Migrations in the database, only to generate SQL for *Simple.Migrations*.
+
+NB) The name for the 0th migration is `0`

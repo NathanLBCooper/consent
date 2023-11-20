@@ -17,7 +17,7 @@ namespace Consent.Storage.Migrations.Users
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("users")
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -39,39 +39,33 @@ namespace Consent.Storage.Migrations.Users
                     b.ToTable("Users", "users");
                 });
 
-            modelBuilder.Entity("Consent.Domain.Users.WorkspaceMembership", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Permissions")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WorkspaceId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable((string)null);
-
-                    b.ToView("WorkspaceMembership", "users");
-                });
-
-            modelBuilder.Entity("Consent.Domain.Users.WorkspaceMembership", b =>
-                {
-                    b.HasOne("Consent.Domain.Users.User", null)
-                        .WithMany("WorkspaceMemberships")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("Consent.Domain.Users.User", b =>
                 {
+                    b.OwnsMany("Consent.Domain.Users.WorkspaceMembership", "WorkspaceMemberships", b1 =>
+                        {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Permissions")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("WorkspaceId")
+                                .HasColumnType("int");
+
+                            b1.HasKey("UserId", "Id");
+
+                            b1.ToTable((string)null);
+
+                            b1.ToView("WorkspaceMembership", "users");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
                     b.Navigation("WorkspaceMemberships");
                 });
 #pragma warning restore 612, 618

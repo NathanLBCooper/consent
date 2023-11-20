@@ -1,7 +1,7 @@
 ﻿using Consent.Api.Contracts;
 using Consent.Api.Workspaces;
 using Consent.Domain.Contracts;
-using Consent.Domain.Permissions;
+using Consent.Domain.Purposes;
 using Consent.Domain.Workspaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -46,9 +46,9 @@ internal class ConsentLinkGenerator
             );
     }
 
-    public string? GetPermission(PermissionId permissionId)
+    public string? GetPurpose(PurposeId purposeId)
     {
-        _ = permissionId;
+        _ = purposeId;
         return null;
     }
 }

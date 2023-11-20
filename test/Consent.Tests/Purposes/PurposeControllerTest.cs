@@ -2,7 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
-using Consent.Api.Client.Models.Permissions;
+using Consent.Api.Client.Models.Purposes;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 using Consent.Tests.Builders;
@@ -10,22 +10,22 @@ using Consent.Tests.Infrastructure;
 using Refit;
 using Shouldly;
 
-namespace Consent.Tests.Permissions;
+namespace Consent.Tests.Purposes;
 
 [Collection("DatabaseTest")]
-public class PermissionsControllerTest : IDisposable
+public class PurposeControllerTest : IDisposable
 {
     private readonly HttpClient _client;
-    private readonly IPermissionEndpoint _sut;
+    private readonly IPurposeEndpoint _sut;
     private readonly IUserEndpoint _userEndpoint;
     private readonly IWorkspaceEndpoint _workspaceEndpoint;
 
-    public PermissionsControllerTest(DatabaseFixture fixture)
+    public PurposeControllerTest(DatabaseFixture fixture)
     {
         var factory = new TestWebApplicationFactory(
             new InMemoryConfigurationBuilder() { SqlSettings = fixture.SqlSettings }.Build());
         _client = factory.CreateClient();
-        _sut = RestService.For<IPermissionEndpoint>(_client);
+        _sut = RestService.For<IPurposeEndpoint>(_client);
         _userEndpoint = RestService.For<IUserEndpoint>(_client);
         _workspaceEndpoint = RestService.For<IWorkspaceEndpoint>(_client);
     }
@@ -35,9 +35,9 @@ public class PermissionsControllerTest : IDisposable
     {
         var user = await CreateUser();
         var workspace = await CreateWorkspace(user);
-        var request = new PermissionCreateRequestModelBuilder(workspace.Id).Build();
+        var request = new PurposeCreateRequestModelBuilder(workspace.Id).Build();
 
-        void Verify(PermissionModel model)
+        void Verify(PurposeModel model)
         {
             model.Name.ShouldBe(request.Name);
             model.Description.ShouldBe(request.Name);
@@ -45,22 +45,22 @@ public class PermissionsControllerTest : IDisposable
             model.Workspace.Href.ShouldBe($"/Workspace/{workspace.Id}");
         }
 
-        var created = await _sut.PermissionCreate(request, user.Id);
+        var created = await _sut.PurposeCreate(request, user.Id);
         Verify(created);
 
-        var fetched = await _sut.PermissioGet(created.Id, user.Id);
+        var fetched = await _sut.PurposeGet(created.Id, user.Id);
         fetched.Id.ShouldBe(created.Id);
         Verify(fetched);
     }
 
-    // Cannot_get_nonexistant_permission
-    // Cannot_get_permission_with_nonexistant_user
-    // Cannot_get_permission_with_user_with_no_workspacePermissions
+    // Cannot_get_nonexistant_purpose
+    // Cannot_get_purpose_with_nonexistant_user
+    // Cannot_get_purpose_with_user_with_no_workspacePermissions
     // ...
 
-    // Cannot_create_permission_with_nonexistant_user
-    // Cannot_create_permission_with_nonexistant_workspace
-    // Cannot_create_permission_with_user_with_no_workspacePermissions
+    // Cannot_create_purpose_with_nonexistant_user
+    // Cannot_create_purpose_with_nonexistant_workspace
+    // Cannot_create_purpose_with_user_with_no_workspacePermissions
     // ...
 
     private async Task<UserModel> CreateUser()
