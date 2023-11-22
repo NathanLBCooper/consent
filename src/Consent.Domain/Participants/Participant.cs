@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Consent.Domain.Core;
 
 namespace Consent.Domain.Participants;
@@ -20,10 +22,19 @@ public class Participant : IEntity<ParticipantId>
         }
     }
 
-    public Participant(string externalId)
+    private readonly List<Tag> _tags;
+    public IReadOnlyList<Tag> Tags => _tags.AsReadOnly();
+
+    public Participant(string externalId, IEnumerable<Tag> tags)
     {
         ValidateExternalId(externalId);
         ExternalId = externalId;
+
+        _tags = tags.ToList();
+    }
+
+    public Participant(string externalId) : this(externalId, Array.Empty<Tag>())
+    {
     }
 }
 
