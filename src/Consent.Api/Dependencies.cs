@@ -5,6 +5,7 @@ using Consent.Application.Users.Create;
 using Consent.Application.Users.Get;
 using Consent.Storage;
 using Consent.Storage.Contracts;
+using Consent.Storage.Purposes;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,9 @@ public static class Dependencies
 
         var workspaceDbContextOptions = Options<WorkspaceDbContext>(sqlSettings);
         container.Register<WorkspaceDbContext>(() => new WorkspaceDbContext(workspaceDbContextOptions), Lifestyle.Scoped);
+
+        var purposeDbContextOptions = Options<PurposeDbContext>(sqlSettings);
+        container.Register<PurposeDbContext>(() => new PurposeDbContext(purposeDbContextOptions), Lifestyle.Scoped);
 
         var contractDbContextOptions = Options<ContractDbContext>(sqlSettings);
         container.Register<ContractDbContext>(() => new ContractDbContext(contractDbContextOptions), Lifestyle.Scoped);

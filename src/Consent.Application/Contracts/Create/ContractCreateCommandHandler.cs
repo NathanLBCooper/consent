@@ -40,7 +40,7 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
             return Result<Contract>.Failure(new UnauthorizedError());
         }
 
-        var created = await _contractRepository.Create(new Contract(Guard.NotNull(command.Name), command.WorkspaceId));
+        var created = await _contractRepository.Create(new Contract(command.WorkspaceId, Guard.NotNull(command.Name)));
 
         return Result<Contract>.Success(created);
     }

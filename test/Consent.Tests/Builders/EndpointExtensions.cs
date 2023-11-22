@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Consent.Api.Client.Endpoints;
 using Consent.Api.Client.Models.Contracts;
+using Consent.Api.Client.Models.Purposes;
 using Consent.Api.Client.Models.Users;
 using Consent.Api.Client.Models.Workspaces;
 
@@ -18,10 +19,7 @@ internal static class EndpointExtensions
 
     public static async Task<WorkspaceModel> WorkspaceCreate(IWorkspaceEndpoint endpoint, UserModel user)
     {
-        return await endpoint.WorkspaceCreate(
-            request: new WorkspaceCreateRequestModelBuilder().Build(),
-            userId: user.Id
-            );
+        return await endpoint.WorkspaceCreate(new WorkspaceCreateRequestModelBuilder().Build(), user.Id);
     }
 
     public static async Task<ContractModel> ContractCreate(IContractEndpoint endpoint, WorkspaceModel workspace, UserModel user)
@@ -33,5 +31,10 @@ internal static class EndpointExtensions
     {
         return await endpoint.ContractVersionCreate(
             contract.Id, new ContractVersionCreateRequestModelBuilder().Build(), user.Id);
+    }
+
+    public static async Task<PurposeModel> PurposeCreate(IPurposeEndpoint endpoint, WorkspaceModel workspace, UserModel user)
+    {
+        return await endpoint.PurposeCreate(new PurposeCreateRequestModelBuilder(workspace.Id).Build(), user.Id);
     }
 }

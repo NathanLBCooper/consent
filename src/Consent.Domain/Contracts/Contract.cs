@@ -36,14 +36,14 @@ public class Contract : IEntity<ContractId>
     private readonly List<ContractVersion> _versions;
     public IReadOnlyList<ContractVersion> Versions => _versions.AsReadOnly();
 
-    public Contract(string name, WorkspaceId workspaceId, IEnumerable<ContractVersion> versions)
+    public Contract(WorkspaceId workspaceId, string name, IEnumerable<ContractVersion> versions)
     {
-        Name = name;
         WorkspaceId = workspaceId;
+        Name = name;
         _versions = versions.ToList();
     }
 
-    public Contract(string name, WorkspaceId workspaceId) : this(name, workspaceId, Array.Empty<ContractVersion>())
+    public Contract(WorkspaceId workspaceId, string name) : this(workspaceId, name, Array.Empty<ContractVersion>())
     {
     }
 

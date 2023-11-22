@@ -14,7 +14,7 @@ public class ContractTest
     [InlineData("  ")]
     public void Cannot_assign_contract_empty_name(string name)
     {
-        var ctor = () => new Contract(name, new WorkspaceId(1));
+        var ctor = () => new Contract(new WorkspaceId(1), name);
         _ = ctor.ShouldThrow<ArgumentException>();
 
         var contract = new ContractBuilder().Build();

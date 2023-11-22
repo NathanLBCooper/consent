@@ -64,13 +64,13 @@ public class WorkspaceControllerTest : IDisposable
     [Fact]
     public async Task Cannot_get_workspace_with_nonexistant_user()
     {
-        var workspaceCreator = await UserCreate(_userEndpoint);
-        var workspace = await WorkspaceCreate(_sut, workspaceCreator);
+        var creator = await UserCreate(_userEndpoint);
+        var workspace = await WorkspaceCreate(_sut, creator);
         var userId = -1;
 
-        var eveFetchesAlicesWorkspace = async () => await _sut.WorkspaceGet(workspace.Id, userId);
+        var fetch = async () => await _sut.WorkspaceGet(workspace.Id, userId);
 
-        var error = await eveFetchesAlicesWorkspace.ShouldThrowAsync<ValidationApiException>();
+        var error = await fetch.ShouldThrowAsync<ValidationApiException>();
         Guard.NotNull(error.Content).Status.ShouldBe((int)HttpStatusCode.NotFound);
     }
 

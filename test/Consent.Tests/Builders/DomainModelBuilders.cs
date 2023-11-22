@@ -7,13 +7,13 @@ namespace Consent.Tests.Builders;
 
 internal record ContractBuilder
 {
-    public string Name { get; init; } = "my contract";
     public WorkspaceId WorkspaceId { get; init; } = new WorkspaceId(1);
+    public string Name { get; init; } = "my contract";
     public ContractVersion[] Versions { get; init; } = Array.Empty<ContractVersion>();
 
     public Contract Build()
     {
-        return new Contract(Name, WorkspaceId, Versions);
+        return new Contract(WorkspaceId, Name, Versions);
     }
 }
 

@@ -40,6 +40,20 @@ CREATE INDEX [IX_Membership_WorkspaceId] ON [workspaces].[Membership] ([Workspac
 
 
 
+
+IF SCHEMA_ID(N'purposes') IS NULL EXEC(N'CREATE SCHEMA [purposes];');
+
+CREATE TABLE [purposes].[Purposes] (
+    [Id] int NOT NULL IDENTITY,
+    [WorkspaceId] int NOT NULL,
+    [Name] nvarchar(max) NOT NULL,
+    [Description] nvarchar(max) NOT NULL,
+    CONSTRAINT [PK_Purposes] PRIMARY KEY ([Id])
+);
+
+
+
+
 IF SCHEMA_ID(N'contracts') IS NULL EXEC(N'CREATE SCHEMA [contracts];');
 
 CREATE TABLE [contracts].[Contracts] (
@@ -87,11 +101,24 @@ DROP VIEW [users].[WorkspaceMembership]
 
 DROP TABLE [users].[Users];
 
+DROP SCHEMA [users]
+
+
 
 
 DROP TABLE [workspaces].[Membership];
 
 DROP TABLE [workspaces].[Workspaces];
+
+DROP SCHEMA [workspaces] 
+
+
+
+
+DROP TABLE [purposes].[Purposes];
+
+DROP SCHEMA [purposes]
+
 
 
 
@@ -100,6 +127,8 @@ DROP TABLE [contracts].[Provision];
 DROP TABLE [contracts].[ContractVersion];
 
 DROP TABLE [contracts].[Contracts];
+
+DROP SCHEMA [contracts]
 ");
     }
 }

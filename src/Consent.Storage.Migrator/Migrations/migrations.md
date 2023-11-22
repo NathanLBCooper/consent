@@ -9,12 +9,16 @@
         # Generate Up
         dotnet ef migrations script PreviousMigration NewMigration --context UserDbContext
         dotnet ef migrations script PreviousMigration NewMigration --context WorkspaceDbContext
+        dotnet ef migrations script PreviousMigration NewMigration --context PurposeDbContext
         dotnet ef migrations script PreviousMigration NewMigration --context ContractDbContext
+        ...
 
         # Generate Down
         dotnet ef migrations script NewMigration PreviousMigration --context UserDbContext
         dotnet ef migrations script NewMigration PreviousMigration --context WorkspaceDbContext
+        dotnet ef migrations script NewMigration PreviousMigration --context PurposeDbContext
         dotnet ef migrations script NewMigration PreviousMigration --context ContractDbContext
+        ...
 
 2) Create a new migration in this project.
     Copy in the SQL from the previous step.
