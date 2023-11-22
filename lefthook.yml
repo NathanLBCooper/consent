@@ -1,0 +1,9 @@
+pre-commit:
+  parallel: true
+  commands:
+    dotnet-format-check: # reject staged changes that require formatting
+      glob: "*.cs"
+      run: dotnet format ./Consent.sln --severity warn --verbosity normal --verify-no-changes --include {staged_files}
+    dotnet-format: # make (unstaged) formatting changes to the files that are staged
+      glob: "*.cs"
+      run: dotnet format ./Consent.sln --severity warn --verbosity minimal --include {staged_files}
