@@ -26,11 +26,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0F0EB6B8-4969-4836-A7DE-285B5A6D9C5C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consent.Api.Client", "src\Consent.Api.Client\Consent.Api.Client.csproj", "{4E9FA82F-0C79-4031-B172-BEB5149A24F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consent.Api.Client", "src\Consent.Api.Client\Consent.Api.Client.csproj", "{4E9FA82F-0C79-4031-B172-BEB5149A24F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consent.Application", "src\Consent.Application\Consent.Application.csproj", "{80173D31-3BB8-4D46-B8F7-B1645735E76B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Consent.Application", "src\Consent.Application\Consent.Application.csproj", "{80173D31-3BB8-4D46-B8F7-B1645735E76B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
