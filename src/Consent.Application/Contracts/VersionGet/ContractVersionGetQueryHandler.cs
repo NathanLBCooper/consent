@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Consent.Application.Workspaces;
 using Consent.Domain.Core;
+using static Consent.Domain.Core.Maybe<Consent.Application.Contracts.VersionGet.ContractVersionGetQueryResult>;
 
 namespace Consent.Application.Contracts.VersionGet;
 
@@ -24,21 +25,21 @@ public class ContractVersionGetQueryHandler : IContractVersionGetQueryHandler
         var contract = await _contractRepository.FindByContractVersion(query.ContractVersionId);
         if (contract is null)
         {
-            return Maybe<ContractVersionGetQueryResult>.None;
+            return None;
         }
 
         var version = contract.Versions.SingleOrDefault(v => v.Id == query.ContractVersionId);
         if (version is null)
         {
-            return Maybe<ContractVersionGetQueryResult>.None;
+            return None;
         }
 
         var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
         if (!workspace.UserCanView(query.RequestedBy))
         {
-            return Maybe<ContractVersionGetQueryResult>.None;
+            return None;
         }
 
-        return Maybe<ContractVersionGetQueryResult>.Some(new(contract, version));
+        return Some(new(contract, version));
     }
 }

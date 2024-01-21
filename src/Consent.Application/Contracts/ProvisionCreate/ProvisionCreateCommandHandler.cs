@@ -5,6 +5,7 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
+using static Consent.Domain.Core.Result<Consent.Application.Contracts.ProvisionCreate.ProvisionCreateCommandResult>;
 
 namespace Consent.Application.Contracts.ProvisionCreate;
 
@@ -27,19 +28,19 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Result<ProvisionCreateCommandResult>.Failure(new ValidationError(validationResult.ToString()));
+            return Failure(new ValidationError(validationResult.ToString()));
         }
 
         var contract = await _contractRepository.FindByContractVersion(command.ContractVersionId);
         if (contract is null)
         {
-            return Result<ProvisionCreateCommandResult>.Failure(new NotFoundError());
+            return Failure(new NotFoundError());
         }
 
         var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Result<ProvisionCreateCommandResult>.Failure(new UnauthorizedError());
+            return Failure(new UnauthorizedError());
         }
 
         var version = contract.Versions.Single(v => v.Id == command.ContractVersionId);
@@ -49,6 +50,6 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
 
         await _contractRepository.Update(contract);
 
-        return Result<ProvisionCreateCommandResult>.Success(new(version, created));
+        return Success(new(version, created));
     }
 }

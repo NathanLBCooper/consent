@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
+using static Consent.Domain.Core.Maybe<Consent.Domain.Contracts.Contract>;
 
 namespace Consent.Application.Contracts.Get;
 
@@ -24,15 +25,15 @@ public class ContractGetQueryHandler : IContractGetQueryHandler
         var contract = await _contractRepository.Get(query.ContractId);
         if (contract is null)
         {
-            return Maybe<Contract>.None;
+            return None;
         }
 
         var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
         if (!workspace.UserCanView(query.RequestedBy))
         {
-            return Maybe<Contract>.None;
+            return None;
         }
 
-        return Maybe<Contract>.Some(contract);
+        return Some(contract);
     }
 }

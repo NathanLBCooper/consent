@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
 using Consent.Domain.Users;
+using static Consent.Domain.Core.Result<Consent.Domain.Users.User>;
 
 namespace Consent.Application.Users.Create;
 
@@ -23,11 +24,11 @@ public class UserCreateCommandHandler : IUserCreateCommandHandler
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Result<User>.Failure(new ValidationError(validationResult.ToString()));
+            return Failure(new ValidationError(validationResult.ToString()));
         }
 
         var created = await _userRepository.Create(new User(Guard.NotNull(command.Name)));
 
-        return Result<User>.Success(created);
+        return Success(created);
     }
 }

@@ -23,6 +23,7 @@ public class ParticipantCreateCommandHandler : IParticipantCreateCommandHandler
     public async Task<Result<Participant>> Handle(ParticipantCreateCommand command, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
+
         throw new System.NotImplementedException();
     }
 }

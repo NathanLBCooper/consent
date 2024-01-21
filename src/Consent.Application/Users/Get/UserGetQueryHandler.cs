@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Consent.Domain.Core;
 using Consent.Domain.Users;
+using static Consent.Domain.Core.Maybe<Consent.Domain.Users.User>;
 
 namespace Consent.Application.Users.Get;
 
@@ -20,15 +21,15 @@ public class UserGetQueryHandler : IUserGetQueryHandler
     {
         if (command.UserId != command.RequestedBy)
         {
-            return Maybe<User>.None;
+            return None;
         }
 
         var user = await _userRepository.Get(command.UserId);
         if (user is null)
         {
-            return Maybe<User>.None;
+            return None;
         }
 
-        return Maybe<User>.Some(user);
+        return Some(user);
     }
 }

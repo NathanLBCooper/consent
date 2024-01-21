@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Consent.Application.Workspaces;
 using Consent.Domain.Core;
 using Consent.Domain.Purposes;
+using static Consent.Domain.Core.Maybe<Consent.Domain.Purposes.Purpose>;
 
 namespace Consent.Application.Purposes.Get;
 
@@ -24,15 +25,15 @@ public class PurposeGetQueryHandler : IPurposeGetQueryHandler
         var purpose = await _purposeRepository.Get(query.PurposeId);
         if (purpose is null)
         {
-            return Maybe<Purpose>.None;
+            return None;
         }
 
         var workspace = Guard.NotNull(await _workspaceRepository.Get(purpose.WorkspaceId));
         if (!workspace.UserCanView(query.RequestedBy))
         {
-            return Maybe<Purpose>.None;
+            return None;
         }
 
-        return Maybe<Purpose>.Some(purpose);
+        return Some(purpose);
     }
 }

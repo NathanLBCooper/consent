@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Consent.Domain.Core;
 using Consent.Domain.Workspaces;
+using static Consent.Domain.Core.Maybe<Consent.Domain.Workspaces.Workspace>;
 
 namespace Consent.Application.Workspaces.Get;
 
@@ -21,14 +22,14 @@ public class WorkspaceGetQueryHandler : IWorkspaceGetQueryHandler
         var workspace = await _workspaceRepository.Get(query.WorkspaceId);
         if (workspace is null)
         {
-            return Maybe<Workspace>.None;
+            return None;
         }
 
         if (!workspace.UserCanView(query.RequestedBy))
         {
-            return Maybe<Workspace>.None;
+            return None;
         }
 
-        return Maybe<Workspace>.Some(workspace);
+        return Some(workspace);
     }
 }

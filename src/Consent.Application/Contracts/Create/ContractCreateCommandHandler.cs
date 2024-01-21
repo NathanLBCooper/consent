@@ -4,6 +4,7 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
+using static Consent.Domain.Core.Result<Consent.Domain.Contracts.Contract>;
 
 namespace Consent.Application.Contracts.Create;
 
@@ -26,22 +27,22 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Result<Contract>.Failure(new ValidationError(validationResult.ToString()));
+            return Failure(new ValidationError(validationResult.ToString()));
         }
 
         var workspace = await _workspaceRepository.Get(command.WorkspaceId);
         if (workspace is null)
         {
-            return Result<Contract>.Failure(new NotFoundError());
+            return Failure(new NotFoundError());
         }
 
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Result<Contract>.Failure(new UnauthorizedError());
+            return Failure(new UnauthorizedError());
         }
 
         var created = await _contractRepository.Create(new Contract(command.WorkspaceId, Guard.NotNull(command.Name)));
 
-        return Result<Contract>.Success(created);
+        return Success(created);
     }
 }

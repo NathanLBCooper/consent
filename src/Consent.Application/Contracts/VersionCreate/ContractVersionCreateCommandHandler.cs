@@ -5,6 +5,7 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
+using static Consent.Domain.Core.Result<Consent.Application.Contracts.VersionCreate.ContractVersionCreateCommandResult>;
 
 namespace Consent.Application.Contracts.VersionCreate;
 
@@ -27,19 +28,19 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Result<ContractVersionCreateCommandResult>.Failure(new ValidationError(validationResult.ToString()));
+            return Failure(new ValidationError(validationResult.ToString()));
         }
 
         var contract = await _contractRepository.Get(command.ContractId);
         if (contract is null)
         {
-            return Result<ContractVersionCreateCommandResult>.Failure(new NotFoundError());
+            return Failure(new NotFoundError());
         }
 
         var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Result<ContractVersionCreateCommandResult>.Failure(new UnauthorizedError());
+            return Failure(new UnauthorizedError());
         }
 
         var created = new ContractVersion(
@@ -49,6 +50,6 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
 
         await _contractRepository.Update(contract);
 
-        return Result<ContractVersionCreateCommandResult>.Success(new(contract, created));
+        return Success(new(contract, created));
     }
 }

@@ -4,6 +4,7 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
+using static Consent.Domain.Core.Result<Consent.Domain.Purposes.Purpose>;
 
 namespace Consent.Application.Purposes.Create;
 
@@ -26,23 +27,23 @@ public class PurposeCreateCommandHandler : IPurposeCreateCommandHandler
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Result<Purpose>.Failure(new ValidationError(validationResult.ToString()));
+            return Failure(new ValidationError(validationResult.ToString()));
         }
 
         var workspace = await _workspaceRepository.Get(command.WorkspaceId);
         if (workspace is null)
         {
-            return Result<Purpose>.Failure(new NotFoundError());
+            return Failure(new NotFoundError());
         }
 
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Result<Purpose>.Failure(new NotFoundError());
+            return Failure(new NotFoundError());
         }
 
         var created = await _purposeRepository.Create(
             new Purpose(command.WorkspaceId, Guard.NotNull(command.Name), Guard.NotNull(command.Description)));
 
-        return Result<Purpose>.Success(created);
+        return Success(created);
     }
 }

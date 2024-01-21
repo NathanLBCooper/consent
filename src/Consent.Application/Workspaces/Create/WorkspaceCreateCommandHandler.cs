@@ -4,6 +4,7 @@ using Consent.Application.Users;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
 using Consent.Domain.Workspaces;
+using static Consent.Domain.Core.Result<Consent.Domain.Workspaces.Workspace>;
 
 namespace Consent.Application.Workspaces.Create;
 
@@ -26,17 +27,17 @@ public class WorkspaceCreateCommandHandler : IWorkspaceCreateCommandHandler
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Result<Workspace>.Failure(new ValidationError(validationResult.ToString()));
+            return Failure(new ValidationError(validationResult.ToString()));
         }
 
         var user = await _userRepository.Get(command.RequestedBy);
         if (user is null)
         {
-            return Result<Workspace>.Failure(new UnauthorizedError());
+            return Failure(new UnauthorizedError());
         }
 
         var created = await _workspaceRepository.Create(new Workspace(Guard.NotNull(command.Name), Guard.NotNull(user.Id)));
 
-        return Result<Workspace>.Success(created);
+        return Success(created);
     }
 }
