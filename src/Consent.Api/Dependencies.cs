@@ -59,7 +59,7 @@ public static class Dependencies
     {
         var registrations = assembly
                             .GetExportedTypes()
-                            .Where(t => !t.IsInterface)
+                            .Where(t => !(t.IsInterface || t.IsAbstract || t.IsGenericTypeDefinition))
                             .Where(condition)
                             .SelectMany(t => t.GetInterfaces(), (implementation, service) => new { service, implementation });
 

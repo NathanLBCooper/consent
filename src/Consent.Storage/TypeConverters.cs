@@ -1,9 +1,8 @@
-﻿using Consent.Domain.Contracts;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using Consent.Domain.Core;
-using Consent.Domain.Participants;
-using Consent.Domain.Purposes;
 using Consent.Domain.Users;
-using Consent.Domain.Workspaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -12,33 +11,23 @@ internal static class TypeConverters
 {
     public static void Configure(ModelConfigurationBuilder configurationBuilder)
     {
-        _ = configurationBuilder
-            .Properties<UserId>()
-            .HaveConversion<IdentifierTypeConverter<UserId>>();
-        _ = configurationBuilder
-            .Properties<WorkspaceId>()
-            .HaveConversion<IdentifierTypeConverter<WorkspaceId>>();
-        _ = configurationBuilder
-            .Properties<MembershipId>()
-            .HaveConversion<IdentifierTypeConverter<MembershipId>>();
-        _ = configurationBuilder
-            .Properties<PurposeId>()
-            .HaveConversion<IdentifierTypeConverter<PurposeId>>();
-        _ = configurationBuilder
-            .Properties<ParticipantId>()
-            .HaveConversion<IdentifierTypeConverter<ParticipantId>>();
-        _ = configurationBuilder
-            .Properties<TagId>()
-            .HaveConversion<IdentifierTypeConverter<TagId>>();
-        _ = configurationBuilder
-            .Properties<ContractId>()
-            .HaveConversion<IdentifierTypeConverter<ContractId>>();
-        _ = configurationBuilder
-            .Properties<ContractVersionId>()
-            .HaveConversion<IdentifierTypeConverter<ContractVersionId>>();
-        _ = configurationBuilder
-            .Properties<ProvisionId>()
-            .HaveConversion<IdentifierTypeConverter<ProvisionId>>();
+        AutoConfigureIdentifiers(configurationBuilder, typeof(UserId).Assembly);
+    }
+
+    private static void AutoConfigureIdentifiers(ModelConfigurationBuilder configurationBuilder, Assembly assembly)
+    {
+        var identifiersTypes = assembly
+            .GetExportedTypes()
+            .Where(t => !(t.IsInterface || t.IsAbstract || t.IsGenericTypeDefinition))
+            .Where(typeof(IIdentifier).IsAssignableFrom)
+            .Where(t => t.IsValueType || t.GetConstructor(Type.EmptyTypes) != null);
+
+        foreach (var type in identifiersTypes)
+        {
+            var identifierTypeConverter = typeof(IdentifierTypeConverter<>).MakeGenericType(type);
+
+            _ = configurationBuilder.Properties(type).HaveConversion(identifierTypeConverter);
+        }
     }
 }
 
