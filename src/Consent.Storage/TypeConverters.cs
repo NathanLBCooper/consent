@@ -28,6 +28,9 @@ internal static class TypeConverters
             .Properties<ParticipantId>()
             .HaveConversion<IdentifierTypeConverter<ParticipantId>>();
         _ = configurationBuilder
+            .Properties<TagId>()
+            .HaveConversion<IdentifierTypeConverter<TagId>>();
+        _ = configurationBuilder
             .Properties<ContractId>()
             .HaveConversion<IdentifierTypeConverter<ContractId>>();
         _ = configurationBuilder

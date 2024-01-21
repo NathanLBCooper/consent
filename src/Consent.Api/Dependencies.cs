@@ -5,6 +5,7 @@ using Consent.Application.Users.Create;
 using Consent.Application.Users.Get;
 using Consent.Storage;
 using Consent.Storage.Contracts;
+using Consent.Storage.Participants;
 using Consent.Storage.Purposes;
 using Consent.Storage.Users;
 using Consent.Storage.Workspaces;
@@ -37,6 +38,9 @@ public static class Dependencies
 
         var contractDbContextOptions = Options<ContractDbContext>(sqlSettings);
         container.Register<ContractDbContext>(() => new ContractDbContext(contractDbContextOptions), Lifestyle.Scoped);
+
+        var participantDbContextOptions = Options<ParticipantDbContext>(sqlSettings);
+        container.Register<ParticipantDbContext>(() => new ParticipantDbContext(participantDbContextOptions), Lifestyle.Scoped);
 
         RegisterByConvention(typeof(UserRepository).Assembly, container, t => t.Name.EndsWith("Repository"), true);
         RegisterByConvention(typeof(UserGetQueryHandler).Assembly, container, t => t.Name.EndsWith("QueryHandler"), true);
