@@ -17,29 +17,20 @@ public class ContractVersion
     public string Name { get; private set; }
     public Result NameSet(string value)
     {
-        var isValid = NameValidate(value, Status);
-        if (isValid.IsFailure)
-        {
-            return isValid;
-        }
-
-        Name = value;
-        return Result.Success();
+        return NameValidate(value, Status)
+            .Bind(() =>
+            {
+                Name = value;
+                return Result.Success();
+            });
     }
     private static Result NameValidate(string value, ContractVersionStatus status)
     {
-        var isEditable = CheckIsEditable(status);
-        if (isEditable.IsFailure)
-        {
-            return isEditable;
-        }
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return Result.Failure(new ArgumentError(null, nameof(Name)));
-        }
-
-        return Result.Success();
+        return CheckIsEditable(status)
+            .Bind(() =>
+            {
+                return string.IsNullOrWhiteSpace(value) ? Result.Failure(new ArgumentError(null, nameof(Name))) : Result.Success();
+            });
     }
 
 
@@ -47,14 +38,12 @@ public class ContractVersion
     public string Text { get; private set; }
     public Result TextSet(string value)
     {
-        var isValid = TextValidate(value, Status);
-        if (isValid.IsFailure)
-        {
-            return isValid;
-        }
-
-        Text = value;
-        return Result.Success();
+        return TextValidate(value, Status)
+            .Bind(() =>
+            {
+                Text = value;
+                return Result.Success();
+            });
     }
     private static Result TextValidate(string _, ContractVersionStatus status)
     {
@@ -88,28 +77,20 @@ public class ContractVersion
 
     public static Result<ContractVersion> New(string name, string text, IEnumerable<Provision> provisions)
     {
-        Result result;
         var status = ContractVersionStatus.Draft;
 
-        result = NameValidate(name, status);
-        if (result.IsFailure)
-        {
-            return Result<ContractVersion>.Failure(result.Error);
-        }
+        return NameValidate(name, status)
+            .Bind(() => TextValidate(name, status))
+            .Bind(() =>
+            {
+                var contractVersion = new ContractVersion(name, text, status, provisions.ToList());
+                foreach (var p in contractVersion._provisions)
+                {
+                    p.OnAddedToVersion(contractVersion);
+                }
 
-        result = TextValidate(name, status);
-        if (result.IsFailure)
-        {
-            return Result<ContractVersion>.Failure(result.Error);
-        }
-
-        var contractVersion = new ContractVersion(name, text, status, provisions.ToList());
-        foreach (var p in contractVersion._provisions)
-        {
-            p.OnAddedToVersion(contractVersion);
-        }
-
-        return Result<ContractVersion>.Success(contractVersion);
+                return Result<ContractVersion>.Success(contractVersion);
+            });
     }
 
     private ContractVersion(string name, string text, ContractVersionStatus status, IEnumerable<Provision> provisions)
