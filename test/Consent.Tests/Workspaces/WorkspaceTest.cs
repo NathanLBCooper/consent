@@ -88,7 +88,7 @@ public class WorkspaceTest
         var empty = () => new Workspace("myworkspace", new List<Membership>());
         var nonSuper = () => new Workspace("myworkspace",
             new List<Membership> {
-                new Membership(new UserId(1), new List<Permission> {
+                new(new UserId(1), new List<Permission> {
                     Permission.Edit, Permission.View
                 })
             });
@@ -103,8 +103,8 @@ public class WorkspaceTest
         var userId = new UserId(1);
         var duplicate = () => new Workspace("myworkspace",
             new List<Membership> {
-                new Membership(userId, Membership.SuperUser),
-                new Membership(userId, Membership.SuperUser) }
+                new(userId, Membership.SuperUser),
+                new(userId, Membership.SuperUser) }
             );
 
         _ = duplicate.ShouldThrow<ArgumentException>();

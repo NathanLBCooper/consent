@@ -26,7 +26,7 @@ public class ProvisionTest
     {
         var version = new ContractVersionBuilder()
         {
-            Provisions = new[] { new Provision("text", new[] { new PurposeId(1010) }) }
+            Provisions = [new Provision("text", new[] { new PurposeId(1010) })]
         }.Build();
         var provision = version.Provisions.Single();
 
