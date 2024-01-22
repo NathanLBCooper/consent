@@ -9,7 +9,9 @@ namespace Consent.Tests.Contracts;
 public class ContractTest
 {
     [Theory]
+#pragma warning disable xUnit1012 // <Nullable> does not guarantee no nulls
     [InlineData(null)]
+#pragma warning restore xUnit1012
     [InlineData("")]
     [InlineData("  ")]
     public void Cannot_assign_contract_empty_name(string name)
