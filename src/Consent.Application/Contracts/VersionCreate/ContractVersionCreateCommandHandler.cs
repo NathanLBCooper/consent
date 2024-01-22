@@ -43,9 +43,13 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
             return Failure(new UnauthorizedError());
         }
 
-        var created = new ContractVersion(
-            Guard.NotNull(command.Name), Guard.NotNull(command.Text), Array.Empty<Provision>()
-            );
+        var createResult = ContractVersion.New(Guard.NotNull(command.Name), Guard.NotNull(command.Text), Array.Empty<Provision>());
+        if (createResult.IsFailure)
+        {
+            return Failure(createResult.Error);
+        }
+
+        var created = createResult.Unwrap();
         contract.AddContractVersions(created);
 
         await _contractRepository.Update(contract);

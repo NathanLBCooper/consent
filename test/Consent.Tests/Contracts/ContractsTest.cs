@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Consent.Domain.Contracts;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
 using Consent.Tests.Builders;
 using Shouldly;
@@ -16,11 +17,11 @@ public class ContractsTest
         var provision = new ProvisionBuilder(purposes).Build();
         var version = new ContractVersionBuilder()
         {
-            Provisions = new[] { provision },
-        }.Build();
+            Provisions = [provision],
+        }.Build().Unwrap();
         var contract = new ContractBuilder()
         {
-            Versions = new[] { version }
+            Versions = [version]
         }.Build();
 
         var updatedName = "updated";
@@ -28,7 +29,7 @@ public class ContractsTest
 
         var newPurpose = new PurposeId(2);
         var updatedVersionName = "updated version";
-        version.Name = updatedVersionName;
+        version.NameSet(updatedVersionName).Unwrap();
         version.Provisions[0].AddPurposeIds(new[] { newPurpose });
 
         contract.Name.ShouldBe(updatedName);
@@ -43,20 +44,17 @@ public class ContractsTest
         var provision = new ProvisionBuilder(purposes).Build();
         var version = new ContractVersionBuilder()
         {
-            Provisions = new[] { provision },
-        }.Build();
+            Provisions = [provision],
+        }.Build().Unwrap();
         _ = new ContractBuilder()
         {
-            Versions = new[] { version }
+            Versions = [version]
         }.Build();
 
-        version.Status = ContractVersionStatus.Active;
+        version.StatusSet(ContractVersionStatus.Active).Unwrap();
 
-        var updateVersion = () => version.Name = "updated version";
+        _ = version.NameSet("updated version").UnwrapError().ShouldBeOfType<InvalidOperationError>();
         var updateProvisionInVersion = () => version.Provisions[0].AddPurposeIds(new[] { new PurposeId(2) });
-        _ = updateVersion.ShouldThrow<InvalidOperationException>();
         _ = updateProvisionInVersion.ShouldThrow<InvalidOperationException>();
     }
-
-    // todo maybe these don't have value, depending on the controller tests
 }

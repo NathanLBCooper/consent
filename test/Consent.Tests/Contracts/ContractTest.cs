@@ -28,7 +28,7 @@ public class ContractTest
     public void Can_add_version()
     {
         var contract = new ContractBuilder().Build();
-        var version = new ContractVersionBuilder().Build();
+        var version = new ContractVersionBuilder().Build().Unwrap();
 
         contract.AddContractVersions(version);
 

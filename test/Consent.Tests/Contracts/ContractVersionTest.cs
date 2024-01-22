@@ -1,5 +1,5 @@
-﻿using System;
-using Consent.Domain.Contracts;
+﻿using Consent.Domain.Contracts;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
 using Consent.Tests.Builders;
 using Shouldly;
@@ -16,14 +16,14 @@ public class ContractVersionTest
     [InlineData("  ")]
     public void Cannot_create_contract_version_with_empty_name(string name)
     {
-        var ctor = () => new ContractVersionBuilder() { Name = name }.Build();
-        _ = ctor.ShouldThrow<ArgumentException>();
+        var ctor = new ContractVersionBuilder() { Name = name }.Build();
+        _ = ctor.UnwrapError().ShouldBeOfType<ArgumentError>();
     }
 
     [Fact]
     public void Can_add_provision()
     {
-        var version = new ContractVersionBuilder().Build();
+        var version = new ContractVersionBuilder().Build().Unwrap();
         var provision = new ProvisionBuilder(new PurposeId(1)).Build();
 
         version.AddProvisions(provision);
@@ -35,61 +35,56 @@ public class ContractVersionTest
     [Fact]
     public void Cannot_change_status_to_draft_from_any_other_status()
     {
-        var version = new ContractVersionBuilder().Build();
+        var version = new ContractVersionBuilder().Build().Unwrap();
 
-        version.Status = ContractVersionStatus.Draft;
+        version.StatusSet(ContractVersionStatus.Draft).Unwrap();
 
         foreach (var status in Util.NonDraftStatuses)
         {
-            version.Status = status;
+            version.StatusSet(status).Unwrap();
 
-            var statusChange = () => { version.Status = ContractVersionStatus.Draft; };
-            _ = statusChange.ShouldThrow<InvalidOperationException>();
+            _ = version.StatusSet(ContractVersionStatus.Draft).UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var statusChange = () => { version.Text = "edited text"; };
-            _ = statusChange.ShouldThrow<InvalidOperationException>();
+            _ = version.TextSet("edited text").UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }, version);
     }
 
     [Fact]
     public void Cannot_change_status_to_invalid_value()
     {
-        var version = new ContractVersionBuilder().Build();
+        var version = new ContractVersionBuilder().Build().Unwrap();
 
-        var statusChange = () => { version.Status = (ContractVersionStatus)199; };
-        _ = statusChange.ShouldThrow<ArgumentException>();
+        _ = version.StatusSet((ContractVersionStatus)199).UnwrapError().ShouldBeOfType<ArgumentError>();
     }
 
     [Fact]
     public void Can_only_change_text_when_in_draft()
     {
-        var version = new ContractVersionBuilder().Build();
-        version.Text = "edited text in draft";
+        var version = new ContractVersionBuilder().Build().Unwrap();
+        version.TextSet("edited text in draft").Unwrap();
 
-        version.Status = ContractVersionStatus.Active;
+        version.StatusSet(ContractVersionStatus.Active).Unwrap();
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var statusChange = () => { version.Text = "edited text"; };
-            _ = statusChange.ShouldThrow<InvalidOperationException>();
+            _ = version.TextSet("edited text").UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }, version);
     }
 
     [Fact]
     public void Can_only_change_name_when_in_draft()
     {
-        var version = new ContractVersionBuilder().Build();
-        version.Name = "edited name in draft";
+        var version = new ContractVersionBuilder().Build().Unwrap();
+        version.NameSet("edited name in draft").Unwrap();
 
-        version.Status = ContractVersionStatus.Active;
+        version.StatusSet(ContractVersionStatus.Active).Unwrap();
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var nameChange = () => { version.Name = "edited name"; };
-            _ = nameChange.ShouldThrow<InvalidOperationException>();
+            _ = version.NameSet("edited name").UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }, version);
     }
 }

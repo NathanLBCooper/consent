@@ -9,10 +9,32 @@ public record Result
     public Error? Error { get; }
     [MemberNotNullWhen(returnValue: false, nameof(Error))]
     public bool IsSuccess => Error is null;
+    [MemberNotNullWhen(returnValue: true, nameof(Error))]
+    public bool IsFailure => !IsSuccess;
 
     protected Result(Error? error = null)
     {
         Error = error;
+    }
+
+    public void Unwrap()
+    {
+        if (IsFailure)
+        {
+            throw new InvalidOperationException(
+                $"Called {nameof(Unwrap)} on {nameof(Error)} value: {Error}");
+        }
+    }
+
+    public virtual Error UnwrapError()
+    {
+        if (IsSuccess)
+        {
+            throw new InvalidOperationException(
+                $"Called {nameof(UnwrapError)} on successful result");
+        }
+
+        return Error;
     }
 
     public static Result Success() => new();
@@ -22,9 +44,6 @@ public record Result
 public record Result<TValue> : Result
 {
     private readonly Maybe<TValue> _value;
-    public TValue Value => _value.HasValue
-        ? _value.Value
-        : throw new InvalidOperationException($"Failure Result has no {nameof(Value)}");
 
     protected Result(TValue value)
     {
@@ -34,6 +53,23 @@ public record Result<TValue> : Result
     protected Result(Error error) : base(error)
     {
         _value = Maybe<TValue>.None;
+    }
+
+    public new TValue Unwrap()
+    {
+        base.Unwrap();
+        return _value.Value;
+    }
+
+    public override Error UnwrapError()
+    {
+        if (IsSuccess)
+        {
+            throw new InvalidOperationException(
+                $"Called {nameof(UnwrapError)} on successful result: {_value}");
+        }
+
+        return Error;
     }
 
     public static Result<TValue> Success(TValue value) => new(value);

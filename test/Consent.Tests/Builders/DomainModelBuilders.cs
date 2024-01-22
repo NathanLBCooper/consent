@@ -1,5 +1,5 @@
-﻿using System;
-using Consent.Domain.Contracts;
+﻿using Consent.Domain.Contracts;
+using Consent.Domain.Core;
 using Consent.Domain.Purposes;
 using Consent.Domain.Workspaces;
 
@@ -9,7 +9,7 @@ internal record ContractBuilder
 {
     public WorkspaceId WorkspaceId { get; init; } = new WorkspaceId(1);
     public string Name { get; init; } = "my contract";
-    public ContractVersion[] Versions { get; init; } = Array.Empty<ContractVersion>();
+    public ContractVersion[] Versions { get; init; } = [];
 
     public Contract Build()
     {
@@ -21,11 +21,11 @@ internal record ContractVersionBuilder
 {
     public string Name { get; init; } = "my version";
     public string Text { get; init; } = string.Empty;
-    public Provision[] Provisions { get; init; } = Array.Empty<Provision>();
+    public Provision[] Provisions { get; init; } = [];
 
-    public ContractVersion Build()
+    public Result<ContractVersion> Build()
     {
-        return new ContractVersion(Name, Text, Provisions);
+        return ContractVersion.New(Name, Text, Provisions);
     }
 }
 

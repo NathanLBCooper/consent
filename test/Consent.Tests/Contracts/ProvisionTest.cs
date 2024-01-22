@@ -27,7 +27,7 @@ public class ProvisionTest
         var version = new ContractVersionBuilder()
         {
             Provisions = [new Provision("text", new[] { new PurposeId(1010) })]
-        }.Build();
+        }.Build().Unwrap();
         var provision = version.Provisions.Single();
 
         provision.AddPurposeIds(new[] { new PurposeId(1011) });
@@ -49,7 +49,7 @@ public class ProvisionTest
     [Fact]
     public void Provision_can_only_be_attached_to_one_version_once()
     {
-        var version = new ContractVersionBuilder().Build();
+        var version = new ContractVersionBuilder().Build().Unwrap();
         var provison = new Provision("text", new[] { new PurposeId(1002) });
 
         // Calling this not from the version is wrong and doesn't actually add to contract. Use domain event or something?
@@ -58,7 +58,7 @@ public class ProvisionTest
         var reattach = () => provison.OnAddedToVersion(version);
         _ = reattach.ShouldThrow<InvalidOperationException>();
 
-        var changeAttached = () => provison.OnAddedToVersion(new ContractVersionBuilder().Build());
+        var changeAttached = () => provison.OnAddedToVersion(new ContractVersionBuilder().Build().Unwrap());
         _ = changeAttached.ShouldThrow<InvalidOperationException>();
 
     }

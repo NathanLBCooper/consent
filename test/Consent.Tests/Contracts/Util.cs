@@ -12,7 +12,7 @@ internal static class Util
     {
         foreach (var status in NonDraftStatuses)
         {
-            version.Status = status;
+            version.StatusSet(status).Unwrap();
             action();
         }
     }
