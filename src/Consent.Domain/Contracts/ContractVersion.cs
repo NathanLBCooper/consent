@@ -17,18 +17,7 @@ public class ContractVersion
     public string Name { get; private set; }
     public Result NameSet(string value)
     {
-        var isValid = NameValidate(value, Status);
-        if (isValid.IsFailure)
-        {
-            return isValid;
-        }
-
-        Name = value;
-        return Result.Success();
-    }
-    private static Result NameValidate(string value, ContractVersionStatus status)
-    {
-        var isEditable = CheckIsEditable(status);
+        var isEditable = CheckIsEditable();
         if (isEditable.IsFailure)
         {
             return isEditable;
@@ -39,15 +28,15 @@ public class ContractVersion
             return Result.Failure(new ArgumentError(null, nameof(Name)));
         }
 
+        Name = value;
         return Result.Success();
     }
-
 
     // todo is this "Text". Is it something more specific like a introduction?
     public string Text { get; private set; }
     public Result TextSet(string value)
     {
-        var isValid = TextValidate(value, Status);
+        var isValid = CheckIsEditable();
         if (isValid.IsFailure)
         {
             return isValid;
@@ -55,10 +44,6 @@ public class ContractVersion
 
         Text = value;
         return Result.Success();
-    }
-    private static Result TextValidate(string _, ContractVersionStatus status)
-    {
-        return CheckIsEditable(status);
     }
 
     public ContractVersionStatus Status { get; private set; }
@@ -89,21 +74,20 @@ public class ContractVersion
     public static Result<ContractVersion> New(string name, string text, IEnumerable<Provision> provisions)
     {
         Result result;
-        var status = ContractVersionStatus.Draft;
+        var contractVersion = new ContractVersion(name, text, ContractVersionStatus.Draft, provisions.ToList());
 
-        result = NameValidate(name, status);
+        result = contractVersion.NameSet(name);
         if (result.IsFailure)
         {
             return Result<ContractVersion>.Failure(result.Error);
         }
 
-        result = TextValidate(name, status);
+        result = contractVersion.TextSet(text);
         if (result.IsFailure)
         {
             return Result<ContractVersion>.Failure(result.Error);
         }
 
-        var contractVersion = new ContractVersion(name, text, status, provisions.ToList());
         foreach (var p in contractVersion._provisions)
         {
             p.OnAddedToVersion(contractVersion);
@@ -133,9 +117,9 @@ public class ContractVersion
         }
     }
 
-    private static Result CheckIsEditable(ContractVersionStatus status)
+    private Result CheckIsEditable()
     {
-        return status == ContractVersionStatus.Draft
+        return Status == ContractVersionStatus.Draft
             ? Result.Success()
             : Result.Failure(new InvalidOperationError("Cannot edit non-draft contract"));
     }
