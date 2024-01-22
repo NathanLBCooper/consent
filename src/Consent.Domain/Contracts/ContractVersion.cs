@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
@@ -14,10 +15,21 @@ public class ContractVersion
 {
     public ContractVersionId? Id { get; init; }
 
-    public string Name { get; private set; }
-    public Result NameSet(string value)
+    private string _name;
+    public string Name
     {
-        var isEditable = CheckIsEditable();
+        get => _name;
+        [MemberNotNull(nameof(_name))]
+        set
+        {
+            ValidateName(value).Unwrap();
+            _name = value;
+        }
+    }
+    public Result ValidateName(string value) => ValidateName(value, Status);
+    private static Result ValidateName(string value, ContractVersionStatus status)
+    {
+        var isEditable = CheckIsEditable(status);
         if (isEditable.IsFailure)
         {
             return isEditable;
@@ -28,28 +40,47 @@ public class ContractVersion
             return Result.Failure(new ArgumentError(null, nameof(Name)));
         }
 
-        Name = value;
         return Result.Success();
     }
 
     // todo is this "Text". Is it something more specific like a introduction?
-    public string Text { get; private set; }
-    public Result TextSet(string value)
+    private string _text;
+    public string Text
     {
-        var isValid = CheckIsEditable();
+        get => _text;
+        [MemberNotNull(nameof(_text))]
+        set
+        {
+            ValidateText(value, Status).Unwrap();
+            _text = value;
+        }
+    }
+    public Result ValidateText(string value) => ValidateText(value, Status);
+    private static Result ValidateText(string _, ContractVersionStatus status)
+    {
+        var isValid = CheckIsEditable(status);
         if (isValid.IsFailure)
         {
             return isValid;
         }
 
-        Text = value;
         return Result.Success();
     }
 
-    public ContractVersionStatus Status { get; private set; }
-    public Result StatusSet(ContractVersionStatus value)
+    private ContractVersionStatus _status;
+    public ContractVersionStatus Status
     {
-        if (value == Status)
+        get => _status;
+        set
+        {
+            ValidateStatus(value).Unwrap();
+            _status = value;
+        }
+    }
+    public Result ValidateStatus(ContractVersionStatus value) => ValidateStatus(value, Status);
+    private static Result ValidateStatus(ContractVersionStatus value, ContractVersionStatus status)
+    {
+        if (value == status)
         {
             return Result.Success();
         }
@@ -64,44 +95,43 @@ public class ContractVersion
             return Result.Failure(new InvalidOperationError("Cannot change a non-draft Version back to draft"));
         }
 
-        Status = value;
         return Result.Success();
     }
 
     private readonly List<Provision> _provisions;
     public IReadOnlyList<Provision> Provisions => _provisions.AsReadOnly();
 
-    public static Result<ContractVersion> New(string name, string text, IEnumerable<Provision> provisions)
+    public static Result ValidateNew(string name, string text, IEnumerable<Provision> _)
     {
         Result result;
-        var contractVersion = new ContractVersion(name, text, ContractVersionStatus.Draft, provisions.ToList());
+        var status = ContractVersionStatus.Draft;
 
-        result = contractVersion.NameSet(name);
+        result = ValidateName(name, status);
         if (result.IsFailure)
         {
-            return Result<ContractVersion>.Failure(result.Error);
+            return result;
         }
 
-        result = contractVersion.TextSet(text);
+        result = ValidateText(text, status);
         if (result.IsFailure)
         {
-            return Result<ContractVersion>.Failure(result.Error);
+            return result;
         }
 
-        foreach (var p in contractVersion._provisions)
-        {
-            p.OnAddedToVersion(contractVersion);
-        }
-
-        return Result<ContractVersion>.Success(contractVersion);
+        return Result.Success();
     }
 
-    private ContractVersion(string name, string text, ContractVersionStatus status, IEnumerable<Provision> provisions)
+    public ContractVersion(string name, string text, ContractVersionStatus status, IEnumerable<Provision> provisions)
     {
+        Status = status;
         Name = name;
         Text = text;
-        Status = status;
         _provisions = provisions.ToList();
+
+        foreach (var p in _provisions)
+        {
+            p.OnAddedToVersion(this);
+        }
     }
 
     private ContractVersion(string name, string text, ContractVersionStatus status) : this(name, text, status, Array.Empty<Provision>())
@@ -117,9 +147,9 @@ public class ContractVersion
         }
     }
 
-    private Result CheckIsEditable()
+    private static Result CheckIsEditable(ContractVersionStatus status)
     {
-        return Status == ContractVersionStatus.Draft
+        return status == ContractVersionStatus.Draft
             ? Result.Success()
             : Result.Failure(new InvalidOperationError("Cannot edit non-draft contract"));
     }
