@@ -18,31 +18,30 @@ public class ContractVersion
     public Result NameSet(string value)
     {
         return NameValidate(value, Status)
-            .Bind(() =>
+            .Then(() =>
             {
                 Name = value;
-                return Result.Success();
             });
     }
     private static Result NameValidate(string value, ContractVersionStatus status)
     {
         return CheckIsEditable(status)
-            .Bind(() =>
+            .Then(() =>
             {
-                return string.IsNullOrWhiteSpace(value) ? Result.Failure(new ArgumentError(null, nameof(Name))) : Result.Success();
+                return string.IsNullOrWhiteSpace(value)
+                    ? Result.Failure(new ArgumentError(null, nameof(Name)))
+                    : Result.Success();
             });
     }
-
 
     // todo is this "Text". Is it something more specific like a introduction?
     public string Text { get; private set; }
     public Result TextSet(string value)
     {
         return TextValidate(value, Status)
-            .Bind(() =>
+            .Then(() =>
             {
                 Text = value;
-                return Result.Success();
             });
     }
     private static Result TextValidate(string _, ContractVersionStatus status)
@@ -80,8 +79,8 @@ public class ContractVersion
         var status = ContractVersionStatus.Draft;
 
         return NameValidate(name, status)
-            .Bind(() => TextValidate(name, status))
-            .Bind(() =>
+            .Then(() => TextValidate(name, status))
+            .Then(() =>
             {
                 var contractVersion = new ContractVersion(name, text, status, provisions.ToList());
                 foreach (var p in contractVersion._provisions)

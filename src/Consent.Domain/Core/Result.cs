@@ -1,28 +1,21 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using Consent.Domain.Core.Errors;
 
 namespace Consent.Domain.Core;
 
 public record Result
 {
-    public Error? Error { get; }
-    [MemberNotNullWhen(returnValue: false, nameof(Error))]
-    public bool IsSuccess => Error is null;
-    [MemberNotNullWhen(returnValue: true, nameof(Error))]
-    public bool IsFailure => !IsSuccess;
+    protected Maybe<Error> Error { get; }
 
-    protected Result(Error? error = null)
-    {
-        Error = error;
-    }
+    public bool IsSuccess => !Error.HasValue;
+    public bool IsFailure => !IsSuccess;
 
     public void Unwrap()
     {
         if (IsFailure)
         {
             throw new InvalidOperationException(
-                $"Called {nameof(Unwrap)} on {nameof(Error)} value: {Error}");
+                $"Called {nameof(Unwrap)} on {nameof(Error)} value: {Error.Value}");
         }
     }
 
@@ -34,31 +27,36 @@ public record Result
                 $"Called {nameof(UnwrapError)} on successful result");
         }
 
-        return Error;
+        return Error.Value;
     }
 
-    public static Result Success() => new();
-    public static Result Failure(Error error) => new(error);
+    protected Result()
+    {
+        Error = Maybe<Error>.None;
+    }
+
+    protected Result(Error error)
+    {
+        Error = Maybe<Error>.Some(error);
+    }
+
+    public static Result Success() => new Result();
+    public static Result Failure(Error error) => new Result(error);
 }
 
 public record Result<TValue> : Result
 {
-    private readonly Maybe<TValue> _value;
-
-    protected Result(TValue value)
-    {
-        _value = Maybe<TValue>.Some(value);
-    }
-
-    protected Result(Error error) : base(error)
-    {
-        _value = Maybe<TValue>.None;
-    }
+    private Maybe<TValue> Value { get; }
 
     public new TValue Unwrap()
     {
-        base.Unwrap();
-        return _value.Value;
+        if (IsFailure)
+        {
+            throw new InvalidOperationException(
+                $"Called {nameof(Unwrap)} on {nameof(Error)} value: {Error.Value}");
+        }
+
+        return Value.Value;
     }
 
     public override Error UnwrapError()
@@ -66,12 +64,22 @@ public record Result<TValue> : Result
         if (IsSuccess)
         {
             throw new InvalidOperationException(
-                $"Called {nameof(UnwrapError)} on successful result: {_value}");
+                $"Called {nameof(UnwrapError)} on successful result: {Value.Value}");
         }
 
-        return Error;
+        return Error.Value;
     }
 
-    public static Result<TValue> Success(TValue value) => new(value);
-    public new static Result<TValue> Failure(Error error) => new(error);
+    private Result(Error error) : base(error)
+    {
+        Value = Maybe<TValue>.None;
+    }
+
+    protected Result(TValue value) : base()
+    {
+        Value = Maybe<TValue>.Some(value);
+    }
+
+    public static Result<TValue> Success(TValue value) => new Result<TValue>(value);
+    public new static Result<TValue> Failure(Error error) => new Result<TValue>(error);
 }
