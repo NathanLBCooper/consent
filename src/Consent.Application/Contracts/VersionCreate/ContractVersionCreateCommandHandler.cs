@@ -46,7 +46,7 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
         var createResult = ContractVersion.New(Guard.NotNull(command.Name), Guard.NotNull(command.Text), Array.Empty<Provision>());
         if (createResult.IsFailure)
         {
-            return Failure(createResult.Error);
+            return Failure(createResult.UnwrapError());
         }
 
         var created = createResult.Unwrap();

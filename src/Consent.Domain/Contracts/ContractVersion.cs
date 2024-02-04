@@ -94,13 +94,13 @@ public class ContractVersion
         result = NameValidate(name, status);
         if (result.IsFailure)
         {
-            return Result<ContractVersion>.Failure(result.Error);
+            return Result<ContractVersion>.Failure(result.UnwrapError());
         }
 
         result = TextValidate(name, status);
         if (result.IsFailure)
         {
-            return Result<ContractVersion>.Failure(result.Error);
+            return Result<ContractVersion>.Failure(result.UnwrapError());
         }
 
         var contractVersion = new ContractVersion(name, text, status, provisions.ToList());
