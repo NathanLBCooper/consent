@@ -5,7 +5,6 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using static Consent.Domain.Core.Result<Consent.Application.Contracts.VersionCreate.ContractVersionCreateCommandResult>;
 
 namespace Consent.Application.Contracts.VersionCreate;
 
@@ -25,35 +24,40 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
 
     public async Task<Result<ContractVersionCreateCommandResult>> Handle(ContractVersionCreateCommand command, CancellationToken cancellationToken)
     {
-        var validationResult = _validator.Validate(command);
-        if (!validationResult.IsValid)
-        {
-            return Failure(new ValidationError(validationResult.ToString()));
-        }
+        return await _validator.Validate(command).ToResult()
+            .Then(async () =>
+            {
+                var contract = await _contractRepository.Get(command.ContractId);
+                if (contract is null)
+                {
+                    return Result<Contract>.Failure(new NotFoundError());
+                }
 
-        var contract = await _contractRepository.Get(command.ContractId);
-        if (contract is null)
-        {
-            return Failure(new NotFoundError());
-        }
+                return Result<Contract>.Success(contract);
+            })
+            .Then(async (Contract contract) =>
+            {
+                var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
 
-        var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
-        if (!workspace.UserCanEdit(command.RequestedBy))
-        {
-            return Failure(new UnauthorizedError());
-        }
+                if (!workspace.UserCanEdit(command.RequestedBy))
+                {
+                    return Result<Contract>.Failure(new UnauthorizedError());
+                }
 
-        var createResult = ContractVersion.New(Guard.NotNull(command.Name), Guard.NotNull(command.Text), Array.Empty<Provision>());
-        if (createResult.IsFailure)
-        {
-            return Failure(createResult.UnwrapError());
-        }
+                return Result<Contract>.Success(contract);
+            })
+            .Then((Contract contract) =>
+            {
+                return ContractVersion.New(Guard.NotNull(command.Name), Guard.NotNull(command.Text), Array.Empty<Provision>())
+                    .Then(version => Result<(Contract contract, ContractVersion version)>.Success((contract, version)));
+            }).Then(async (r) =>
+            {
+                var (contract, created) = r;
 
-        var created = createResult.Unwrap();
-        contract.AddContractVersions(created);
+                contract.AddContractVersions(created);
 
-        await _contractRepository.Update(contract);
-
-        return Success(new(contract, created));
+                await _contractRepository.Update(contract);
+                return Result<ContractVersionCreateCommandResult>.Success(new ContractVersionCreateCommandResult(contract, created));
+            });
     }
 }
