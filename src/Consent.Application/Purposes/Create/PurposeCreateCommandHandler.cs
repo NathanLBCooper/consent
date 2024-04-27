@@ -41,8 +41,14 @@ public class PurposeCreateCommandHandler : IPurposeCreateCommandHandler
             return Failure(new NotFoundError());
         }
 
-        var created = await _purposeRepository.Create(
-            new Purpose(command.WorkspaceId, Guard.NotNull(command.Name), Guard.NotNull(command.Description)));
+        var purposeResult = Purpose.Ctor(command.WorkspaceId, Guard.NotNull(command.Name),
+            Guard.NotNull(command.Description));
+        if (purposeResult.Value is not { } purpose)
+        {
+            return purposeResult;
+        }
+
+        var created = await _purposeRepository.Create(purpose);
 
         return Success(created);
     }

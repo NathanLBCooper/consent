@@ -25,15 +25,25 @@ public class Participant : IEntity<ParticipantId>
     private readonly List<Tag> _tags;
     public IReadOnlyList<Tag> Tags => _tags.AsReadOnly();
 
-    public Participant(string externalId, IEnumerable<Tag> tags)
+    public static Result<Participant> Ctor(string externalId, IEnumerable<Tag> tags)
+    {
+        ValidateExternalId(externalId);
+        return Result<Participant>.Success(new Participant(externalId, tags.ToList()));
+    }
+
+    public static Result<Participant> Ctor(string externalId)
+    {
+        return Ctor(externalId, new List<Tag>());
+    }
+
+    private Participant(string externalId, List<Tag> tags)
     {
         ValidateExternalId(externalId);
         ExternalId = externalId;
-
-        _tags = tags.ToList();
+        _tags = tags;
     }
 
-    public Participant(string externalId) : this(externalId, Array.Empty<Tag>())
+    private Participant(string externalId) : this(externalId, new List<Tag>())
     {
     }
 }

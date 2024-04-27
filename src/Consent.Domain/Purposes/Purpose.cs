@@ -24,13 +24,17 @@ public class Purpose : IEntity<PurposeId>
 
     public string Description { get; private init; }
 
-    public Purpose(WorkspaceId workspaceId, string name, string description)
+    public static Result<Purpose> Ctor(WorkspaceId workspaceId, string name, string description)
+    {
+        ValidateName(name);
+
+        return Result<Purpose>.Success(new Purpose(workspaceId, name, description));
+    }
+
+    private Purpose(WorkspaceId workspaceId, string name, string description)
     {
         WorkspaceId = workspaceId;
-
-        ValidateName(name);
         Name = name;
-
         Description = description;
     }
 }

@@ -14,17 +14,25 @@ namespace Consent.Domain.Agreements;
 
 public class Agreement
 {
-    public ProvisionId ProvisionId { get; private init; }
-    public ContractVersionId ContractVersionId { get; private init; }
-    public ContractId ContractId { get; private init; }
-    public ImmutableArray<PurposeId> PurposeIds { get; private init; }
+    public ProvisionId ProvisionId { get; }
+    public ContractVersionId ContractVersionId { get; }
+    public ContractId ContractId { get; }
+    public ImmutableArray<PurposeId> PurposeIds { get; }
 
-    public ParticipantId ParticipantId { get; private init; }
+    public ParticipantId ParticipantId { get; }
 
-    public DateTime DecisionTime { get; private init; }
-    public bool Accepted { get; private init; }
+    public DateTime DecisionTime { get; }
+    public bool Accepted { get; }
 
-    public Agreement(ProvisionId provisionId, ContractVersionId contractVersionId,
+    public static Agreement Ctor(ProvisionId provisionId, ContractVersionId contractVersionId,
+        ContractId contractId, IEnumerable<PurposeId> purposeIds,
+        ParticipantId participantId, DateTime decisionTime, bool accepted)
+    {
+        return new Agreement(provisionId, contractVersionId, contractId, purposeIds, participantId, decisionTime,
+            accepted);
+    }
+
+    private Agreement(ProvisionId provisionId, ContractVersionId contractVersionId,
         ContractId contractId, IEnumerable<PurposeId> purposeIds,
         ParticipantId participantId, DateTime decisionTime, bool accepted)
     {

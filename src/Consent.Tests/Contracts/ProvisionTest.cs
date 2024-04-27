@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Consent.Domain.Contracts;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
 using Consent.Tests.Builders;
 using Shouldly;
@@ -15,10 +16,12 @@ public class ProvisionTest
 #pragma warning restore xUnit1012
     [InlineData("")]
     [InlineData("  ")]
-    public void Cannot_create_provision_with_empty_name(string text)
+    public void Cannot_create_provision_with_empty_text(string text)
     {
-        var ctor = () => new Provision(text, new[] { new PurposeId(1001) });
-        _ = ctor.ShouldThrow<ArgumentException>();
+        var result = Provision.Ctor(text, new[] { new PurposeId(1001) });
+
+        var error = result.UnwrapError().ShouldBeOfType<ArgumentError>();
+        error.ParamName.ShouldBe(nameof(Provision.Text));
     }
 
     [Fact]
@@ -26,23 +29,23 @@ public class ProvisionTest
     {
         var version = new ContractVersionBuilder()
         {
-            Provisions = [new Provision("text", new[] { new PurposeId(1010) })]
+            Provisions = [Provision.Ctor("text", new[] { new PurposeId(1010) }).Unwrap()]
         }.Build();
         var provision = version.Provisions.Single();
 
-        provision.AddPurposeIds(new[] { new PurposeId(1011) });
-        provision.Text = "new text";
+        provision.AddPurposeIds(new[] { new PurposeId(1011) }).Unwrap();
+        provision.SetText("new text").Unwrap();
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var addPurposeId = () => { provision.AddPurposeIds(new[] { new PurposeId(1012) }); };
-            _ = addPurposeId.ShouldThrow<InvalidOperationException>();
+            var result = provision.AddPurposeIds(new[] { new PurposeId(1012) });
+            _ = result.UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }, version);
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var changeText = () => { provision.Text = "newer text"; };
-            _ = changeText.ShouldThrow<InvalidOperationException>();
+            var result = provision.SetText("newer text");
+            _ = result.UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }, version);
     }
 
@@ -50,23 +53,23 @@ public class ProvisionTest
     public void Provision_can_only_be_attached_to_one_version_once()
     {
         var version = new ContractVersionBuilder().Build();
-        var provison = new Provision("text", new[] { new PurposeId(1002) });
+        var provision = Provision.Ctor("text", new[] { new PurposeId(1002) }).Unwrap();
 
         // Calling this not from the version is wrong and doesn't actually add to contract. Use domain event or something?
-        provison.OnAddedToVersion(version);
+        provision.OnAddedToVersion(version);
 
-        var reattach = () => provison.OnAddedToVersion(version);
+        var reattach = () => provision.OnAddedToVersion(version);
         _ = reattach.ShouldThrow<InvalidOperationException>();
 
-        var changeAttached = () => provison.OnAddedToVersion(new ContractVersionBuilder().Build());
+        var changeAttached = () => provision.OnAddedToVersion(new ContractVersionBuilder().Build());
         _ = changeAttached.ShouldThrow<InvalidOperationException>();
-
     }
 
     [Fact]
     public void Purposes_must_not_be_empty()
     {
-        var ctor = () => new Provision("text", Array.Empty<PurposeId>()); // todo null
-        _ = ctor.ShouldThrow<ArgumentException>();
+        var result = Provision.Ctor("text", Array.Empty<PurposeId>()); // todo null
+        var error = result.UnwrapError().ShouldBeOfType<ArgumentError>();
+        error.ParamName.ShouldBe(nameof(Provision.PurposeIds));
     }
 }

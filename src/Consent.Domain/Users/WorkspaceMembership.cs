@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using Consent.Domain.Workspaces;
 
@@ -11,14 +10,20 @@ public class WorkspaceMembership
     public WorkspaceId WorkspaceId { get; private init; }
     public ImmutableList<Permission> Permissions { get; private init; }
 
-    public WorkspaceMembership(MembershipId id, WorkspaceId workspaceId, IEnumerable<Permission> permissions)
+    public static WorkspaceMembership Ctor(MembershipId id, WorkspaceId workspaceId,
+        IEnumerable<Permission> permissions)
+    {
+        return new WorkspaceMembership(id, workspaceId, permissions.ToImmutableList());
+    }
+
+    private WorkspaceMembership(MembershipId id, WorkspaceId workspaceId, ImmutableList<Permission> permissions)
     {
         Id = id;
         WorkspaceId = workspaceId;
-        Permissions = permissions.ToImmutableList();
+        Permissions = permissions;
     }
 
-    private WorkspaceMembership() : this(default, default, Array.Empty<Permission>())
+    private WorkspaceMembership() : this(default, default, ImmutableList<Permission>.Empty)
     {
     }
 }

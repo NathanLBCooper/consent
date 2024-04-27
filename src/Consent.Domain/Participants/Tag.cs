@@ -22,11 +22,15 @@ public class Tag : IEntity<TagId>
 
     public string Description { get; private init; }
 
-    public Tag(string name, string description)
+    public static Result<Tag> Ctor(string name, string description)
     {
         ValidateName(name);
-        Name = name;
+        return Result<Tag>.Success(new Tag(name, description));
+    }
 
+    private Tag(string name, string description)
+    {
+        Name = name;
         Description = description;
     }
 }
