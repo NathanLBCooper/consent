@@ -6,7 +6,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - SqlSettings__ConnectionString=server=sql-server,1433;TrustServerCertificate=Yes;database=consentdb;user id=sa;password=Password1!
     ports:
-      - "33080:80"
+      - "33080:8080"
+      - "33081:8080"
     depends_on:
       - migrator
       - sql-server
@@ -16,7 +17,7 @@ services:
        - SqlSettings__ConnectionString=server=sql-server,1433;database=consentdb;user id=sa;password=Password1!
      build:
        context: .
-       dockerfile: ./src/Consent.Storage.Migrator/Dockerfile
+       dockerfile: /src/Consent.Storage.Migrator/Dockerfile
      depends_on:
        - sql-server
 
