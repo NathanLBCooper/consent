@@ -9,6 +9,7 @@ public record Maybe<TValue>
     public TValue Value => HasValue
         ? _value!
         : throw new InvalidOperationException($"{nameof(Value)} does not exist");
+    public TValue? Unwrap() => _value;
 
     private Maybe(TValue? value)
     {
@@ -24,4 +25,9 @@ public record Maybe<TValue>
 
     public static Maybe<TValue> None => new();
     public static Maybe<TValue> Some(TValue value) => new(value);
+
+    public static implicit operator Maybe<TValue>(TValue value)
+    {
+        return value is null ? None : Some(value);
+    }
 }

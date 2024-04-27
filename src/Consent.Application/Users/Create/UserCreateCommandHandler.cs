@@ -3,11 +3,10 @@ using System.Threading.Tasks;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
 using Consent.Domain.Users;
-using static Consent.Domain.Core.Result<Consent.Domain.Users.User>;
 
 namespace Consent.Application.Users.Create;
 
-public interface IUserCreateCommandHandler : ICommandHandler<UserCreateCommand, Result<User>> { }
+public interface IUserCreateCommandHandler : ICommandHandler<UserCreateCommand, User> { }
 
 public class UserCreateCommandHandler : IUserCreateCommandHandler
 {
@@ -19,16 +18,16 @@ public class UserCreateCommandHandler : IUserCreateCommandHandler
         _userRepository = userRepository;
     }
 
-    public async Task<Result<User>> Handle(UserCreateCommand command, CancellationToken cancellationToken)
+    public async Task<User> Handle(UserCreateCommand command, CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Failure(new ValidationError(validationResult.ToString()));
+            throw new ValidationError(validationResult.ToString());
         }
 
         var created = await _userRepository.Create(new User(Guard.NotNull(command.Name)));
 
-        return Success(created);
+        return created;
     }
 }

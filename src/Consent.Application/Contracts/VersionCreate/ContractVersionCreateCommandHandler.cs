@@ -5,11 +5,10 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using static Consent.Domain.Core.Result<Consent.Application.Contracts.VersionCreate.ContractVersionCreateCommandResult>;
 
 namespace Consent.Application.Contracts.VersionCreate;
 
-public interface IContractVersionCreateCommandHandler : ICommandHandler<ContractVersionCreateCommand, Result<ContractVersionCreateCommandResult>> { }
+public interface IContractVersionCreateCommandHandler : ICommandHandler<ContractVersionCreateCommand, ContractVersionCreateCommandResult> { }
 
 public class ContractVersionCreateCommandHandler : IContractVersionCreateCommandHandler
 {
@@ -23,24 +22,24 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<ContractVersionCreateCommandResult>> Handle(ContractVersionCreateCommand command, CancellationToken cancellationToken)
+    public async Task<ContractVersionCreateCommandResult> Handle(ContractVersionCreateCommand command, CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Failure(new ValidationError(validationResult.ToString()));
+            throw new ValidationError(validationResult.ToString());
         }
 
         var contract = await _contractRepository.Get(command.ContractId);
         if (contract is null)
         {
-            return Failure(new NotFoundError());
+            throw new NotFoundError();
         }
 
         var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Failure(new UnauthorizedError());
+            throw new UnauthorizedError();
         }
 
         var created = new ContractVersion(
@@ -50,6 +49,6 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
 
         await _contractRepository.Update(contract);
 
-        return Success(new(contract, created));
+        return new ContractVersionCreateCommandResult(contract, created);
     }
 }

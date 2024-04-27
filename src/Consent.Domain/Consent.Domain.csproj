@@ -4,4 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="Consent.Domain">
+      <HintPath>..\Consent.Api\bin\Debug\net8.0\Consent.Domain.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

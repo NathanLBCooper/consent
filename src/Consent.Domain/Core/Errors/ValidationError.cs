@@ -1,7 +1,11 @@
 namespace Consent.Domain.Core.Errors;
 
-public record ValidationError : Error
+public class ValidationError : Error
 {
+    public ValidationError()
+    {
+    }
+
     public ValidationError(string message) : base(message)
     {
     }

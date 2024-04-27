@@ -4,12 +4,11 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using static Consent.Domain.Core.Result<Consent.Domain.Contracts.Contract>;
 
 namespace Consent.Application.Contracts.Create;
 
 
-public interface IContractCreateCommandHandler : ICommandHandler<ContractCreateCommand, Result<Contract>>
+public interface IContractCreateCommandHandler : ICommandHandler<ContractCreateCommand, Contract>
 {
 }
 
@@ -26,28 +25,28 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<Contract>> Handle(ContractCreateCommand command, CancellationToken cancellationToken)
+    public async Task<Contract> Handle(ContractCreateCommand command, CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Failure(new ValidationError(validationResult.ToString()));
+            throw new ValidationError(validationResult.ToString());
         }
 
         var workspace = await _workspaceRepository.Get(command.WorkspaceId);
         if (workspace is null)
         {
-            return Failure(new NotFoundError());
+            throw new NotFoundError();
         }
 
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Failure(new UnauthorizedError());
+            throw new UnauthorizedError();
         }
 
         var created =
             await _contractRepository.Create(new Contract(command.WorkspaceId, Guard.NotNull(command.Name)));
 
-        return Success(created);
+        return created;
     }
 }

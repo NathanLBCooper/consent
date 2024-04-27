@@ -5,11 +5,10 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using static Consent.Domain.Core.Result<Consent.Application.Contracts.ProvisionCreate.ProvisionCreateCommandResult>;
 
 namespace Consent.Application.Contracts.ProvisionCreate;
 
-public interface IProvisionCreateCommandHandler : ICommandHandler<ProvisionCreateCommand, Result<ProvisionCreateCommandResult>> { }
+public interface IProvisionCreateCommandHandler : ICommandHandler<ProvisionCreateCommand, ProvisionCreateCommandResult> { }
 
 public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
 {
@@ -23,24 +22,24 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<ProvisionCreateCommandResult>> Handle(ProvisionCreateCommand command, CancellationToken cancellationToken)
+    public async Task<ProvisionCreateCommandResult> Handle(ProvisionCreateCommand command, CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Failure(new ValidationError(validationResult.ToString()));
+            throw new ValidationError(validationResult.ToString());
         }
 
         var contract = await _contractRepository.FindByContractVersion(command.ContractVersionId);
         if (contract is null)
         {
-            return Failure(new NotFoundError());
+            throw new NotFoundError();
         }
 
         var workspace = Guard.NotNull(await _workspaceRepository.Get(contract.WorkspaceId));
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Failure(new UnauthorizedError());
+            throw new UnauthorizedError();
         }
 
         var version = contract.Versions.Single(v => v.Id == command.ContractVersionId);
@@ -50,6 +49,6 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
 
         await _contractRepository.Update(contract);
 
-        return Success(new(version, created));
+        return new ProvisionCreateCommandResult(version, created);
     }
 }

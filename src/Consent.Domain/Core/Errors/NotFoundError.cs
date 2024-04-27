@@ -1,8 +1,12 @@
 namespace Consent.Domain.Core.Errors;
 
-public record NotFoundError : Error
+public class NotFoundError : Error
 {
-    public NotFoundError(string? message = null) : base(message)
+    public NotFoundError()
+    {
+    }
+
+    public NotFoundError(string detail) : base(detail)
     {
     }
 }

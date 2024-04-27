@@ -1,8 +1,12 @@
 namespace Consent.Domain.Core.Errors;
 
-public record UnauthorizedError : Error
+public class UnauthorizedError : Error
 {
-    public UnauthorizedError(string? message = null) : base(message)
+    public UnauthorizedError()
+    {
+    }
+
+    public UnauthorizedError(string message) : base(message)
     {
     }
 }

@@ -4,11 +4,12 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
-using static Consent.Domain.Core.Result<Consent.Domain.Purposes.Purpose>;
 
 namespace Consent.Application.Purposes.Create;
 
-public interface IPurposeCreateCommandHandler : ICommandHandler<PurposeCreateCommand, Result<Purpose>> { }
+public interface IPurposeCreateCommandHandler : ICommandHandler<PurposeCreateCommand, Purpose>
+{
+}
 
 public class PurposeCreateCommandHandler : IPurposeCreateCommandHandler
 {
@@ -22,28 +23,28 @@ public class PurposeCreateCommandHandler : IPurposeCreateCommandHandler
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<Purpose>> Handle(PurposeCreateCommand command, CancellationToken cancellationToken)
+    public async Task<Purpose> Handle(PurposeCreateCommand command, CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
         {
-            return Failure(new ValidationError(validationResult.ToString()));
+            throw new ValidationError(validationResult.ToString());
         }
 
         var workspace = await _workspaceRepository.Get(command.WorkspaceId);
         if (workspace is null)
         {
-            return Failure(new NotFoundError());
+            throw new NotFoundError();
         }
 
         if (!workspace.UserCanEdit(command.RequestedBy))
         {
-            return Failure(new NotFoundError());
+            throw new NotFoundError();
         }
 
         var created = await _purposeRepository.Create(
             new Purpose(command.WorkspaceId, Guard.NotNull(command.Name), Guard.NotNull(command.Description)));
 
-        return Success(created);
+        return created;
     }
 }

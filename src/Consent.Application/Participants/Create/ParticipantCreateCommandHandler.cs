@@ -1,12 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Consent.Application.Workspaces;
-using Consent.Domain.Core;
 using Consent.Domain.Participants;
 
 namespace Consent.Application.Participants.Create;
 
-public interface IParticipantCreateCommandHandler : ICommandHandler<ParticipantCreateCommand, Result<Participant>> { }
+public interface IParticipantCreateCommandHandler : ICommandHandler<ParticipantCreateCommand, Participant> { }
 
 public class ParticipantCreateCommandHandler : IParticipantCreateCommandHandler
 {
@@ -20,7 +19,7 @@ public class ParticipantCreateCommandHandler : IParticipantCreateCommandHandler
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<Participant>> Handle(ParticipantCreateCommand command, CancellationToken cancellationToken)
+    public async Task<Participant> Handle(ParticipantCreateCommand command, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
 

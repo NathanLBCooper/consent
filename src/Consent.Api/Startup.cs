@@ -28,6 +28,8 @@ internal class Startup
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
             );
 
+        _ = services.AddExceptionHandler<ErrorHandler>();
+
         _ = services
             .AddEndpointsApiExplorer()
             .AddSwaggerGen();

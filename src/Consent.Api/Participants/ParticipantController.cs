@@ -21,7 +21,8 @@ public class ParticipantController : ControllerBase // [FromHeader] int userId i
 
     private ConsentLinkGenerator Links => new(HttpContext, _linkGenerator);
 
-    public ParticipantController(LinkGenerator linkGenerator, IParticipantGetQueryHandler get, IParticipantCreateCommandHandler create)
+    public ParticipantController(LinkGenerator linkGenerator, IParticipantGetQueryHandler get,
+        IParticipantCreateCommandHandler create)
     {
         _linkGenerator = linkGenerator;
         _get = get;
@@ -29,14 +30,15 @@ public class ParticipantController : ControllerBase // [FromHeader] int userId i
     }
 
     [HttpGet("{id}", Name = "GetParticipant")]
-    public async Task<ActionResult<ParticipantModel>> ParticipantGet(int id, [FromHeader] int userId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ParticipantModel>> ParticipantGet(int id, [FromHeader] int userId,
+        CancellationToken cancellationToken)
     {
         var query = new ParticipantGetQuery(new ParticipantId(id), new UserId(userId));
         var maybe = await _get.Handle(query, cancellationToken);
         return maybe.Match<Participant, ActionResult<ParticipantModel>>(
             participant => Ok(participant.ToModel(Links)),
             () => NotFound()
-            );
+        );
     }
 
     [HttpPost("", Name = "CreateParticipant")]
@@ -45,10 +47,8 @@ public class ParticipantController : ControllerBase // [FromHeader] int userId i
     {
         var _ = request;
         var command = new ParticipantCreateCommand(new UserId(userId));
-        var result = await _create.Handle(command, cancellationToken);
-        return result.Match(
-            participant => Ok(participant.ToModel(Links)),
-            error => error.ToErrorResponse<ParticipantModel>(this)
-            );
+
+        var participant = await _create.Handle(command, cancellationToken);
+        return Ok(participant.ToModel(Links));
     }
 }
