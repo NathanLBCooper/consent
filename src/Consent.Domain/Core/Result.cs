@@ -11,6 +11,10 @@ public record Result
     [MemberNotNullWhen(returnValue: false, nameof(Error))]
     public bool IsSuccess => Error is null;
 
+    public Error UnwrapError() => !IsSuccess
+        ? Error!
+        : throw new InvalidOperationException($"{nameof(Error)} does not exist");
+
     protected Result(Error? error = null)
     {
         Error = error;
@@ -25,6 +29,7 @@ public record Result<TValue> : Result
     private readonly Maybe<TValue> _maybe;
 
     public TValue? Value => _maybe.Value;
+
     public TValue Unwrap() => _maybe.HasValue
         ? _maybe.Unwrap()
         : throw new InvalidOperationException($"Failure Result has no {nameof(Value)}");

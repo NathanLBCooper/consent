@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Consent.Api.Client.Models.Users;
 using Consent.Application.Users.Create;
 using Consent.Application.Users.Get;
-using Consent.Domain.Core;
 using Consent.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -34,12 +33,12 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         var command = new UserGetQuery(id, id);
         var maybe = await _get.Handle(command, cancellationToken);
 
-        var response = maybe.Match<User, ActionResult<UserModel>>(
-            user => Ok(user.ToModel(Links)),
-            () => NotFound()
-        );
+        if (maybe.Value is not { } user)
+        {
+            return NotFound();
+        }
 
-        return response;
+        return Ok(user.ToModel(Links));
     }
 
     [HttpGet("{id}", Name = "GetUser")]
@@ -48,12 +47,12 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         var command = new UserGetQuery(new UserId(id), new UserId(userId));
         var maybe = await _get.Handle(command, cancellationToken);
 
-        var response = maybe.Match<User, ActionResult<UserModel>>(
-            user => Ok(user.ToModel(Links)),
-            () => NotFound()
-        );
+        if (maybe.Value is not { } user)
+        {
+            return NotFound();
+        }
 
-        return response;
+        return Ok(user.ToModel(Links));
     }
 
     [HttpPost("", Name = "CreateUser")]
@@ -62,11 +61,11 @@ public class UserController : ControllerBase // [FromHeader] int userId is hones
         var command = new UserCreateCommand(request.Name);
         var result = await _create.Handle(command, cancellationToken);
 
-        var response = result.Match(
-            user => Ok(user.ToModel(Links)),
-            error => error.ToErrorResponse<UserModel>(this)
-            );
+        if (result.Value is not { } user)
+        {
+            return result.UnwrapError().ToErrorResponse<UserModel>(this);
+        }
 
-        return response;
+        return Ok(user.ToModel(Links));
     }
 }
