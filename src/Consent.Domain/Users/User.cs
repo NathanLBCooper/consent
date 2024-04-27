@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Consent.Domain.Core;
+using Consent.Domain.Core.Errors;
 
 namespace Consent.Domain.Users;
 
@@ -14,34 +14,43 @@ public class User : IEntity<UserId>
 {
     public UserId? Id { get; init; }
 
-    private readonly string _name;
-    public string Name
+    public string Name { get; private init; }
+    private static Result ValidateName(string value)
     {
-        get => _name;
-        [MemberNotNull(nameof(_name))]
-        init
+        if (string.IsNullOrWhiteSpace(value))
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                _name = value;
-                throw new ArgumentException(nameof(Name));
-            }
-
-            _name = value;
+            return Result.Failure(new ArgumentError(nameof(Name)));
         }
+
+        return Result.Success();
     }
 
     private readonly List<WorkspaceMembership> _workspaceMemberships;
     public IReadOnlyList<WorkspaceMembership> WorkspaceMemberships => _workspaceMemberships.AsReadOnly();
 
-    public User(string name, IEnumerable<WorkspaceMembership> workspaceMemberships)
+    private User(string name, IEnumerable<WorkspaceMembership> workspaceMemberships)
     {
         Name = name;
         _workspaceMemberships = workspaceMemberships.ToList();
     }
 
-    public User(string name) : this(name, Array.Empty<WorkspaceMembership>())
+    private User(string name) : this(name, Array.Empty<WorkspaceMembership>())
     {
+    }
+
+    public static Result<User> Ctor(string name, IEnumerable<WorkspaceMembership> workspaceMemberships)
+    {
+        if (ValidateName(name) is { IsSuccess: false } result)
+        {
+            return Result<User>.Failure(result.Error);
+        }
+
+        return Result<User>.Success(new User(name, workspaceMemberships));
+    }
+
+    public static Result<User> Ctor(string name)
+    {
+        return Ctor(name, Array.Empty<WorkspaceMembership>());
     }
 }
 

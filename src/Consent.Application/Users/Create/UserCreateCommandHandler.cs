@@ -7,7 +7,9 @@ using static Consent.Domain.Core.Result<Consent.Domain.Users.User>;
 
 namespace Consent.Application.Users.Create;
 
-public interface IUserCreateCommandHandler : ICommandHandler<UserCreateCommand, Result<User>> { }
+public interface IUserCreateCommandHandler : ICommandHandler<UserCreateCommand, Result<User>>
+{
+}
 
 public class UserCreateCommandHandler : IUserCreateCommandHandler
 {
@@ -27,7 +29,13 @@ public class UserCreateCommandHandler : IUserCreateCommandHandler
             return Failure(new ValidationError(validationResult.ToString()));
         }
 
-        var created = await _userRepository.Create(new User(Guard.NotNull(command.Name)));
+        var result = User.Ctor(Guard.NotNull(command.Name));
+        if (result.Value is not { } user)
+        {
+            return result;
+        }
+
+        var created = await _userRepository.Create(user);
 
         return Success(created);
     }
