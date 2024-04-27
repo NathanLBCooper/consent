@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Consent.Domain.Core;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
 
 namespace Consent.Domain.Contracts;
@@ -16,50 +17,70 @@ public class Provision
 
     public ContractVersion? ContractVersion { get; private set; }
 
-    private string _text;
-    public string Text
+    public string Text { get; private set; }
+
+    private static Result ValidateText(string text)
     {
-        get => _text;
-        [MemberNotNull(nameof(_text))]
-        set
+        if (string.IsNullOrWhiteSpace(text))
         {
-            ThrowIfNotDraft();
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException(nameof(Text));
-            }
-
-            _text = value;
+            return Result.Failure(new ArgumentError(nameof(Text)));
         }
+
+        return Result.Success();
     }
 
-    private ImmutableList<PurposeId> _purposeIds;
-    public ImmutableList<PurposeId> PurposeIds
+    public Result SetText(string value)
     {
-        get => _purposeIds;
-        [MemberNotNull(nameof(_purposeIds))]
-        private set
+        if (FailIfNotDraft() is { IsSuccess: false } dResult)
         {
-            if (value.IsEmpty)
-            {
-                throw new ArgumentException("Cannot be empty", nameof(PurposeIds));
-            }
-
-            _purposeIds = value;
+            return dResult;
         }
+
+        if (ValidateText(value) is { IsSuccess: false } tResult)
+        {
+            return tResult;
+        }
+
+        Text = value;
+        return Result.Success();
     }
 
-    public Provision(string text, IEnumerable<PurposeId> purposeIds)
+    public ImmutableList<PurposeId> PurposeIds { get; private set; }
+
+    private static Result ValidatePurposeIds(ImmutableList<PurposeId> purposeIds)
+    {
+        if (purposeIds.IsEmpty)
+        {
+            return Result.Failure(new ArgumentError(nameof(PurposeIds), "Cannot be empty"));
+        }
+
+        return Result.Success();
+    }
+
+    public static Result<Provision> Ctor(string text, IEnumerable<PurposeId> purposeIds)
+    {
+        if (ValidateText(text) is { IsSuccess: false } tResult)
+        {
+            return Result<Provision>.Failure(tResult.Error);
+        }
+
+        var p = purposeIds.ToImmutableList();
+        if (ValidatePurposeIds(p) is { IsSuccess: false } pResult)
+        {
+            return Result<Provision>.Failure(pResult.Error);
+        }
+
+        return Result<Provision>.Success(new Provision(text, p));
+    }
+
+    private Provision(string text, ImmutableList<PurposeId> purposeIds)
     {
         Text = text;
-        PurposeIds = purposeIds.ToImmutableList();
+        PurposeIds = purposeIds;
     }
 
-    private Provision(string text)
+    private Provision(string text) : this(text, ImmutableList<PurposeId>.Empty)
     {
-        Text = text;
-        _purposeIds = [];
     }
 
     public void OnAddedToVersion(ContractVersion version)
@@ -72,19 +93,28 @@ public class Provision
         ContractVersion = version;
     }
 
-    public void AddPurposeIds(IEnumerable<PurposeId> purposeIds)
+    public Result AddPurposeIds(IEnumerable<PurposeId> purposeIds)
     {
-        ThrowIfNotDraft();
+        if (FailIfNotDraft() is { IsSuccess: false } dResult)
+        {
+            return dResult;
+        }
 
-        PurposeIds = PurposeIds.AddRange(purposeIds);
+        var value = PurposeIds.Concat(purposeIds).ToImmutableList();
+        // skip validation, cannot get invalid list (empty) via concat
+
+        PurposeIds = value;
+        return Result.Success();
     }
 
-    private void ThrowIfNotDraft()
+    private Result FailIfNotDraft()
     {
         if (ContractVersion is not null && ContractVersion.Status != ContractVersionStatus.Draft)
         {
-            throw new InvalidOperationException("Cannot mutate a non-draft Version");
+            return Result.Failure(new InvalidOperationError("Cannot mutate a non-draft Version"));
         }
+
+        return Result.Success();
     }
 }
 

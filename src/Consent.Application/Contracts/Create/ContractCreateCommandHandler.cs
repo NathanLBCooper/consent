@@ -8,7 +8,6 @@ using static Consent.Domain.Core.Result<Consent.Domain.Contracts.Contract>;
 
 namespace Consent.Application.Contracts.Create;
 
-
 public interface IContractCreateCommandHandler : ICommandHandler<ContractCreateCommand, Result<Contract>>
 {
 }
@@ -45,8 +44,13 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
             return Failure(new UnauthorizedError());
         }
 
-        var created =
-            await _contractRepository.Create(new Contract(command.WorkspaceId, Guard.NotNull(command.Name)));
+        var contractResult = Contract.Ctor(command.WorkspaceId, Guard.NotNull(command.Name));
+        if (contractResult.Value is not { } contract)
+        {
+            return Failure(contractResult.UnwrapError());
+        }
+
+        var created = await _contractRepository.Create(contract);
 
         return Success(created);
     }

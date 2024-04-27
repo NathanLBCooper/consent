@@ -1,6 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Consent.Domain.Contracts;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
 using Consent.Tests.Builders;
 using Shouldly;
@@ -24,12 +24,12 @@ public class ContractsTest
         }.Build();
 
         var updatedName = "updated";
-        contract.Name = updatedName;
+        contract.SetName(updatedName).Unwrap();
 
         var newPurpose = new PurposeId(2);
         var updatedVersionName = "updated version";
-        version.Name = updatedVersionName;
-        version.Provisions[0].AddPurposeIds(new[] { newPurpose });
+        version.SetName(updatedVersionName).Unwrap();
+        version.Provisions[0].AddPurposeIds(new[] { newPurpose }).Unwrap();
 
         contract.Name.ShouldBe(updatedName);
         contract.Versions.Single().Name.ShouldBe(updatedVersionName);
@@ -50,12 +50,12 @@ public class ContractsTest
             Versions = new[] { version }
         }.Build();
 
-        version.Status = ContractVersionStatus.Active;
+        version.SetStatus(ContractVersionStatus.Active).Unwrap();
 
-        var updateVersion = () => version.Name = "updated version";
-        var updateProvisionInVersion = () => version.Provisions[0].AddPurposeIds(new[] { new PurposeId(2) });
-        _ = updateVersion.ShouldThrow<InvalidOperationException>();
-        _ = updateProvisionInVersion.ShouldThrow<InvalidOperationException>();
+        var updateVersionResult = version.SetName("updated version");
+        var updateProvisionInVersion = version.Provisions[0].AddPurposeIds(new[] { new PurposeId(2) });
+        _ = updateVersionResult.UnwrapError().ShouldBeOfType<InvalidOperationError>();
+        _ = updateProvisionInVersion.UnwrapError().ShouldBeOfType<InvalidOperationError>();
     }
 
     // todo maybe these don't have value, depending on the controller tests

@@ -9,7 +9,10 @@ using static Consent.Domain.Core.Result<Consent.Application.Contracts.ProvisionC
 
 namespace Consent.Application.Contracts.ProvisionCreate;
 
-public interface IProvisionCreateCommandHandler : ICommandHandler<ProvisionCreateCommand, Result<ProvisionCreateCommandResponse>> { }
+public interface
+    IProvisionCreateCommandHandler : ICommandHandler<ProvisionCreateCommand, Result<ProvisionCreateCommandResponse>>
+{
+}
 
 public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
 {
@@ -17,13 +20,15 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly ProvisionCreateCommandValidator _validator = new();
 
-    public ProvisionCreateCommandHandler(IContractRepository contractRepository, IWorkspaceRepository workspaceRepository)
+    public ProvisionCreateCommandHandler(IContractRepository contractRepository,
+        IWorkspaceRepository workspaceRepository)
     {
         _contractRepository = contractRepository;
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<ProvisionCreateCommandResponse>> Handle(ProvisionCreateCommand command, CancellationToken cancellationToken)
+    public async Task<Result<ProvisionCreateCommandResponse>> Handle(ProvisionCreateCommand command,
+        CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
@@ -45,11 +50,16 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
 
         var version = contract.Versions.Single(v => v.Id == command.ContractVersionId);
 
-        var created = new Provision(Guard.NotNull(command.Text), Guard.NotNull(command.PurposeIds));
-        version.AddProvisions(created);
+        var provisionResult = Provision.Ctor(Guard.NotNull(command.Text), Guard.NotNull(command.PurposeIds));
+        if (provisionResult.Value is not { } provision)
+        {
+            return Failure(provisionResult.UnwrapError());
+        }
+
+        version.AddProvisions(provision);
 
         await _contractRepository.Update(contract);
 
-        return Success(new(version, created));
+        return Success(new(version, provision));
     }
 }

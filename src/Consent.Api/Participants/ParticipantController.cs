@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Consent.Api.Client.Models.Participants;
 using Consent.Application.Participants.Create;
 using Consent.Application.Participants.Get;
-using Consent.Domain.Core;
 using Consent.Domain.Participants;
 using Consent.Domain.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -33,10 +32,13 @@ public class ParticipantController : ControllerBase // [FromHeader] int userId i
     {
         var query = new ParticipantGetQuery(new ParticipantId(id), new UserId(userId));
         var maybe = await _get.Handle(query, cancellationToken);
-        return maybe.Match<Participant, ActionResult<ParticipantModel>>(
-            participant => Ok(participant.ToModel(Links)),
-            () => NotFound()
-            );
+
+        if (maybe.Value is not { } participant)
+        {
+            return NotFound();
+        }
+
+        return Ok(participant.ToModel(Links));
     }
 
     [HttpPost("", Name = "CreateParticipant")]
@@ -46,9 +48,12 @@ public class ParticipantController : ControllerBase // [FromHeader] int userId i
         var _ = request;
         var command = new ParticipantCreateCommand(new UserId(userId));
         var result = await _create.Handle(command, cancellationToken);
-        return result.Match(
-            participant => Ok(participant.ToModel(Links)),
-            error => error.ToErrorResponse<ParticipantModel>(this)
-            );
+
+        if (result.Value is not { } participant)
+        {
+            return result.UnwrapError().ToErrorResponse<ParticipantModel>(this);
+        }
+
+        return Ok(participant.ToModel(Links));
     }
 }

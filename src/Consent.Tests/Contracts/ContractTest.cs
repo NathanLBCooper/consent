@@ -1,5 +1,5 @@
-﻿using System;
-using Consent.Domain.Contracts;
+﻿using Consent.Domain.Contracts;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Workspaces;
 using Consent.Tests.Builders;
 using Shouldly;
@@ -16,12 +16,14 @@ public class ContractTest
     [InlineData("  ")]
     public void Cannot_assign_contract_empty_name(string name)
     {
-        var ctor = () => new Contract(new WorkspaceId(1), name);
-        _ = ctor.ShouldThrow<ArgumentException>();
+        var result = Contract.Ctor(new WorkspaceId(1), name);
+        var error = result.UnwrapError().ShouldBeOfType<ArgumentError>();
+        error.ParamName.ShouldBe(nameof(Contract.Name));
 
         var contract = new ContractBuilder().Build();
-        var setter = () => contract.Name = name;
-        _ = setter.ShouldThrow<ArgumentException>();
+        var setResult = contract.SetName(name);
+        var setError = setResult.UnwrapError().ShouldBeOfType<ArgumentError>();
+        setError.ParamName.ShouldBe(nameof(Contract.Name));
     }
 
     [Fact]

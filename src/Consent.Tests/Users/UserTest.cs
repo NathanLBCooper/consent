@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Consent.Domain.Core.Errors;
 using Consent.Domain.Users;
 using Shouldly;
 
@@ -14,7 +14,11 @@ public class UserTest
     [InlineData("  ")]
     public void Cannot_create_user_with_empty_name(string name)
     {
-        var ctor = () => new User(name);
-        _ = ctor.ShouldThrow<ArgumentException>();
+        var result = User.Ctor(name);
+
+        result.IsSuccess.ShouldBeFalse();
+
+        var error = result.Error.ShouldBeOfType<ArgumentError>();
+        error.ParamName.ShouldBe(nameof(User.Name));
     }
 }

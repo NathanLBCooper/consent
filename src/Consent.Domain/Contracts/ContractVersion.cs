@@ -1,93 +1,126 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Consent.Domain.Core;
+using Consent.Domain.Core.Errors;
 
 namespace Consent.Domain.Contracts;
 
 /*
- * A specific version of a Contract, which contains all wording required for informed consent on one or many provisions 
+ * A specific version of a Contract, which contains all wording required for informed consent on one or many provisions
  */
 
 public class ContractVersion
 {
     public ContractVersionId? Id { get; init; }
 
-    private string _name;
-    public string Name
+    public string Name { get; private set; }
+
+    private static Result ValidateName(string name)
     {
-        get => _name;
-        [MemberNotNull(nameof(_name))]
-        set
+        if (string.IsNullOrWhiteSpace(name))
         {
-            ThrowIfNotDraft();
-
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException(nameof(Name));
-            }
-
-            _name = value;
+            return Result.Failure(new ArgumentError(nameof(Name)));
         }
+
+        return Result.Success();
+    }
+
+    public Result SetName(string value)
+    {
+        if (FailIfNotDraft() is { IsSuccess: false } dResult)
+        {
+            return dResult;
+        }
+
+        if (ValidateName(value) is { IsSuccess: false } tResult)
+        {
+            return tResult;
+        }
+
+        Name = value;
+        return Result.Success();
     }
 
     // todo is this "Text". Is it something more specific like a introduction?
-    private string _text;
-    public string Text
+    public string Text { get; private set; }
+
+    public Result SetText(string value)
     {
-        get => _text;
-        [MemberNotNull(nameof(_text))]
-        set
+        if (FailIfNotDraft() is { IsSuccess: false } dResult)
         {
-            ThrowIfNotDraft();
-            _text = value;
+            return dResult;
         }
+
+        Text = value;
+        return Result.Success();
     }
 
-    private ContractVersionStatus _status = ContractVersionStatus.Draft;
-    public ContractVersionStatus Status
+    public ContractVersionStatus Status { get; private set; }
+
+    public Result SetStatus(ContractVersionStatus value)
     {
-        get => _status;
-        set
+        if (value == Status)
         {
-            if (value == Status)
-            {
-                return;
-            }
-
-            if (!Enum.IsDefined(typeof(ContractVersionStatus), value))
-            {
-                throw new ArgumentException(nameof(Status));
-            }
-
-            if (value == ContractVersionStatus.Draft)
-            {
-                throw new InvalidOperationException("Cannot change a non-draft Version back to draft");
-            }
-
-            _status = value;
+            return Result.Success();
         }
+
+        if (!Enum.IsDefined(typeof(ContractVersionStatus), value))
+        {
+            return Result.Failure(new ArgumentError(nameof(Status)));
+        }
+
+        if (value == ContractVersionStatus.Draft)
+        {
+            return Result.Failure(new InvalidOperationError("Cannot change a non-draft Version back to draft"));
+        }
+
+        Status = value;
+        return Result.Success();
     }
 
     private readonly List<Provision> _provisions;
     public IReadOnlyList<Provision> Provisions => _provisions.AsReadOnly();
 
-    public ContractVersion(string name, string text, IEnumerable<Provision> provisions)
+    public static Result<ContractVersion> Ctor(string name, string text, IEnumerable<Provision> provisions)
+    {
+        return Ctor(name, text, ContractVersionStatus.Draft, provisions);
+    }
+
+    public static Result<ContractVersion> Ctor(string name, string text, ContractVersionStatus status)
+    {
+        return Ctor(name, text, status, new List<Provision>());
+    }
+
+    private static Result<ContractVersion> Ctor(string name, string text, ContractVersionStatus status,
+        IEnumerable<Provision> provisions)
+    {
+        if (ValidateName(name) is { IsSuccess: false } result)
+        {
+            return Result<ContractVersion>.Failure(result.Error);
+        }
+
+        var pr = provisions.ToList();
+        var version = new ContractVersion(name, text, status, pr);
+        foreach (var p in pr)
+        {
+            p.OnAddedToVersion(version);
+        }
+
+        return Result<ContractVersion>.Success(version);
+    }
+
+    private ContractVersion(string name, string text, ContractVersionStatus status, List<Provision> provisions)
     {
         Name = name;
         Text = text;
-
-        _provisions = provisions.ToList();
-        foreach (var p in provisions)
-        {
-            p.OnAddedToVersion(this);
-        }
+        Status = status;
+        _provisions = provisions;
     }
 
-    private ContractVersion(string name, string text, ContractVersionStatus status) : this(name, text, Array.Empty<Provision>())
+    private ContractVersion(string name, string text, ContractVersionStatus status) : this(name, text, status,
+        new List<Provision>())
     {
-        Status = status;
     }
 
     public void AddProvisions(params Provision[] provisions)
@@ -99,12 +132,14 @@ public class ContractVersion
         }
     }
 
-    private void ThrowIfNotDraft()
+    private Result FailIfNotDraft()
     {
         if (Status != ContractVersionStatus.Draft)
         {
-            throw new InvalidOperationException("Cannot mutate a non-draft Version");
+            return Result.Failure(new InvalidOperationError("Cannot mutate a non-draft Version"));
         }
+
+        return Result.Success();
     }
 }
 

@@ -20,15 +20,22 @@ public class Membership
     public bool CanView => Permissions.Contains(Permission.View);
     public bool CanEdit => Permissions.Contains(Permission.Edit);
 
-    public Membership(UserId userId, IEnumerable<Permission> permissions)
+    public static Membership Ctor(UserId userId, IEnumerable<Permission> permissions)
     {
-        UserId = userId;
-        Permissions = permissions.ToImmutableList();
+        var p = permissions.ToImmutableList();
+        var isSuperUser = SuperUser.All(p.Contains);
 
-        IsSuperUser = SuperUser.All(Permissions.Contains);
+        return new Membership(userId, p, isSuperUser);
     }
 
-    private Membership(UserId userId) : this(userId, Array.Empty<Permission>())
+    private Membership(UserId userId, ImmutableList<Permission> permissions, bool isSuperUser)
+    {
+        UserId = userId;
+        Permissions = permissions;
+        IsSuperUser = isSuperUser;
+    }
+
+    private Membership(UserId userId) : this(userId, ImmutableList<Permission>.Empty, false)
     {
     }
 }

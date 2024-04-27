@@ -8,7 +8,6 @@ using Consent.Application.Contracts.ProvisionCreate;
 using Consent.Application.Contracts.VersionCreate;
 using Consent.Application.Contracts.VersionGet;
 using Consent.Domain.Contracts;
-using Consent.Domain.Core;
 using Consent.Domain.Purposes;
 using Consent.Domain.Users;
 using Consent.Domain.Workspaces;
@@ -49,10 +48,13 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     {
         var query = new ContractGetQuery(new ContractId(id), new UserId(userId));
         var maybe = await _contractGet.Handle(query, cancellationToken);
-        return maybe.Match<Contract, ActionResult<ContractModel>>(
-            contract => Ok(contract.ToModel(Links)),
-            () => NotFound()
-            );
+
+        if (maybe.Value is not { } contract)
+        {
+            return NotFound();
+        }
+
+        return Ok(contract.ToModel(Links));
     }
 
     [HttpPost("", Name = "CreateContract")]
@@ -60,10 +62,13 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     {
         var command = new ContractCreateCommand(request.Name, new WorkspaceId(request.WorkspaceId), new UserId(userId));
         var result = await _contractCreate.Handle(command, cancellationToken);
-        return result.Match(
-            contract => Ok(contract.ToModel(Links)),
-            error => error.ToErrorResponse<ContractModel>(this)
-            );
+
+        if (result.Value is not { } contract)
+        {
+            return NotFound();
+        }
+
+        return Ok(contract.ToModel(Links));
     }
 
     [HttpGet("version/{id}", Name = "GetContractVersion")]
@@ -71,10 +76,13 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     {
         var query = new ContractVersionGetQuery(new ContractVersionId(id), new UserId(userId));
         var result = await _versionGet.Handle(query, cancellationToken);
-        return result.Match<ContractVersionGetQueryResponse, ActionResult<ContractVersionModel>>(
-            r => Ok(r.Version.ToModel(r.Contract, Links)),
-            () => NotFound()
-            );
+
+        if (result.Value is not { } response)
+        {
+            return NotFound();
+        }
+
+        return Ok(response.Version.ToModel(response.Contract, Links));
     }
 
     [HttpPost("{contractId}/version", Name = "CreateContractVersion")]
@@ -83,10 +91,13 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     {
         var command = new ContractVersionCreateCommand(request.Name, request.Text, new ContractId(contractId), new UserId(userId));
         var result = await _versionCreate.Handle(command, cancellationToken);
-        return result.Match(
-            r => Ok(r.Version.ToModel(r.Contract, Links)),
-            error => error.ToErrorResponse<ContractVersionModel>(this)
-            );
+
+        if (result.Value is not { } response)
+        {
+            return result.UnwrapError().ToErrorResponse<ContractVersionModel>(this);
+        }
+
+        return Ok(response.Version.ToModel(response.Contract, Links));
     }
 
     [HttpPost("version/{versionId}/provision", Name = "CreateProvision")]
@@ -97,9 +108,12 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
             request.Text, request.PurposeIds?.Select(p => new PurposeId(p)).ToArray(), new ContractVersionId(versionId), new UserId(userId)
             );
         var result = await _provisionCreate.Handle(command, cancellationToken);
-        return result.Match(
-            r => Ok(r.Provision.ToModel(r.Version, Links)),
-            error => error.ToErrorResponse<ProvisionModel>(this)
-            );
+
+        if (result.Value is not { } response)
+        {
+            return result.UnwrapError().ToErrorResponse<ProvisionModel>(this);
+        }
+
+        return Ok(response.Provision.ToModel(response.Version, Links));
     }
 }

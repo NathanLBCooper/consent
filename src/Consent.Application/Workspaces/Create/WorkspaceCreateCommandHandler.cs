@@ -36,7 +36,13 @@ public class WorkspaceCreateCommandHandler : IWorkspaceCreateCommandHandler
             return Failure(new UnauthorizedError());
         }
 
-        var created = await _workspaceRepository.Create(new Workspace(Guard.NotNull(command.Name), Guard.NotNull(user.Id)));
+        var workspaceResult = Workspace.Ctor(Guard.NotNull(command.Name), Guard.NotNull(user.Id));
+        if (workspaceResult.Value is not { } workspace)
+        {
+            return workspaceResult;
+        }
+
+        var created = await _workspaceRepository.Create(workspace);
 
         return Success(created);
     }

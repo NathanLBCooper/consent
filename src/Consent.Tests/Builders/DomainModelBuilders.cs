@@ -13,7 +13,7 @@ internal record ContractBuilder
 
     public Contract Build()
     {
-        return new Contract(WorkspaceId, Name, Versions);
+        return Contract.Ctor(WorkspaceId, Name, Versions).Unwrap();
     }
 }
 
@@ -25,7 +25,7 @@ internal record ContractVersionBuilder
 
     public ContractVersion Build()
     {
-        return new ContractVersion(Name, Text, Provisions);
+        return ContractVersion.Ctor(Name, Text, Provisions).Unwrap();
     }
 }
 
@@ -41,6 +41,6 @@ internal record ProvisionBuilder
 
     public Provision Build()
     {
-        return new Provision(Text, PurposeIds);
+        return Provision.Ctor(Text, PurposeIds).Unwrap();
     }
 }

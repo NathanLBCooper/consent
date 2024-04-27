@@ -1,5 +1,5 @@
-﻿using System;
-using Consent.Domain.Contracts;
+﻿using Consent.Domain.Contracts;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Purposes;
 using Consent.Tests.Builders;
 using Shouldly;
@@ -16,8 +16,8 @@ public class ContractVersionTest
     [InlineData("  ")]
     public void Cannot_create_contract_version_with_empty_name(string name)
     {
-        var ctor = () => new ContractVersionBuilder() { Name = name }.Build();
-        _ = ctor.ShouldThrow<ArgumentException>();
+        var result = ContractVersion.Ctor(name, "text", []);
+        _ = result.UnwrapError().ShouldBeOfType<ArgumentError>();
     }
 
     [Fact]
@@ -37,21 +37,15 @@ public class ContractVersionTest
     {
         var version = new ContractVersionBuilder().Build();
 
-        version.Status = ContractVersionStatus.Draft;
+        version.SetStatus(ContractVersionStatus.Draft).Unwrap();
 
         foreach (var status in Util.NonDraftStatuses)
         {
-            version.Status = status;
+            version.SetStatus(status).Unwrap();
 
-            var statusChange = () => { version.Status = ContractVersionStatus.Draft; };
-            _ = statusChange.ShouldThrow<InvalidOperationException>();
+            var statusChangeResult = version.SetStatus(ContractVersionStatus.Draft);
+            _ = statusChangeResult.UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }
-
-        Util.InvokeForAllNonDraftStatuses(() =>
-        {
-            var statusChange = () => { version.Text = "edited text"; };
-            _ = statusChange.ShouldThrow<InvalidOperationException>();
-        }, version);
     }
 
     [Fact]
@@ -59,22 +53,23 @@ public class ContractVersionTest
     {
         var version = new ContractVersionBuilder().Build();
 
-        var statusChange = () => { version.Status = (ContractVersionStatus)199; };
-        _ = statusChange.ShouldThrow<ArgumentException>();
+        var statusChangeResult = version.SetStatus((ContractVersionStatus)199);
+        var error = statusChangeResult.UnwrapError().ShouldBeOfType<ArgumentError>();
+        error.ParamName.ShouldBe(nameof(ContractVersion.Status));
     }
 
     [Fact]
     public void Can_only_change_text_when_in_draft()
     {
         var version = new ContractVersionBuilder().Build();
-        version.Text = "edited text in draft";
+        version.SetText("edited text in draft").Unwrap();
 
-        version.Status = ContractVersionStatus.Active;
+        version.SetStatus(ContractVersionStatus.Active).Unwrap();
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var statusChange = () => { version.Text = "edited text"; };
-            _ = statusChange.ShouldThrow<InvalidOperationException>();
+            var statusChangeResult = version.SetText("edited text");
+            _ = statusChangeResult.UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }, version);
     }
 
@@ -82,14 +77,14 @@ public class ContractVersionTest
     public void Can_only_change_name_when_in_draft()
     {
         var version = new ContractVersionBuilder().Build();
-        version.Name = "edited name in draft";
+        version.SetName("edited name in draft").Unwrap();
 
-        version.Status = ContractVersionStatus.Active;
+        version.SetStatus(ContractVersionStatus.Active).Unwrap();
 
         Util.InvokeForAllNonDraftStatuses(() =>
         {
-            var nameChange = () => { version.Name = "edited name"; };
-            _ = nameChange.ShouldThrow<InvalidOperationException>();
+            var nameChangeResult = version.SetName("edited name");
+            _ = nameChangeResult.UnwrapError().ShouldBeOfType<InvalidOperationError>();
         }, version);
     }
 }
