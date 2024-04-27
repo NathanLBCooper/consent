@@ -2,7 +2,7 @@
 
 namespace Consent.Application.Contracts.VersionCreate;
 
-public record ContractVersionCreateCommandResult(
+public record ContractVersionCreateCommandResponse(
     Contract Contract,
     ContractVersion Version
     );

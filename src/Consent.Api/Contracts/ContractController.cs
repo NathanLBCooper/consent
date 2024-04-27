@@ -71,7 +71,7 @@ public class ContractController : ControllerBase // [FromHeader] int userId is h
     {
         var query = new ContractVersionGetQuery(new ContractVersionId(id), new UserId(userId));
         var result = await _versionGet.Handle(query, cancellationToken);
-        return result.Match<ContractVersionGetQueryResult, ActionResult<ContractVersionModel>>(
+        return result.Match<ContractVersionGetQueryResponse, ActionResult<ContractVersionModel>>(
             r => Ok(r.Version.ToModel(r.Contract, Links)),
             () => NotFound()
             );

@@ -5,11 +5,11 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using static Consent.Domain.Core.Result<Consent.Application.Contracts.VersionCreate.ContractVersionCreateCommandResult>;
+using static Consent.Domain.Core.Result<Consent.Application.Contracts.VersionCreate.ContractVersionCreateCommandResponse>;
 
 namespace Consent.Application.Contracts.VersionCreate;
 
-public interface IContractVersionCreateCommandHandler : ICommandHandler<ContractVersionCreateCommand, Result<ContractVersionCreateCommandResult>> { }
+public interface IContractVersionCreateCommandHandler : ICommandHandler<ContractVersionCreateCommand, Result<ContractVersionCreateCommandResponse>> { }
 
 public class ContractVersionCreateCommandHandler : IContractVersionCreateCommandHandler
 {
@@ -23,7 +23,7 @@ public class ContractVersionCreateCommandHandler : IContractVersionCreateCommand
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<ContractVersionCreateCommandResult>> Handle(ContractVersionCreateCommand command, CancellationToken cancellationToken)
+    public async Task<Result<ContractVersionCreateCommandResponse>> Handle(ContractVersionCreateCommand command, CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)

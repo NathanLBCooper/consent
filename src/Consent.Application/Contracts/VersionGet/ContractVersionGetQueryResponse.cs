@@ -2,7 +2,7 @@
 
 namespace Consent.Application.Contracts.VersionGet;
 
-public record ContractVersionGetQueryResult(
+public record ContractVersionGetQueryResponse(
     Contract Contract,
     ContractVersion Version
     );

@@ -2,7 +2,7 @@
 
 namespace Consent.Application.Contracts.ProvisionCreate;
 
-public record ProvisionCreateCommandResult(
+public record ProvisionCreateCommandResponse(
     ContractVersion Version,
     Provision Provision
     );

@@ -22,20 +22,21 @@ public record Result
 
 public record Result<TValue> : Result
 {
-    private readonly Maybe<TValue> _value;
+    private readonly Maybe<TValue> _maybe;
 
-    public TValue Value => _value.HasValue
-        ? _value.Value
+    public TValue? Value => _maybe.Value;
+    public TValue Unwrap() => _maybe.HasValue
+        ? _maybe.Unwrap()
         : throw new InvalidOperationException($"Failure Result has no {nameof(Value)}");
 
     private Result(TValue value)
     {
-        _value = Maybe<TValue>.Some(value);
+        _maybe = Maybe<TValue>.Some(value);
     }
 
     private Result(Error error) : base(error)
     {
-        _value = Maybe<TValue>.None;
+        _maybe = Maybe<TValue>.None;
     }
 
     public static Result<TValue> Success(TValue value) => new(value);

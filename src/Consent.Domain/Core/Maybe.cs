@@ -4,21 +4,21 @@ namespace Consent.Domain.Core;
 
 public record Maybe<TValue>
 {
-    private readonly TValue? _value;
+    public TValue? Value { get; }
     public bool HasValue { get; }
-    public TValue Value => HasValue
-        ? _value!
+    public TValue Unwrap() => HasValue
+        ? Value!
         : throw new InvalidOperationException($"{nameof(Value)} does not exist");
 
     private Maybe(TValue? value)
     {
-        _value = value;
+        Value = value;
         HasValue = true;
     }
 
     private Maybe()
     {
-        _value = default;
+        Value = default;
         HasValue = false;
     }
 

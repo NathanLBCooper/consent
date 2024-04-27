@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Consent.Application.Workspaces;
 using Consent.Domain.Core;
-using static Consent.Domain.Core.Maybe<Consent.Application.Contracts.VersionGet.ContractVersionGetQueryResult>;
+using static Consent.Domain.Core.Maybe<Consent.Application.Contracts.VersionGet.ContractVersionGetQueryResponse>;
 
 namespace Consent.Application.Contracts.VersionGet;
 
-public interface IContractVersionGetQueryHandler : IQueryHandler<ContractVersionGetQuery, Maybe<ContractVersionGetQueryResult>> { }
+public interface IContractVersionGetQueryHandler : IQueryHandler<ContractVersionGetQuery, Maybe<ContractVersionGetQueryResponse>> { }
 
 public class ContractVersionGetQueryHandler : IContractVersionGetQueryHandler
 {
@@ -20,7 +20,7 @@ public class ContractVersionGetQueryHandler : IContractVersionGetQueryHandler
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Maybe<ContractVersionGetQueryResult>> Handle(ContractVersionGetQuery query, CancellationToken cancellationToken)
+    public async Task<Maybe<ContractVersionGetQueryResponse>> Handle(ContractVersionGetQuery query, CancellationToken cancellationToken)
     {
         var contract = await _contractRepository.FindByContractVersion(query.ContractVersionId);
         if (contract is null)

@@ -5,11 +5,11 @@ using Consent.Application.Workspaces;
 using Consent.Domain.Contracts;
 using Consent.Domain.Core;
 using Consent.Domain.Core.Errors;
-using static Consent.Domain.Core.Result<Consent.Application.Contracts.ProvisionCreate.ProvisionCreateCommandResult>;
+using static Consent.Domain.Core.Result<Consent.Application.Contracts.ProvisionCreate.ProvisionCreateCommandResponse>;
 
 namespace Consent.Application.Contracts.ProvisionCreate;
 
-public interface IProvisionCreateCommandHandler : ICommandHandler<ProvisionCreateCommand, Result<ProvisionCreateCommandResult>> { }
+public interface IProvisionCreateCommandHandler : ICommandHandler<ProvisionCreateCommand, Result<ProvisionCreateCommandResponse>> { }
 
 public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
 {
@@ -23,7 +23,7 @@ public class ProvisionCreateCommandHandler : IProvisionCreateCommandHandler
         _workspaceRepository = workspaceRepository;
     }
 
-    public async Task<Result<ProvisionCreateCommandResult>> Handle(ProvisionCreateCommand command, CancellationToken cancellationToken)
+    public async Task<Result<ProvisionCreateCommandResponse>> Handle(ProvisionCreateCommand command, CancellationToken cancellationToken)
     {
         var validationResult = _validator.Validate(command);
         if (!validationResult.IsValid)
