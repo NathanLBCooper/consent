@@ -23,8 +23,5 @@ public record Maybe<TValue>
     }
 
     public static Maybe<TValue> None => new();
-    public static Maybe<TValue> Some(TValue value)
-    {
-        return new Maybe<TValue>(value);
-    }
+    public static Maybe<TValue> Some(TValue value) => new(value);
 }

@@ -7,6 +7,7 @@ namespace Consent.Domain.Core;
 public record Result
 {
     public Error? Error { get; }
+
     [MemberNotNullWhen(returnValue: false, nameof(Error))]
     public bool IsSuccess => Error is null;
 
@@ -15,20 +16,14 @@ public record Result
         Error = error;
     }
 
-    public static Result Success()
-    {
-        return new Result();
-    }
-
-    public static Result Failure(Error error)
-    {
-        return new Result(error);
-    }
+    public static Result Success() => new();
+    public static Result Failure(Error error) => new(error);
 }
 
 public record Result<TValue> : Result
 {
     private readonly Maybe<TValue> _value;
+
     public TValue Value => _value.HasValue
         ? _value.Value
         : throw new InvalidOperationException($"Failure Result has no {nameof(Value)}");
@@ -43,13 +38,6 @@ public record Result<TValue> : Result
         _value = Maybe<TValue>.None;
     }
 
-    public static Result<TValue> Success(TValue value)
-    {
-        return new Result<TValue>(value);
-    }
-
-    public static new Result<TValue> Failure(Error error)
-    {
-        return new Result<TValue>(error);
-    }
+    public static Result<TValue> Success(TValue value) => new(value);
+    public static new Result<TValue> Failure(Error error) => new(error);
 }
