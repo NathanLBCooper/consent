@@ -8,7 +8,10 @@ using static Consent.Domain.Core.Result<Consent.Domain.Contracts.Contract>;
 
 namespace Consent.Application.Contracts.Create;
 
-public interface IContractCreateCommandHandler : ICommandHandler<ContractCreateCommand, Result<Contract>> { }
+
+public interface IContractCreateCommandHandler : ICommandHandler<ContractCreateCommand, Result<Contract>>
+{
+}
 
 public class ContractCreateCommandHandler : IContractCreateCommandHandler
 {
@@ -16,7 +19,8 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly ContractCreateCommandValidator _validator = new();
 
-    public ContractCreateCommandHandler(IContractRepository contractRepository, IWorkspaceRepository workspaceRepository)
+    public ContractCreateCommandHandler(IContractRepository contractRepository,
+        IWorkspaceRepository workspaceRepository)
     {
         _contractRepository = contractRepository;
         _workspaceRepository = workspaceRepository;
@@ -41,7 +45,8 @@ public class ContractCreateCommandHandler : IContractCreateCommandHandler
             return Failure(new UnauthorizedError());
         }
 
-        var created = await _contractRepository.Create(new Contract(command.WorkspaceId, Guard.NotNull(command.Name)));
+        var created =
+            await _contractRepository.Create(new Contract(command.WorkspaceId, Guard.NotNull(command.Name)));
 
         return Success(created);
     }

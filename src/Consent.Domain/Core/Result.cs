@@ -15,8 +15,15 @@ public record Result
         Error = error;
     }
 
-    public static Result Success() => new();
-    public static Result Failure(Error error) => new(error);
+    public static Result Success()
+    {
+        return new Result();
+    }
+
+    public static Result Failure(Error error)
+    {
+        return new Result(error);
+    }
 }
 
 public record Result<TValue> : Result
@@ -26,16 +33,23 @@ public record Result<TValue> : Result
         ? _value.Value
         : throw new InvalidOperationException($"Failure Result has no {nameof(Value)}");
 
-    protected Result(TValue value)
+    private Result(TValue value)
     {
         _value = Maybe<TValue>.Some(value);
     }
 
-    protected Result(Error error) : base(error)
+    private Result(Error error) : base(error)
     {
         _value = Maybe<TValue>.None;
     }
 
-    public static Result<TValue> Success(TValue value) => new(value);
-    public new static Result<TValue> Failure(Error error) => new(error);
+    public static Result<TValue> Success(TValue value)
+    {
+        return new Result<TValue>(value);
+    }
+
+    public static new Result<TValue> Failure(Error error)
+    {
+        return new Result<TValue>(error);
+    }
 }

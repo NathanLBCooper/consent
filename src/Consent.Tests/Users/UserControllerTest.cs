@@ -79,7 +79,7 @@ public class UserControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_get_nonexistant_user()
+    public async Task Cannot_get_nonexistent_user()
     {
         var userId = -1;
         var requestingUser = await UserCreate(_sut);
@@ -91,7 +91,7 @@ public class UserControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_get_user_with_nonexistant_requesting_user()
+    public async Task Cannot_get_user_with_nonexistent_requesting_user()
     {
         var user = await UserCreate(_sut);
         var requestingUserId = -1;

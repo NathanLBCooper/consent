@@ -50,7 +50,7 @@ public class WorkspaceControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_get_nonexistant_workspace()
+    public async Task Cannot_get_nonexistent_workspace()
     {
         var user = await UserCreate(_userEndpoint);
         var workspaceId = -1;
@@ -62,7 +62,7 @@ public class WorkspaceControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_get_workspace_with_nonexistant_user()
+    public async Task Cannot_get_workspace_with_nonexistent_user()
     {
         var creator = await UserCreate(_userEndpoint);
         var workspace = await WorkspaceCreate(_sut, creator);
@@ -88,7 +88,7 @@ public class WorkspaceControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_create_workspace_with_nonexistant_user()
+    public async Task Cannot_create_workspace_with_nonexistent_user()
     {
         var userId = -1;
 
@@ -99,7 +99,7 @@ public class WorkspaceControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Workspace_creater_gets_all_permissions()
+    public async Task Workspace_creator_gets_all_permissions()
     {
         var creator = await UserCreate(_userEndpoint);
         var request = new WorkspaceCreateRequestModelBuilder().Build();

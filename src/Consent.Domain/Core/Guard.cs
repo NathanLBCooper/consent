@@ -6,7 +6,7 @@ namespace Consent.Domain.Core;
 public static class Guard
 {
     [return: NotNull]
-    public static TValue NotNull<TValue>(TValue? value, [CallerArgumentExpression("value")] string? valueName = null) where TValue : class
+    public static TValue NotNull<TValue>(TValue? value, [CallerArgumentExpression(nameof(value))] string? valueName = null) where TValue : class
     {
         if (value is null)
         {
@@ -17,7 +17,7 @@ public static class Guard
     }
 
     [return: NotNull]
-    public static TValue NotNull<TValue>(TValue? value, [CallerArgumentExpression("value")] string? valueName = null) where TValue : struct
+    public static TValue NotNull<TValue>(TValue? value, [CallerArgumentExpression(nameof(value))] string? valueName = null) where TValue : struct
     {
         if (value is null)
         {

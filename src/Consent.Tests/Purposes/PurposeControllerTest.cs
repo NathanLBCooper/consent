@@ -57,7 +57,7 @@ public class PurposeControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_get_a_non_existant_purpose()
+    public async Task Cannot_get_a_non_existent_purpose()
     {
         var user = await UserCreate(_userEndpoint);
         var purposeId = -1;
@@ -69,7 +69,7 @@ public class PurposeControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_get_purpose_with_nonexistant_user()
+    public async Task Cannot_get_purpose_with_nonexistent_user()
     {
         var creator = await UserCreate(_userEndpoint);
         var workspace = await WorkspaceCreate(_workspaceEndpoint, creator);
@@ -97,7 +97,7 @@ public class PurposeControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_create_purpose_with_nonexistant_user()
+    public async Task Cannot_create_purpose_with_nonexistent_user()
     {
         var workspaceCreator = await UserCreate(_userEndpoint);
         var workspace = WorkspaceCreate(_workspaceEndpoint, workspaceCreator);
@@ -110,7 +110,7 @@ public class PurposeControllerTest : IDisposable
     }
 
     [Fact]
-    public async Task Cannot_create_purpose_with_nonexistant_workspace()
+    public async Task Cannot_create_purpose_with_nonexistent_workspace()
     {
         var user = await UserCreate(_userEndpoint);
         var workspaceId = -1;

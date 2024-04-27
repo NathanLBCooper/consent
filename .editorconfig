@@ -11,7 +11,8 @@ end_of_line = crlf
 indent_size = 2
 
 [*.cs]
-end_of_line = crlf:warning
+# fail build on editorconfig errors
+dotnet_analyzer_diagnostic.category-Style.severity = warning
 # use var everywhere
 csharp_style_var_for_built_in_types = true:warning
 csharp_style_var_when_type_is_apparent = true:warning
@@ -21,13 +22,12 @@ csharp_style_namespace_declarations = file_scoped:warning
 # match namespaces to folder structure
 #   this fails in a somewhat cryptic manner: "NotSupportedException: Changing document properties is not supported" on dotnet format
 dotnet_style_namespace_match_folder = true:warning
-dotnet_diagnostic.IDE0130.severity = warning
 # Organize usings 
-dotnet_sort_system_directives_first = true:warning
+dotnet_sort_system_directives_first = true
 # Expression-level preferences
-dotnet_style_prefer_conditional_expression_over_return = false
+dotnet_style_prefer_conditional_expression_over_return = false:warning
 # Don't force `var (a, b) = Foo();` over `var aandbTuple = Foo();`
-csharp_style_deconstructed_variable_declaration = false
+csharp_style_deconstructed_variable_declaration = false:warning
 # private member underscores
 dotnet_naming_symbols.private_fields.applicable_kinds = field
 dotnet_naming_symbols.private_fields.applicable_accessibilities = private
@@ -56,3 +56,15 @@ csharp_prefer_braces = true:warning
 dotnet_diagnostic.IDE0005.severity = warning
 # use "is null" rather than "== null"
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:warning # todo this doesn't work
+# Use expression body for methods
+csharp_style_expression_bodied_methods = false:warning
+# Primary constructor
+csharp_style_prefer_primary_constructors = false:warning
+# Disable a resharper rule which disagrees with IDE0036 for modifier order
+resharper_arrange_modifiers_order_highlighting = none
+# Don't force collection expressions
+dotnet_style_prefer_collection_expression = false
+# Don't force null-coalescing expressions
+dotnet_style_coalesce_expression = false
+# Don't enforce Simplify name. It fails in dotnet format, but not in EnforceCodeStyleInBuild, which is annoying
+dotnet_diagnostic.IDE0001.severity = none

@@ -22,7 +22,7 @@ public static class Dependencies
         var sqlSettings = configuration.GetSection(nameof(SqlSettings)).Get<SqlSettings>();
         if (sqlSettings is null)
         {
-            throw new ArgumentNullException(nameof(SqlSettings));
+            throw new Exception($"{nameof(SqlSettings)} configuration not found");
         }
 
         container.RegisterInstance<SqlSettings>(sqlSettings);

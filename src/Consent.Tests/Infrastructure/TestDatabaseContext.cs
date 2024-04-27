@@ -86,7 +86,7 @@ internal class TestDatabaseContext : IDisposable
         {
             // todo might break when there are tables with int identity
             _ = connection.Execute($"dbcc checkident ('{table}', reseed, {startId})");
-            startId = startId + step;
+            startId += step;
         }
     }
 }
