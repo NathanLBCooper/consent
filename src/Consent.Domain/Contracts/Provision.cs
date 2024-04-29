@@ -19,13 +19,14 @@ public class Provision
 
     public string Text { get; private set; }
 
-    private static Result ValidateText(string text)
+    private Result InitText(string value)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(value))
         {
             return Result.Failure(new ArgumentError(nameof(Text)));
         }
 
+        Text = value;
         return Result.Success();
     }
 
@@ -36,41 +37,38 @@ public class Provision
             return dResult;
         }
 
-        if (ValidateText(value) is { IsSuccess: false } tResult)
-        {
-            return tResult;
-        }
-
-        Text = value;
-        return Result.Success();
+        return InitText(value);
     }
 
     public ImmutableList<PurposeId> PurposeIds { get; private set; }
 
-    private static Result ValidatePurposeIds(ImmutableList<PurposeId> purposeIds)
+    private Result SetPurposeIds(ImmutableList<PurposeId> value)
     {
-        if (purposeIds.IsEmpty)
+        if (value.IsEmpty)
         {
             return Result.Failure(new ArgumentError(nameof(PurposeIds), "Cannot be empty"));
         }
 
+        PurposeIds = value;
         return Result.Success();
     }
 
     public static Result<Provision> Ctor(string text, IEnumerable<PurposeId> purposeIds)
     {
-        if (ValidateText(text) is { IsSuccess: false } tResult)
+        var p = purposeIds.ToImmutableList();
+        var @new = new Provision(null!, null!);
+
+        if (@new.InitText(text) is { IsSuccess: false } tResult)
         {
             return Result<Provision>.Failure(tResult.Error);
         }
 
-        var p = purposeIds.ToImmutableList();
-        if (ValidatePurposeIds(p) is { IsSuccess: false } pResult)
+        if (@new.SetPurposeIds(p) is { IsSuccess: false } pResult)
         {
             return Result<Provision>.Failure(pResult.Error);
         }
 
-        return Result<Provision>.Success(new Provision(text, p));
+        return Result<Provision>.Success(@new);
     }
 
     private Provision(string text, ImmutableList<PurposeId> purposeIds)
@@ -100,11 +98,7 @@ public class Provision
             return dResult;
         }
 
-        var value = PurposeIds.Concat(purposeIds).ToImmutableList();
-        // skip validation, cannot get invalid list (empty) via concat
-
-        PurposeIds = value;
-        return Result.Success();
+        return SetPurposeIds(PurposeIds.Concat(purposeIds).ToImmutableList());
     }
 
     private Result FailIfNotDraft()

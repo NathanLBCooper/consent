@@ -1,5 +1,5 @@
-﻿using System;
-using Consent.Domain.Core;
+﻿using Consent.Domain.Core;
+using Consent.Domain.Core.Errors;
 using Consent.Domain.Workspaces;
 
 namespace Consent.Domain.Purposes;
@@ -14,19 +14,15 @@ public class Purpose : IEntity<PurposeId>
     public WorkspaceId WorkspaceId { get; private init; }
 
     public string Name { get; private init; }
-    private static void ValidateName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException(nameof(Name));
-        }
-    }
 
     public string Description { get; private init; }
 
     public static Result<Purpose> Ctor(WorkspaceId workspaceId, string name, string description)
     {
-        ValidateName(name);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return Result<Purpose>.Failure(new ArgumentError(nameof(Name)));
+        }
 
         return Result<Purpose>.Success(new Purpose(workspaceId, name, description));
     }

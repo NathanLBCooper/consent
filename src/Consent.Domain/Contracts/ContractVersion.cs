@@ -16,16 +16,16 @@ public class ContractVersion
 
     public string Name { get; private set; }
 
-    private static Result ValidateName(string name)
+    private Result InitName(string value)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(value))
         {
             return Result.Failure(new ArgumentError(nameof(Name)));
         }
 
+        Name = value;
         return Result.Success();
     }
-
     public Result SetName(string value)
     {
         if (FailIfNotDraft() is { IsSuccess: false } dResult)
@@ -33,13 +33,7 @@ public class ContractVersion
             return dResult;
         }
 
-        if (ValidateName(value) is { IsSuccess: false } tResult)
-        {
-            return tResult;
-        }
-
-        Name = value;
-        return Result.Success();
+        return InitName(value);
     }
 
     // todo is this "Text". Is it something more specific like a introduction?
@@ -82,6 +76,30 @@ public class ContractVersion
     private readonly List<Provision> _provisions;
     public IReadOnlyList<Provision> Provisions => _provisions.AsReadOnly();
 
+    private static Result<ContractVersion> Ctor(string name, string text, ContractVersionStatus status,
+        IEnumerable<Provision> provisions)
+    {
+        var pr = provisions.ToList();
+        var @new = new ContractVersion(null!, text, default, pr);
+
+        if (@new.InitName(name) is { IsSuccess: false } nResult)
+        {
+            return Result<ContractVersion>.Failure(nResult.Error);
+        }
+
+        if (@new.SetStatus(status) is { IsSuccess: false } sResult)
+        {
+            return Result<ContractVersion>.Failure(sResult.Error);
+        }
+
+        foreach (var p in pr)
+        {
+            p.OnAddedToVersion(@new);
+        }
+
+        return Result<ContractVersion>.Success(@new);
+    }
+
     public static Result<ContractVersion> Ctor(string name, string text, IEnumerable<Provision> provisions)
     {
         return Ctor(name, text, ContractVersionStatus.Draft, provisions);
@@ -90,24 +108,6 @@ public class ContractVersion
     public static Result<ContractVersion> Ctor(string name, string text, ContractVersionStatus status)
     {
         return Ctor(name, text, status, new List<Provision>());
-    }
-
-    private static Result<ContractVersion> Ctor(string name, string text, ContractVersionStatus status,
-        IEnumerable<Provision> provisions)
-    {
-        if (ValidateName(name) is { IsSuccess: false } result)
-        {
-            return Result<ContractVersion>.Failure(result.Error);
-        }
-
-        var pr = provisions.ToList();
-        var version = new ContractVersion(name, text, status, pr);
-        foreach (var p in pr)
-        {
-            p.OnAddedToVersion(version);
-        }
-
-        return Result<ContractVersion>.Success(version);
     }
 
     private ContractVersion(string name, string text, ContractVersionStatus status, List<Provision> provisions)

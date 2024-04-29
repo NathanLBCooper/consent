@@ -17,22 +17,11 @@ public class Contract : IEntity<ContractId>
     public WorkspaceId WorkspaceId { get; private init; }
 
     public string Name { get; private set; }
-
-    private static Result ValidateName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return Result.Failure(new ArgumentError(nameof(Name)));
-        }
-
-        return Result.Success();
-    }
-
     public Result SetName(string value)
     {
-        if (ValidateName(value) is { IsSuccess: false } result)
+        if (string.IsNullOrWhiteSpace(value))
         {
-            return result;
+            return Result.Failure(new ArgumentError(nameof(Name)));
         }
 
         Name = value;
@@ -49,12 +38,13 @@ public class Contract : IEntity<ContractId>
 
     public static Result<Contract> Ctor(WorkspaceId workspaceId, string name, IEnumerable<ContractVersion> versions)
     {
-        if (ValidateName(name) is { IsSuccess: false } nResult)
+        var @new = new Contract(workspaceId, null!, versions.ToList());
+        if (@new.SetName(name) is { IsSuccess: false } nResult)
         {
             return Result<Contract>.Failure(nResult.Error);
         }
 
-        return Result<Contract>.Success(new Contract(workspaceId, name, versions.ToList()));
+        return Result<Contract>.Success(@new);
     }
 
     private Contract(WorkspaceId workspaceId, string name, List<ContractVersion> versions)

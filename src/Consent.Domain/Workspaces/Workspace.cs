@@ -14,16 +14,7 @@ public class Workspace : IEntity<WorkspaceId>
 {
     public WorkspaceId? Id { get; init; }
 
-    public string Name { get; init; }
-    private static Result ValidateName(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return Result.Failure(new ArgumentError(nameof(Name)));
-        }
-
-        return Result.Success();
-    }
+    public string Name { get; private init; }
 
     private readonly List<Membership> _memberships;
     public IReadOnlyList<Membership> Memberships => _memberships.AsReadOnly();
@@ -48,9 +39,9 @@ public class Workspace : IEntity<WorkspaceId>
 
     public static Result<Workspace> Ctor(string name, IEnumerable<Membership> memberships)
     {
-        if (ValidateName(name) is { IsSuccess: false } nameResult)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            return Result<Workspace>.Failure(nameResult.Error);
+            return Result<Workspace>.Failure(new ArgumentError(nameof(Name)));
         }
 
         var m = memberships.ToList();
@@ -68,13 +59,13 @@ public class Workspace : IEntity<WorkspaceId>
         return Ctor(name, new[] { creatorAsSuperUser });
     }
 
-    private Workspace(string name, IEnumerable<Membership> memberships)
+    private Workspace(string name, List<Membership> memberships)
     {
         Name = name;
-        _memberships = memberships.ToList();
+        _memberships = memberships;
     }
 
-    private Workspace(string name) : this(name, Array.Empty<Membership>())
+    private Workspace(string name) : this(name, new List<Membership>())
     {
     }
 
